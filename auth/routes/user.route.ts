@@ -6,33 +6,30 @@ import {
   logoutUser,
   registerUser,
   socialAuth,
-  updateAccessToken,
   updatePassword,
   updateProfilePicture,
   updateUser,
 } from "../controllers/user.controller";
 import { authorizeRoles, isAuthenticated } from "../middleware/auth";
 
-const userRouter = express.Router();
+const router = express.Router();
 
-userRouter.post("/register", registerUser);
+router.post("/register", registerUser);
 
-userRouter.post("/activate-user", activateUser);
+router.post("/activate-user", activateUser);
 
-userRouter.post("/login", loginUser);
+router.post("/login", loginUser);
 
-userRouter.get("/logout", isAuthenticated, logoutUser);
+router.get("/logout", logoutUser);
 
-userRouter.get("/refresh-token", updateAccessToken);
+router.get("/current-user", isAuthenticated, getUserInfo);
 
-userRouter.get("/me", isAuthenticated, getUserInfo);
+router.post("/social-auth", socialAuth);
 
-userRouter.post("/social-auth", socialAuth);
+router.put("/update-user", isAuthenticated, updateUser)
 
-userRouter.put("/update-user", isAuthenticated, updateUser)
+router.put("/update-password", isAuthenticated, updatePassword)
 
-userRouter.put("/update-password", isAuthenticated, updatePassword)
+router.put("/update-user-avatar", isAuthenticated, updateProfilePicture)
 
-userRouter.put("/update-user-avatar", isAuthenticated, updateProfilePicture)
-
-export default userRouter;
+export default router;

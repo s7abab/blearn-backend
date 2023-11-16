@@ -2,17 +2,12 @@ require("dotenv").config();
 import express, { NextFunction, Request, Response } from "express";
 export const app = express();
 import cors from "cors";
-import cookieParser from "cookie-parser";
-import { ErrorMiddleware } from "./middleware/error";
 import morgan from "morgan";
-
-import userRouter from "./routes/user.route";
+import router from "./routes/course.route";
+import {ErrorMiddleware} from "@s7abab/common"
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
-
-// cookie parser
-app.use(cookieParser());
 
 // cors
 app.use(
@@ -27,7 +22,7 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1", userRouter);
+app.use("/api/v1", router );
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
