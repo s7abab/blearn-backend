@@ -1,11 +1,5 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
-
-interface IUser extends Document {
-  _id?: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import mongoose, { Schema, Types } from "mongoose";
+import { IUser } from "../../@types/modelTypes/model.types";
 
 const userSchema: Schema<IUser> = new Schema<IUser>(
   {

@@ -3,8 +3,9 @@ import express, { NextFunction, Request, Response } from "express";
 export const app = express();
 import cors from "cors";
 import morgan from "morgan";
-import router from "./routes/course.route";
-import {ErrorMiddleware} from "@s7abab/common"
+import { ErrorMiddleware } from "@s7abab/common";
+import courseRoute from "./routes/course.route";
+import categoryRoute from "./routes/category.route"
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -22,7 +23,7 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1", router );
+app.use("/api/v1", courseRoute);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
