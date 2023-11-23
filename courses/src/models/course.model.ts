@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { ICourse, IReview } from "../../@types/modelTypes/model.types";
+import { ICourse, IReview } from "../@types/modelTypes/model.types";
 
 const reviewSchema = new Schema<IReview>({
   user: Object,
@@ -10,17 +10,17 @@ const reviewSchema = new Schema<IReview>({
 const courseSchema: Schema<ICourse> = new Schema<ICourse>(
   {
     title: { type: String, required: true },
-    category: { type: String, required: true },
+    category: { type: Schema.ObjectId, ref: 'Category', required: true },
     description: { type: String, required: true },
     thumbnail: { type: String, required: true },
     demoUrl: { type: String, required: true },
     price: { type: Number, required: true },
     discountPrice: { type: Number },
     tags: { type: String },
-    entrolls: { type: String },
-    revenue: { type: String },
+    entrolls: { type: Number,default:0 },
+    revenue: { type: Number, default:0 },
     isBlock: { type: Boolean, required: true, default: false },
-    level: { type: String, default: "0" },
+    level: { type: Number, default: "0" },
     coupon: [{ type: Schema.Types.ObjectId }],
     reviews: [reviewSchema],
   },

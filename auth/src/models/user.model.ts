@@ -10,7 +10,7 @@ export interface IUser extends Document {
   password: string;
   avatar: string;
   role: string;
-  isVerified: boolean;
+  isBlock: boolean;
   courses: Array<{ courseId: string }>;
   comparePassword(password: string): Promise<boolean>;
 }
@@ -39,7 +39,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: String,
       default: "user",
     },
-    isVerified: { type: Boolean, default: false },
+    isBlock: { type: Boolean, default: false },
     courses: [{ courseId: String }],
   },
   { timestamps: true }

@@ -1,15 +1,23 @@
-import express from "express"
+import express from "express";
+import {
+  createCategory,
+  editCategory,
+  getAllCategory,
+  getSingleCategory,
+  unlistCategory,
+} from "../controllers/category.controller";
+import { isAuthenticated } from "@s7abab/common";
 
 const router = express.Router();
 
-router.post("/create-category")
+router.post("/create-category",isAuthenticated, createCategory);
 
-router.put("/edit-category")
+router.put("/edit-category", editCategory);
 
-router.put("/list-category")
+router.put("/unlist-category", unlistCategory);
 
-router.get("/get-all-category")
+router.get("/get-all-category", getAllCategory);
 
-router.get("/get-single-category")
+router.get("/get-single-category/:categoryId", getSingleCategory);
 
 export default router;

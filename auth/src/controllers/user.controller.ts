@@ -18,6 +18,8 @@ import {
   IUpdateProfilePicture,
   IUpdateUser,
 } from "../@types/types";
+import { sendMessage } from "../events/publishers/publisher";
+import { QueueTypes } from "../events/queues";
 
 // register user
 export const registerUser = catchAsyncError(
@@ -111,6 +113,8 @@ export const activateUser = catchAsyncError(
         password,
       });
 
+      sendMessage(user, QueueTypes.user_queue);
+
       res.status(201).json({
         success: true,
       });
@@ -128,19 +132,18 @@ export const loginUser = catchAsyncError(
       if (!email || !password) {
         return next(new ErrorHandler("Please enter email and password", 400));
       }
-      
+
       const user = await userModel.findOne({ email }).select("+password");
       if (!user) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
-
       const isPasswordMatched = await user.comparePassword(password);
       if (!isPasswordMatched) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
       sendToken(user, 200, res);
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message, 500));
     }
   }
 );
@@ -149,6 +152,7 @@ export const loginUser = catchAsyncError(
 export const logoutUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      res.clearCookie("token");
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
@@ -200,14 +204,13 @@ export const updateUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, email } = req.body as IUpdateUser;
-      const userId = req.user?._id;
+      const userId = req.user?.id;
       const user = await userModel.findById(userId);
-
       if (email && user) {
         const isEmailExist = await userModel.findOne({ email });
 
-        if (isEmailExist) {
-          return next(new ErrorHandler("Email is already exist", 400));
+        if (!isEmailExist) {
+          return next(new ErrorHandler("Email is doesnot exist", 400));
         }
         user.email = email;
       }
@@ -274,8 +277,7 @@ export const updateProfilePicture = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { imageUrl } = req.body as IUpdateProfilePicture;
-
-      const userId = req.user?._id;
+      const userId = req.user?.id;
       const user = await userModel.findById(userId);
       if (!user) {
         return next(new ErrorHandler("User not exist", 400));

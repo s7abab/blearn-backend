@@ -15,7 +15,7 @@ export interface IReview extends Document {
 
 export interface ICourse extends Document {
   title: string;
-  category: string;
+  category: Types.ObjectId;
   description: string;
   thumbnail: string;
   demoUrl: string;
@@ -23,10 +23,10 @@ export interface ICourse extends Document {
   discountPrice?: number;
   courseData?: Types.ObjectId[];
   tags?: string;
-  entrolls?: string;
-  revenue?: string;
+  entrolls?: number;
+  revenue?: number;
   isBlock: boolean;
-  level?: string;
+  level?: number;
   coupon?: Types.ObjectId[];
   reviews?: IReview[];
   rating?: number;

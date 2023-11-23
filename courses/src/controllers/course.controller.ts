@@ -1,14 +1,14 @@
 import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
-import { ICourseRequestData } from "../../@types/types";
 import courseModel from "../models/course.model";
 import mongoose from "mongoose";
-import { ICourse } from "../../@types/modelTypes/model.types";
+import { ICourseRequestData } from "../@types/types";
+import { ICourse } from "../@types/modelTypes/model.types";
 
 export const createCourse = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const {
+    let {
       title,
       description,
       category,
@@ -17,6 +17,7 @@ export const createCourse = catchAsyncError(
       price,
       discountPrice,
     } = req.body as ICourseRequestData;
+    console.log(req.body)
     try {
       if (
         !title ||
@@ -29,6 +30,7 @@ export const createCourse = catchAsyncError(
       ) {
         return next(new ErrorHandler("Fill all the fields", 400));
       }
+      category = new mongoose.Types.ObjectId();
       const course: ICourse = await courseModel.create({
         title,
         category,

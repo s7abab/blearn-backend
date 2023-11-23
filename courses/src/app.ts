@@ -5,10 +5,15 @@ import cors from "cors";
 import morgan from "morgan";
 import { ErrorMiddleware } from "@s7abab/common";
 import courseRoute from "./routes/course.route";
-import categoryRoute from "./routes/category.route"
-
+import categoryRoute from "./routes/category.route";
+import cookieParser = require("cookie-parser");
+import { startConsumer } from "./events/consumers/consumer";
+import { QueueTypes } from "./events/queues";
 // body parser
 app.use(express.json({ limit: "50mb" }));
+
+// cookie parser
+app.use(cookieParser());
 
 // cors
 app.use(
@@ -23,7 +28,11 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1", courseRoute);
+app.use("/api/v1/course", courseRoute);
+app.use("/api/v1/category", categoryRoute);
+
+// rabbitmq event consume
+startConsumer(QueueTypes.user_queue);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

@@ -1,12 +1,14 @@
+import { Types } from "mongoose";
+
 export interface ICourseRequestData {
   title: string;
-  category: string;
+  category: string | Types.ObjectId;
   demoUrl: string;
   description: string;
   thumbnail: string;
   preview: string;
-  price: string;
-  discountPrice: string;
+  price: number;
+  discountPrice: number;
 }
 
 export interface ICreateCategory {
@@ -18,7 +20,6 @@ export interface IEditCategory {
   name: string;
 }
 
-export interface IListCategory {
+export interface ICategoryId {
   categoryId: string;
-  isListed: boolean;
 }
