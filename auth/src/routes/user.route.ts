@@ -10,7 +10,7 @@ import {
   updateProfilePicture,
   updateUser,
 } from "../controllers/user.controller";
-import { authorizeRoles, isAuthenticated } from "../middleware/auth";
+import { isAuthenticated } from "@s7abab/common";
 
 const router = express.Router();
 

@@ -6,15 +6,30 @@ import {
   getSingleCategory,
   unlistCategory,
 } from "../controllers/category.controller";
-import { isAuthenticated } from "@s7abab/common";
+import { Roles, authorizeRoles, isAuthenticated } from "@s7abab/common";
 
 const router = express.Router();
 
-router.post("/create-category",isAuthenticated, createCategory);
+router.post(
+  "/create-category",
+  isAuthenticated,
+  authorizeRoles(Roles.ADMIN),
+  createCategory
+);
 
-router.put("/edit-category", editCategory);
+router.put(
+  "/edit-category",
+  isAuthenticated,
+  authorizeRoles(Roles.ADMIN),
+  editCategory
+);
 
-router.put("/unlist-category", unlistCategory);
+router.put(
+  "/unlist-category",
+  isAuthenticated,
+  authorizeRoles(Roles.ADMIN),
+  unlistCategory
+);
 
 router.get("/get-all-category", getAllCategory);
 

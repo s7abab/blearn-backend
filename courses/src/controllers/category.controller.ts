@@ -15,6 +15,19 @@ export const createCategory = catchAsyncError(
       return next(new ErrorHandler("Invalid name", 400));
     }
     try {
+      const existingCategory = await categoryModel.findOne({
+        $or: [
+          { name: { $regex: new RegExp(`^${name}$`, "i") } }, // Case-insensitive query
+          { $where: `this.name.toLowerCase() === "${name.toLowerCase()}"` }, // Case-sensitive JavaScript comparison
+        ],
+      });
+
+      if (existingCategory) {
+        return next(
+          new ErrorHandler("Category with the same name already exists", 400)
+        );
+      }
+
       const category = await categoryModel.create({ name });
       res.status(201).json({
         success: true,

@@ -1,8 +1,6 @@
 require("dotenv").config();
 import { Request, Response, NextFunction } from "express";
 import userModel, { IUser } from "../models/user.model";
-import ErrorHandler from "../utils/ErrorHandler";
-import { catchAsyncError } from "../middleware/catchAsyncError";
 import jwt, { Secret } from "jsonwebtoken";
 import ejs from "ejs";
 import path from "path";
@@ -20,6 +18,8 @@ import {
 } from "../@types/types";
 import { sendMessage } from "../events/publishers/publisher";
 import { QueueTypes } from "../events/queues";
+import { catchAsyncError } from "@s7abab/common";
+import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 
 // register user
 export const registerUser = catchAsyncError(
@@ -78,7 +78,7 @@ export const createActivationToken = (user: any): IActivationToken => {
     },
     process.env.ACTIVATION_SECRET as Secret,
     {
-      expiresIn: "1d",
+      expiresIn: "2m",
     }
   );
   return { token, activationCode };
