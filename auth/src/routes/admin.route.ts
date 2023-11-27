@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  blockUser,
   getInstructors,
   getSingleInstructor,
   getSingleUser,
@@ -19,17 +20,24 @@ router.get(
 );
 
 router.get(
-  "/single-user",
+  "/single-user/:id",
   isAuthenticated,
   authorizeRoles(Roles.ADMIN),
   getSingleUser
 );
 
 router.get(
-  "/single-instructor",
+  "/single-instructor/:id",
   isAuthenticated,
   authorizeRoles(Roles.ADMIN),
   getSingleInstructor
+);
+
+router.put(
+  "/block-user/:id",
+  isAuthenticated,
+  authorizeRoles(Roles.ADMIN),
+  blockUser
 );
 
 export default router;

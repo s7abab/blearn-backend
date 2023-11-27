@@ -17,7 +17,6 @@ export const createCourse = catchAsyncError(
       price,
       discountPrice,
     } = req.body as ICourseRequestData;
-    console.log(req.body)
     try {
       if (
         !title ||
@@ -42,6 +41,7 @@ export const createCourse = catchAsyncError(
       });
       res.status(200).json({
         success: true,
+        message: "Course created successfully",
         course,
       });
     } catch (error: any) {
@@ -104,6 +104,7 @@ export const deleteCourse = catchAsyncError(
 
       res.status(200).json({
         success: true,
+        message: "Course deleted successfully",
       });
     } catch (error: any) {
       next(new ErrorHandler(error.message, 500));

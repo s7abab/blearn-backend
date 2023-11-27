@@ -31,6 +31,7 @@ export const createCategory = catchAsyncError(
       const category = await categoryModel.create({ name });
       res.status(201).json({
         success: true,
+        message:"Category created successfully",
         category,
       });
     } catch (error: any) {
@@ -60,6 +61,7 @@ export const editCategory = catchAsyncError(
 
       res.status(200).json({
         success: true,
+        message:"Category edited successfully",
         category,
       });
     } catch (error: any) {
