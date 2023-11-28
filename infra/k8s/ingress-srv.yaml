@@ -10,7 +10,7 @@ spec:
     - host: blearn.dev
       http:
         paths:
-          - path: /auth/?(.*)
+          - path: /api/v1/auth/?(.*)
             pathType: Prefix
             backend:
               service:
@@ -38,3 +38,4 @@ spec:
                 name: courses-srv
                 port:
                   number: 8001
+          

@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 require("dotenv").config();
 
-const dbUrl: string =
-  "mongodb+srv://s7abab:n4AiAOBnXsv8ygfC@cluster1.aejszzn.mongodb.net/bLearnCourses";
-  
+const dbUrl: string | undefined = process.env.MONGO_URL;
+
 const connectDb = async () => {
   try {
-    await mongoose.connect(dbUrl).then((data: any) => {
-      console.log(`Database connected with${data.connection.host}`);
-    });
+    if (dbUrl) {
+      await mongoose.connect(dbUrl).then((data: any) => {
+        console.log(`Database connected with${data.connection.host}`);
+      });
+    }
   } catch (error: any) {
     console.log(error.message);
     setTimeout(connectDb, 5000);
