@@ -6,7 +6,7 @@ import {
   ICategoryId,
   ICreateCategory,
   IEditCategory,
-} from "../@types/category";
+} from "../@types/category.types";
 import { validateCategoryName } from "../utils/validations/category.validation";
 import CategoryRepository from "../repositories/category.repository";
 

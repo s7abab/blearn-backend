@@ -3,7 +3,7 @@ import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import courseModel from "../models/course.model";
 import mongoose from "mongoose";
-import { ICourseRequestData } from "../@types/course";
+import { ICourseRequestData } from "../@types/course.types";
 import { ICourse } from "../@types/modelTypes/course";
 import courseRepository from "../repositories/course.repository";
 

@@ -15,7 +15,7 @@ import {
   IUpdatePassword,
   IUpdateProfilePicture,
   IUpdateUser,
-} from "../@types/types";
+} from "../@types/user.types";
 import { sendMessage } from "../events/publishers/publisher";
 import { QueueTypes } from "../events/queues";
 import { catchAsyncError } from "@s7abab/common";

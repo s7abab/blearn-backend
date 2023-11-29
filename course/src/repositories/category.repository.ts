@@ -1,4 +1,4 @@
-import { IEditCategory } from "../@types/category";
+import { IEditCategory } from "../@types/category.types";
 import categoryModel from "../models/category.model";
 
 class CategoryRepository {
