@@ -1,4 +1,4 @@
-export enum QueueTypes {
-    user_queue = "user_queue",
-    course_queue = "course_queue"
-  }
+export enum Queues {
+  user_queue = "user",
+  course_queue = "course",
+}

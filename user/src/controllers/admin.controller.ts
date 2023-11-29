@@ -2,12 +2,15 @@ import { Request, Response, NextFunction } from "express";
 import userModel from "../models/user.model";
 import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import { isBlock } from "typescript";
+import userRepository from "../repositories/user.repository";
 
 export const getUsers = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const users = await userModel.find({ role: "user" });
+      const users = await userRepository.findUsersByRole("user");
+      if (!users) {
+        return next(new ErrorHandler("Users not found", 404));
+      }
       res.status(200).send({
         success: true,
         users,
@@ -21,7 +24,10 @@ export const getUsers = catchAsyncError(
 export const getInstructors = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const instructors = await userModel.find({ role: "instructor" });
+      const instructors = await userRepository.findUsersByRole("instructor");
+      if (!instructors) {
+        return next(new ErrorHandler("Instructors not found", 404));
+      }
       res.status(200).send({
         success: true,
         instructors,
@@ -36,7 +42,7 @@ export const getSingleUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     try {
-      const user = await userModel.findOne({ _id: id, role: "user" });
+      const user = await userRepository.findUserByIdAndRole(id, "user");
       if (!user) {
         return new ErrorHandler("User not exist", 404);
       }
@@ -53,7 +59,7 @@ export const getSingleInstructor = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     try {
-      const user = await userModel.findOne({ _id: id, role: "instructor" });
+      const user = await userRepository.findUserByIdAndRole(id, "instructor");
       if (!user) {
         return new ErrorHandler("User not exist", 404);
       }
@@ -74,15 +80,9 @@ export const blockUser = catchAsyncError(
       if (!id) {
         return new ErrorHandler("Invalid id", 400);
       }
-      const user = await userModel.findById(id);
-      if (!user) {
-        return new ErrorHandler("User not found", 404);
-      }
-      // toggle the isBlock status
-      user.isBlock = !user.isBlock;
-      await user.save();
-      let message;
-      if (user.isBlock) {
+      const blockStatus = userRepository.toggleBlockStatus;
+      let message = "";
+      if (!blockStatus) {
         message = "User blocked";
       } else {
         message = "User unblocked";

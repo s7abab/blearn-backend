@@ -1,7 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
-  _id?: string;
+  _id?: Types.ObjectId;
   name: string;
   email: string;
   role: string;
@@ -20,7 +20,7 @@ export interface ICourse extends Document {
   thumbnail: string;
   demoUrl: string;
   price: number;
-  discountPrice?: number;
+  discountPrice: number;
   courseData?: Types.ObjectId[];
   tags?: string;
   entrolls?: number;

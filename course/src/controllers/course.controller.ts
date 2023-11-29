@@ -3,8 +3,9 @@ import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import courseModel from "../models/course.model";
 import mongoose from "mongoose";
-import { ICourseRequestData } from "../@types/types";
-import { ICourse } from "../@types/modelTypes/model.types";
+import { ICourseRequestData } from "../@types/course";
+import { ICourse } from "../@types/modelTypes/course";
+import courseRepository from "../repositories/course.repository";
 
 export const createCourse = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -30,7 +31,7 @@ export const createCourse = catchAsyncError(
         return next(new ErrorHandler("Fill all the fields", 400));
       }
       category = new mongoose.Types.ObjectId();
-      const course: ICourse = await courseModel.create({
+      const course = await courseRepository.createCourse({
         title,
         category,
         thumbnail,
@@ -38,7 +39,8 @@ export const createCourse = catchAsyncError(
         demoUrl,
         price,
         discountPrice,
-      });
+      } as ICourse);
+
       res.status(200).json({
         success: true,
         message: "Course created successfully",
@@ -53,7 +55,10 @@ export const createCourse = catchAsyncError(
 export const getAllCourses = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const courses = await courseModel.find();
+      const courses = await courseRepository.findCourses();
+      if (!courses) {
+        return next(new ErrorHandler("Courses not found", 404));
+      }
       res.status(200).json({
         success: true,
         courses,
@@ -76,7 +81,7 @@ export const getSingleCourse = catchAsyncError(
         return next(new ErrorHandler("Invalid course ID", 400));
       }
 
-      const course = await courseModel.findById(courseId);
+      const course = await courseRepository.findCourseById(courseId);
 
       if (!course) {
         return next(new ErrorHandler("Course not found", 404));
@@ -99,9 +104,7 @@ export const deleteCourse = catchAsyncError(
       if (!courseId) {
         return next(new ErrorHandler("Invalid courseId", 400));
       }
-
-      await courseModel.findByIdAndDelete(courseId);
-
+      await courseRepository.findCourseByIdAndDelete(courseId);
       res.status(200).json({
         success: true,
         message: "Course deleted successfully",

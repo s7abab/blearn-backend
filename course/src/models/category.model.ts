@@ -1,9 +1,9 @@
 import mongoose, { Schema, Types } from "mongoose";
-import { ICategory } from "../../@types/modelTypes/model.types";
+import { ICategory } from "../@types/modelTypes/course";
 
 const categorySchema: Schema<ICategory> = new Schema<ICategory>(
   {
-    name: { type: String, required: true },
+    name: { type: String,unique:true, required: true },
     isListed: { type: Boolean, default: true },
   },
   {

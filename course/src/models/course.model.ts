@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { ICourse, IReview } from "../@types/modelTypes/model.types";
+import { ICourse, IReview } from "../@types/modelTypes/course";
 
 const reviewSchema = new Schema<IReview>({
   user: Object,

@@ -6,7 +6,6 @@ import {
   logoutUser,
   registerUser,
   socialAuth,
-  updatePassword,
   updateProfilePicture,
   updateUser,
 } from "../controllers/user.controller";
@@ -27,8 +26,6 @@ router.get("/current-user", isAuthenticated, getUserInfo);
 router.post("/social-auth", socialAuth);
 
 router.put("/update-user", isAuthenticated, updateUser)
-
-router.put("/update-password", isAuthenticated, updatePassword)
 
 router.put("/update-user-avatar", isAuthenticated, updateProfilePicture)
 

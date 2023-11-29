@@ -2,8 +2,13 @@ import { catchAsyncError } from "@s7abab/common";
 import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import categoryModel from "../models/category.model";
-import { ICategoryId, ICreateCategory, IEditCategory } from "../@types/types";
+import {
+  ICategoryId,
+  ICreateCategory,
+  IEditCategory,
+} from "../@types/category";
 import { validateCategoryName } from "../utils/validations/category.validation";
+import CategoryRepository from "../repositories/category.repository";
 
 export const createCategory = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -15,24 +20,17 @@ export const createCategory = catchAsyncError(
       return next(new ErrorHandler("Invalid name", 400));
     }
     try {
-      const existingCategory = await categoryModel.findOne({
-        $or: [
-          { name: { $regex: new RegExp(`^${name}$`, "i") } }, // Case-insensitive query
-          { $where: `this.name.toLowerCase() === "${name.toLowerCase()}"` }, // Case-sensitive JavaScript comparison
-        ],
-      });
+      const existingCategory = await CategoryRepository.findCategoryByName(name);
 
       if (existingCategory) {
         return next(
           new ErrorHandler("Category with the same name already exists", 400)
         );
       }
-
-      const category = await categoryModel.create({ name });
+      const category = await CategoryRepository.createCategory(name);
       res.status(201).json({
         success: true,
-        message:"Category created successfully",
-        category,
+        message: "Category created successfully",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
@@ -53,16 +51,22 @@ export const editCategory = catchAsyncError(
           new ErrorHandler("Invalid name or categoryId provided", 400)
         );
       }
-      const category = await categoryModel.findByIdAndUpdate(
+
+      const existingCategory = await CategoryRepository.findCategoryByName(name);
+      if (existingCategory) {
+        return next(
+          new ErrorHandler("Category with the same name already exists", 409)
+        );
+      }
+
+      await CategoryRepository.updateCategory({
         categoryId,
-        { name },
-        { new: true }
-      );
+        name,
+      });
 
       res.status(200).json({
         success: true,
-        message:"Category edited successfully",
-        category,
+        message: "Category edited successfully",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
@@ -73,25 +77,23 @@ export const editCategory = catchAsyncError(
 export const unlistCategory = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { categoryId } = req.body as ICategoryId;
-    if (!categoryId) {
-      return next(
-        new ErrorHandler("Invalid categoryId or isListed value provided", 400)
-      );
-    }
-    const category = await categoryModel.findById(categoryId);
-
-    if (!category) {
-      return next(new ErrorHandler("Category not found", 404));
-    }
-
-    category.isListed = !category.isListed;
-    await category.save();
-
-    res.status(200).json({
-      success: true,
-      category,
-    });
     try {
+      if (!categoryId) {
+        return next(
+          new ErrorHandler("Invalid categoryId or isListed value provided", 400)
+        );
+      }
+      const category = await CategoryRepository.findCategoryById(categoryId);
+
+      if (!category) {
+        return next(new ErrorHandler("Category not found", 404));
+      }
+
+      await CategoryRepository.toggleCategoryListing(categoryId);
+
+      res.status(200).json({
+        success: true,
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -101,7 +103,7 @@ export const unlistCategory = catchAsyncError(
 export const getAllCategory = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const categories = await categoryModel.find();
+      const categories = await CategoryRepository.findCategory();
       if (!categories) {
         return next(new ErrorHandler("Categories not found", 404));
       }
@@ -118,7 +120,7 @@ export const getSingleCategory = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { categoryId } = req.params;
     try {
-      const category = await categoryModel.findById(categoryId);
+      const category = await CategoryRepository.findCategoryById(categoryId)
       if (!category) {
         return next(new ErrorHandler("Categories not found", 404));
       }

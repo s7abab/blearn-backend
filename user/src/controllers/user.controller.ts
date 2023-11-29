@@ -20,6 +20,7 @@ import { sendMessage } from "../events/publishers/publisher";
 import { QueueTypes } from "../events/queues";
 import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
+import userRepository from "../repositories/user.repository";
 
 // register user
 export const registerUser = catchAsyncError(
@@ -27,7 +28,7 @@ export const registerUser = catchAsyncError(
     try {
       const { name, email, password }: IRegisterUser = req.body;
 
-      const isEmailExist = await userModel.findOne({ email });
+      const isEmailExist = await userRepository.findUserByEmail(email);
       if (isEmailExist) {
         return next(new ErrorHandler("Email is already exist", 400));
       }
@@ -101,17 +102,17 @@ export const activateUser = catchAsyncError(
 
       const { name, email, password } = newUser.user;
 
-      const existingUser = await userModel.findOne({ email });
+      const existingUser = await userRepository.findUserByEmail(email);
 
       if (existingUser) {
         return next(new ErrorHandler("User already exist", 400));
       }
 
-      const user: IUser = await userModel.create({
+      const user: IUser = await userRepository.createUser({
         name,
         email,
         password,
-      });
+      } as IUser);
 
       sendMessage(user, QueueTypes.user_queue);
 
@@ -132,12 +133,14 @@ export const loginUser = catchAsyncError(
       if (!email || !password) {
         return next(new ErrorHandler("Please enter email and password", 400));
       }
-
-      const user = await userModel.findOne({ email }).select("+password");
+      const user = await userRepository.findUserByEmail(email);
       if (!user) {
-        return next(new ErrorHandler("Invalid email or password", 400));
+        return next(new ErrorHandler("User not found", 404));
       }
-      const isPasswordMatched = await user.comparePassword(password);
+      const isPasswordMatched = await userRepository.compareUserPassword(
+        email,
+        password
+      );
       if (!isPasswordMatched) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
@@ -168,7 +171,7 @@ export const getUserInfo = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?.id;
-      const user = await userModel.findById(userId);
+      const user = await userRepository.findUserById(userId);
       if (user) {
         res.status(200).json({
           success: true,
@@ -186,9 +189,16 @@ export const socialAuth = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, email, avatar } = req.body as ISocialAuthBody;
-      const user = await userModel.findOne({ email });
+      if (!name || !email || !avatar) {
+        return next(new ErrorHandler("Some fields are missing", 400));
+      }
+      const user = await userRepository.findUserByEmail(email);
       if (!user) {
-        const newUser = await userModel.create({ email, name, avatar });
+        const newUser = await userRepository.createUser({
+          email,
+          name,
+          avatar,
+        } as IUser);
         sendToken(newUser, 200, res);
       } else {
         sendToken(user, 200, res);
@@ -200,77 +210,40 @@ export const socialAuth = catchAsyncError(
 );
 
 // update user
-export const updateUser = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { name, email } = req.body as IUpdateUser;
-      const userId = req.user?.id;
-      const user = await userModel.findById(userId);
-      if (email && user) {
-        const isEmailExist = await userModel.findOne({ email });
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name, email }: IUpdateUser = req.body;
+    const userId: string | undefined = req.user?.id;
 
-        if (!isEmailExist) {
-          return next(new ErrorHandler("Email is doesnot exist", 400));
-        }
-        user.email = email;
-      }
-
-      if (name && user) {
-        user.name = name;
-      }
-      await user?.save();
-
-      res.status(201).json({
-        success: true,
-        user,
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+    const updatedData: Partial<IUpdateUser> = {};
+    if (email) {
+      updatedData.email = email;
     }
-  }
-);
-
-// update password
-export const updatePassword = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { oldPassword, newPassword } = req.body as IUpdatePassword;
-
-      if (!oldPassword || !newPassword) {
-        return next(new ErrorHandler("Please enter old and new password", 400));
-      }
-
-      if (oldPassword === newPassword) {
-        return next(
-          new ErrorHandler("Old and new password cannot be same", 400)
-        );
-      }
-
-      const user = await userModel.findById(req.user?._id).select("+password");
-
-      if (user?.password === undefined) {
-        return next(new ErrorHandler("Invalid user", 400));
-      }
-
-      const isPasswordMatched = await user?.comparePassword(oldPassword);
-
-      if (!isPasswordMatched) {
-        return next(new ErrorHandler("Old password is incorrect", 400));
-      }
-
-      user.password = newPassword;
-
-      await user.save();
-
-      res.status(201).json({
-        success: true,
-        user,
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+    if (name) {
+      updatedData.name = name;
     }
+
+    if (!userId) {
+      throw new Error("User ID not found");
+    }
+
+    const updatedUser = await userRepository.updateUserDetails(
+      userId,
+      updatedData
+    );
+
+    res.status(201).json({
+      success: true,
+      user: updatedUser,
+    });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 400));
   }
-);
+};
 
 // update profile picture
 export const updateProfilePicture = catchAsyncError(
@@ -278,17 +251,19 @@ export const updateProfilePicture = catchAsyncError(
     try {
       const { imageUrl } = req.body as IUpdateProfilePicture;
       const userId = req.user?.id;
-      const user = await userModel.findById(userId);
-      if (!user) {
-        return next(new ErrorHandler("User not exist", 400));
-      }
-      user.avatar = imageUrl;
 
-      await user?.save();
+      if (!userId) {
+        return next(new ErrorHandler("User ID not found", 400));
+      }
+
+      const updatedUser = await userRepository.updateUserProfilePicture(
+        userId,
+        imageUrl
+      );
 
       res.status(200).json({
         success: true,
-        user,
+        user: updatedUser,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
