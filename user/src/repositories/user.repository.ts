@@ -32,7 +32,9 @@ class UserRepository {
 
   async findUserByEmail(email: string, fieldsToSelect: string = "") {
     try {
-      const user = await userModel.findOne({ email }).select(fieldsToSelect);
+      const user: IUser = await userModel
+        .findOne({ email })
+        .select(fieldsToSelect);
       return user;
     } catch (error: any) {
       throw new Error(error);

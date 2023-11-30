@@ -19,9 +19,9 @@ import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import userRepository from "../repositories/user.repository";
 import { IUser } from "../models/user.model";
 import validator from "validator";
-import { publishEvent } from "../events/publishers/user.publisher";
-import { User } from "../events/eventTypes/user.events";
+import { publishEvent } from "../events/publishers/publisher";
 import { USER_EXCHANGE } from "../events/exchanges/user.exchange";
+import { User } from "../events/eventTypes/user.events";
 
 // register user
 export const registerUser = catchAsyncError(
@@ -129,6 +129,17 @@ export const activateUser = catchAsyncError(
         password,
       } as IUser);
 
+      const payload = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+      publishEvent({
+        exchage: USER_EXCHANGE,
+        type: User.USER_CREATED,
+        payload,
+      });
       res.status(201).json({
         success: true,
       });
@@ -163,16 +174,6 @@ export const loginUser = catchAsyncError(
       if (!isPasswordMatched) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
-      const payload = {
-        name: "Jhon",
-        age: "22",
-      };
-      publishEvent({
-        exchage: USER_EXCHANGE,
-        type: User.USER_CREATED,
-        payload: payload,
-      });
-
       sendToken(user, 200, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
@@ -221,13 +222,24 @@ export const socialAuth = catchAsyncError(
       if (!name || !email || !avatar) {
         return next(new ErrorHandler("Some fields are missing", 400));
       }
-      const user = await userRepository.findUserByEmail(email);
+      const user: IUser = await userRepository.findUserByEmail(email);
       if (!user) {
-        const newUser = await userRepository.createUser({
+        const newUser: IUser = await userRepository.createUser({
           email,
           name,
           avatar,
         } as IUser);
+        const payload = {
+          _id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+        };
+        publishEvent({
+          exchage: USER_EXCHANGE,
+          type: User.USER_CREATED,
+          payload,
+        });
         sendToken(newUser, 200, res);
       } else {
         sendToken(user, 200, res);
@@ -264,6 +276,18 @@ export const updateUser = async (
       userId,
       updatedData
     );
+
+    const payload = {
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+    };
+    publishEvent({
+      exchage: USER_EXCHANGE,
+      type: User.USER_UPDATED,
+      payload,
+    });
 
     res.status(201).json({
       success: true,

@@ -4,7 +4,7 @@ import { USER_EXCHANGE } from "../exchanges/user.exchange";
 import { USER_QUEUE } from "../queues/user.queues";
 
 
-export async function startRabbitMQConsumer() {
+export async function subscribeRabbitmq() {
   try {
     const { channel } = await connectToRabbitMQ();
 

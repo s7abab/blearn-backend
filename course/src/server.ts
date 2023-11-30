@@ -1,11 +1,11 @@
 import { app } from "./app";
 import connectDb from "./config/db";
-import { startRabbitMQConsumer } from "./events/consumers/user.consumer";
+import { subscribeRabbitmq } from "./events/subscribers/user.subscriber";
 require("dotenv").config();
 
 // create server
 app.listen(process.env.PORT || 8001, () => {
-  startRabbitMQConsumer();
+  subscribeRabbitmq();
   connectDb();
   console.log(`Server running ${process.env.PORT}`);
 });
