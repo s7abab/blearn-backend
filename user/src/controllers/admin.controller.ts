@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import userModel from "../models/user.model";
 import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import userRepository from "../repositories/user.repository";

@@ -1,6 +1,5 @@
 require("dotenv").config();
 import { Request, Response, NextFunction } from "express";
-import userModel, { IUser } from "../models/user.model";
 import jwt, { Secret } from "jsonwebtoken";
 import ejs from "ejs";
 import path from "path";
@@ -12,21 +11,37 @@ import {
   ILoginRequest,
   IRegisterUser,
   ISocialAuthBody,
-  IUpdatePassword,
   IUpdateProfilePicture,
   IUpdateUser,
 } from "../@types/user.types";
-import { sendMessage } from "../events/publishers/publisher";
-import { QueueTypes } from "../events/queues";
 import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import userRepository from "../repositories/user.repository";
+import { IUser } from "../models/user.model";
+import validator from "validator";
+import { publishEvent } from "../events/publishers/user.publisher";
+import { User } from "../events/eventTypes/user.events";
+import { USER_EXCHANGE } from "../events/exchanges/user.exchange";
 
 // register user
 export const registerUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, email, password }: IRegisterUser = req.body;
+
+      // Validate the email address
+      if (!validator.isEmail(email)) {
+        return next(new ErrorHandler("Invalid email address", 400));
+      }
+
+      if (!validator.isStrongPassword(password)) {
+        return next(
+          new ErrorHandler(
+            "At least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character",
+            400
+          )
+        );
+      }
 
       const isEmailExist = await userRepository.findUserByEmail(email);
       if (isEmailExist) {
@@ -114,8 +129,6 @@ export const activateUser = catchAsyncError(
         password,
       } as IUser);
 
-      sendMessage(user, QueueTypes.user_queue);
-
       res.status(201).json({
         success: true,
       });
@@ -130,6 +143,12 @@ export const loginUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body as ILoginRequest;
+
+      // Validate the email address
+      if (!validator.isEmail(email)) {
+        return next(new ErrorHandler("Invalid email address", 400));
+      }
+
       if (!email || !password) {
         return next(new ErrorHandler("Please enter email and password", 400));
       }
@@ -144,6 +163,16 @@ export const loginUser = catchAsyncError(
       if (!isPasswordMatched) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
+      const payload = {
+        name: "Jhon",
+        age: "22",
+      };
+      publishEvent({
+        exchage: USER_EXCHANGE,
+        type: User.USER_CREATED,
+        payload: payload,
+      });
+
       sendToken(user, 200, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
