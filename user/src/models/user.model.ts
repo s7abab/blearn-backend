@@ -11,7 +11,6 @@ export interface IUser extends Document {
   avatar: string;
   role: string;
   isBlock: boolean;
-  courses: Array<{ courseId: string }>;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -40,7 +39,6 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       default: "user",
     },
     isBlock: { type: Boolean, default: false },
-    courses: [{ courseId: String }],
   },
   { timestamps: true }
 );

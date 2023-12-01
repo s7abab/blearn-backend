@@ -9,6 +9,7 @@ const reviewSchema = new Schema<IReview>({
 
 const courseSchema: Schema<ICourse> = new Schema<ICourse>(
   {
+    instructorId:{type:String, required:true},
     title: { type: String, required: true },
     category: { type: Schema.ObjectId, ref: 'Category', required: true },
     description: { type: String, required: true },

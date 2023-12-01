@@ -5,9 +5,6 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser = require("cookie-parser");
 import { ErrorMiddleware } from "@s7abab/common";
-import courseRoute from "./routes/course.route";
-import categoryRoute from "./routes/category.route";
-import enrollmentRoute from "./routes/enrollment.route";
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -27,9 +24,6 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1/courses", courseRoute);
-app.use("/api/v1/category", categoryRoute);
-app.use("/api/v1/enrollment", enrollmentRoute);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
