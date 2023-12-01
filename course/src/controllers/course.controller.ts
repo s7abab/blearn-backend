@@ -1,7 +1,6 @@
 import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
-import courseModel from "../models/course.model";
 import mongoose from "mongoose";
 import { ICourseRequestData } from "../@types/course.types";
 import { ICourse } from "../@types/modelTypes/course";
@@ -10,6 +9,7 @@ import courseRepository from "../repositories/course.repository";
 export const createCourse = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     let {
+      id,
       title,
       description,
       category,
@@ -20,6 +20,7 @@ export const createCourse = catchAsyncError(
     } = req.body as ICourseRequestData;
     try {
       if (
+        !id ||
         !title ||
         !category ||
         !demoUrl ||
@@ -32,6 +33,7 @@ export const createCourse = catchAsyncError(
       }
       category = new mongoose.Types.ObjectId();
       const course = await courseRepository.createCourse({
+        instructorId: id,
         title,
         category,
         thumbnail,

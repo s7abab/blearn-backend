@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface ICourseRequestData {
+  id:string;
   title: string;
   category: string | Types.ObjectId;
   demoUrl: string;

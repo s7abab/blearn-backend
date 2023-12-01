@@ -11,6 +11,10 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       required: true,
     },
     role: { type: String, default: "user" },
+    courses: {
+      type: [String],
+      default: [] 
+    },
   },
   {
     timestamps: true,

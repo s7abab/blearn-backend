@@ -5,6 +5,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   role: string;
+  courses: string[];
 }
 
 export interface IReview extends Document {
@@ -14,6 +15,7 @@ export interface IReview extends Document {
 }
 
 export interface ICourse extends Document {
+  instructorId: string;
   title: string;
   category: Types.ObjectId;
   description: string;
@@ -35,4 +37,11 @@ export interface ICourse extends Document {
 export interface ICategory extends Document {
   name: string;
   isListed: boolean;
+}
+
+export interface IEntroll {
+  userId?: string;
+  courseId: string;
+  price?: number;
+  payment_status?: string;
 }
