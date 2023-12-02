@@ -18,7 +18,15 @@ class UserRepository {
       if (!user) {
         throw new Error("User not found");
       }
-      const addCourse = user?.courses.push(courseId);
+      // push courseId to user
+      const addCourse = user.courses.push(courseId);
+
+      // increment entroll +1
+      const updatedCourse = await courseModel.findByIdAndUpdate(
+        courseId,
+        { $inc: { entrolls: 1 } },
+        { new: true }
+      );
       await user.save();
       return addCourse;
     } catch (error: any) {

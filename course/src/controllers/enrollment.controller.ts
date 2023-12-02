@@ -1,34 +1,8 @@
 import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
-import { IEntroll } from "../@types/modelTypes/course";
 import userRepository from "../repositories/enrollment.repository";
 
-export const createEnrollment = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { courseId, price } = req.body as IEntroll;
-      const userId = req?.user?.id;
-      if (!userId || !courseId || !price) {
-        return next(new ErrorHandler("Some fields are missing", 400));
-      }
-      const existingEnrollment =
-        await userRepository.findEnrolledCourseByuserIdAndCourseId(
-          userId,
-          courseId
-        );
-      if (existingEnrollment) {
-        return next(new ErrorHandler("Already entrolled course", 400));
-      }
-      // add enrolled course to user model
-      await userRepository.addCourseToUser(userId, courseId);
-
-      res.status(201).json({ success: true, message: "Enrolled successfully" });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, error.statusCode || 500));
-    }
-  }
-);
 
 export const getEnrolledCourses = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

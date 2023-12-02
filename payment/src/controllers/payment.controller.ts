@@ -2,6 +2,9 @@ import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import paymentRepository from "../repositories/payment.repository";
+import { publishEvent } from "../events/publishers/publisher";
+import { PAYMENT_EXCHANGE } from "../events/exchanges/payment.exchange";
+import { Order } from "../events/eventTypes/order.event";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 interface IOrder {
@@ -15,7 +18,6 @@ export const createOrder = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { courseId, payment_info } = req.body as IOrder;
-      console.log(req.body);
       if (payment_info) {
         if ("id" in payment_info) {
           const paymentIntentId = payment_info.id;
@@ -29,12 +31,25 @@ export const createOrder = catchAsyncError(
         }
       }
       const price = payment_info.amount / 100;
+      const userId = req?.user?.id;
+
       await paymentRepository.createOrder({
         courseId: courseId,
-        userId: req?.user?.id,
+        userId: userId,
         price: price,
         payment_status: payment_info.status,
       });
+      // publish order created event
+      const payload = {
+        courseId,
+        userId,
+      };
+      publishEvent({
+        exchage: PAYMENT_EXCHANGE,
+        type: Order.ORDER_CREATED,
+        payload,
+      });
+
       res.status(200).json({
         success: true,
       });

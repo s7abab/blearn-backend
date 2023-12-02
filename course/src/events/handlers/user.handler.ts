@@ -1,43 +1,38 @@
-import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import userModel from "../../models/user.model";
 import { IUser } from "../../@types/modelTypes/course";
+import userRepository from "../../repositories/user.repository";
 
 export const createUser = async (payload: IUser) => {
   try {
-    const { _id, name, email } = payload;
-    const existingUser = await userModel.findOne({ email });
+    const { _id, name, email, role } = payload;
+    const existingUser = await userRepository.findUserById(_id);
     if (existingUser) {
       throw new Error("Userr already exist");
     }
-    const user = await userModel.create({
+
+    const user = await userRepository.createUser({
       _id,
       name,
       email,
-    });
+      role,
+    } as IUser);
 
     return user;
   } catch (error: any) {
-    console.log(error)
+    throw new Error(error);
   }
 };
 
 export const updateUser = async (payload: IUser) => {
   try {
     const { _id, name, email, role } = payload;
-    // Check if the user exists
-    const existingUser = await userModel.findById(_id);
-    if (!existingUser) {
-      throw new Error("User not found");
-    }
-
-    existingUser.name = name;
-    existingUser.email = email;
-    existingUser.role = role;
-
-    const updatedUser = await existingUser.save();
-
-    return updatedUser;
+    const user = await userRepository.updateUser({
+      _id,
+      name,
+      email,
+      role,
+    } as IUser);
+    return user;
   } catch (error: any) {
-    console.log(error)
+    throw new Error(error);
   }
 };

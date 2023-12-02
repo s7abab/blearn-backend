@@ -1,7 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
-  _id?: Types.ObjectId;
+  _id: Types.ObjectId;
   name: string;
   email: string;
   role: string;
@@ -39,8 +39,8 @@ export interface ICategory extends Document {
   isListed: boolean;
 }
 
-export interface IEntroll {
-  userId?: string;
+export interface IEnroll {
+  userId: string;
   courseId: string;
   price?: number;
   payment_status?: string;
