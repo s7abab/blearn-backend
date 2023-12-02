@@ -17,14 +17,13 @@ export const createUser = async (payload: IUser) => {
 
     return user;
   } catch (error: any) {
-    throw new Error(error);
+    console.log(error)
   }
 };
 
 export const updateUser = async (payload: IUser) => {
   try {
     const { _id, name, email, role } = payload;
-
     // Check if the user exists
     const existingUser = await userModel.findById(_id);
     if (!existingUser) {
@@ -39,6 +38,6 @@ export const updateUser = async (payload: IUser) => {
 
     return updatedUser;
   } catch (error: any) {
-    throw new Error(error);
+    console.log(error)
   }
 };

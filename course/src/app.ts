@@ -8,7 +8,6 @@ import { ErrorMiddleware } from "@s7abab/common";
 import courseRoute from "./routes/course.route";
 import categoryRoute from "./routes/category.route";
 import enrollmentRoute from "./routes/enrollment.route";
-
 // body parser
 app.use(express.json({ limit: "50mb" }));
 // cookie parser
