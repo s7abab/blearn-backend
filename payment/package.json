@@ -25,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.1",
     "morgan": "^1.10.0",
+    "stripe": "^14.7.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   }

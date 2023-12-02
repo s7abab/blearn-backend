@@ -1,6 +1,6 @@
 import connectToRabbitMQ from "../../config/rabbitmq";
-import { User } from "../eventTypes/user.events";
-import { USER_EXCHANGE } from "../exchanges/user.exchange";
+import { User } from "../eventTypes/order.event";
+import { USER_EXCHANGE } from "../exchanges/payment.exchange";
 
 export async function publishUserCreatedEvent(userId: string) {
   try {
