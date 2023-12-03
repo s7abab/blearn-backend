@@ -5,7 +5,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   role: string;
-  courses: string[];
+  courses: [Types.ObjectId];
 }
 
 export interface IReview extends Document {

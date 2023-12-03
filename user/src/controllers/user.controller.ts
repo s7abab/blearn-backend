@@ -21,7 +21,7 @@ import { IUser } from "../models/user.model";
 import validator from "validator";
 import { publishEvent } from "../events/publishers/publisher";
 import { USER_EXCHANGE } from "../events/exchanges/user.exchange";
-import { User } from "../events/eventTypes/user.events";
+import { User } from "../events/subjects/user.events";
 
 // register user
 export const registerUser = catchAsyncError(

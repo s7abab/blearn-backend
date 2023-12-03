@@ -12,8 +12,9 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
     },
     role: { type: String, default: "user" },
     courses: {
-      type: [String],
-      default: [] 
+      type: [Types.ObjectId],
+      ref: "Course",
+      default: [],
     },
   },
   {

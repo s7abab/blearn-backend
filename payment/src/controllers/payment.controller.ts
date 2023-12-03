@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import paymentRepository from "../repositories/payment.repository";
 import { publishEvent } from "../events/publishers/publisher";
 import { PAYMENT_EXCHANGE } from "../events/exchanges/payment.exchange";
-import { Order } from "../events/eventTypes/order.event";
+import { Order } from "../events/subjects/order.event";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 interface IOrder {
