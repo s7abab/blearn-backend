@@ -1,9 +1,9 @@
 import { IEnroll } from "../../@types/modelTypes/course";
-import enrollmentRepository from "../../repositories/enrollment.repository";
+import userRepository from "../../repositories/user.repository";
 
 export const createEnrollment = async ({ courseId, userId }: IEnroll) => {
   try {
-    const enrollment = await enrollmentRepository.addCourseToUser(
+    const enrollment = await userRepository.addCourseToUser(
       userId,
       courseId
     );

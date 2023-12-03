@@ -1,5 +1,5 @@
 import connectToRabbitMQ from "../../config/rabbitmq";
-import { User } from "../eventTypes/user.events";
+import { User } from "../subjects/user.events";
 import { USER_EXCHANGE } from "../exchanges/user.exchange";
 import { USER_QUEUE } from "../queues/user.queues";
 

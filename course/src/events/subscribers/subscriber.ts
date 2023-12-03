@@ -1,7 +1,7 @@
 import { IUser } from "../../@types/modelTypes/course";
 import connectToRabbitMQ from "../../config/rabbitmq";
-import { Order } from "../eventTypes/order.event";
-import { User } from "../eventTypes/user.events";
+import { Order } from "../subjects/order.event";
+import { User } from "../subjects/user.events";
 import { PAYMENT_EXCHANGE } from "../exchanges/payment.exchange";
 import { USER_EXCHANGE } from "../exchanges/user.exchange";
 import { createEnrollment } from "../handlers/order.handler";
@@ -17,7 +17,7 @@ export async function subscribeRabbitmq() {
     await channel.assertExchange(USER_EXCHANGE, "direct", {
       durable: true,
     });
-
+    
     // payment exchange
     await channel.assertExchange(PAYMENT_EXCHANGE, "direct", {
       durable: true,
@@ -40,7 +40,6 @@ export async function subscribeRabbitmq() {
     channel.bindQueue(ORDER_CREATED, PAYMENT_EXCHANGE, Order.ORDER_CREATED);
 
     // Consume messages
-
     // user
     channel.consume(USER_CREATED, (msg) => {
       if (msg && msg.fields.routingKey === User.USER_CREATED) {

@@ -1,6 +1,6 @@
 import { IEnrollment } from "../../@types/modelTypes/order";
 import connectToRabbitMQ from "../../config/rabbitmq";
-import { Enrollment } from "../eventTypes/order.event";
+import { Enrollment } from "../subjects/order.event";
 import { ENROLLMENT_EXCHANGE } from "../exchanges/payment.exchange";
 import { createEnrollment } from "../handlers/enrollment.handler";
 import { ENROLLMENT_CREATED } from "../queues/order.queues";
