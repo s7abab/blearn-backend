@@ -27,7 +27,8 @@ import { User } from "../events/subjects/user.events";
 export const registerUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email, password }: IRegisterUser = req.body;
+      const { name, email, password, confirmpassword }: IRegisterUser =
+        req.body;
 
       // Validate the email address
       if (!validator.isEmail(email)) {
@@ -40,6 +41,12 @@ export const registerUser = catchAsyncError(
             "At least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character",
             400
           )
+        );
+      }
+
+      if (password !== confirmpassword) {
+        return next(
+          new ErrorHandler("Password and Confirm Password do not match", 400)
         );
       }
 
