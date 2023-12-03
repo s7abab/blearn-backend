@@ -1,5 +1,19 @@
 import mongoose, { Schema, Types } from "mongoose";
-import { IUser } from "../@types/modelTypes/course";
+import { ICourseProgress, IUser } from "../@types/modelTypes/course";
+
+const courseProgressSchema: Schema<ICourseProgress> = new Schema(
+  {
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+    },
+    progress: {
+      type: Number,
+      default: 0,
+    },
+  },
+  { _id: false }
+);
 
 const userSchema: Schema<IUser> = new Schema<IUser>(
   {
@@ -12,8 +26,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
     },
     role: { type: String, default: "user" },
     courses: {
-      type: [Types.ObjectId],
-      ref: "Course",
+      type: [courseProgressSchema],
       default: [],
     },
   },

@@ -6,9 +6,9 @@ class CourseRepository {
 
   async createCourse(data: ICourse) {
     try {
-      const course = await courseModel.create({
+      const course = await courseModel.create(
         data,
-      });
+      );
       return course;
     } catch (error: any) {
       throw new Error(error);
