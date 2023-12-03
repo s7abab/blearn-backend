@@ -1,5 +1,5 @@
 import mongoose, { Types } from "mongoose";
-import { IUser } from "../@types/modelTypes/course";
+import { ICourseProgress, IUser } from "../@types/modelTypes/course";
 import userModel from "../models/user.model";
 import courseModel from "../models/course.model";
 
@@ -33,7 +33,7 @@ class UserRepository {
     try {
       const existingUser = await this.findUserById(_id);
       if (!existingUser) {
-        throw new Error("User not found");
+        return this.createUser({ _id, name, email, role } as IUser);
       }
       existingUser.name = name;
       existingUser.email = email;
@@ -53,13 +53,19 @@ class UserRepository {
       if (!user) {
         throw new Error("User not found");
       }
-      // push courseId to user
-      const addCourse = user.courses.push(courseid);
+      // push course to user
+      const newCourse = {
+        course: courseid,
+        progress: 0,
+      } as ICourseProgress;
 
-      // increment entroll +1
+      const addCourse = user.courses.push(newCourse);
+
+      // increment entroll +1 and add revenue
+      const course = await courseModel.findById(courseId);
       const updatedCourse = await courseModel.findByIdAndUpdate(
         courseId,
-        { $inc: { entrolls: 1 } },
+        { $inc: { entrolls: 1, revenue: course?.discountPrice } },
         { new: true }
       );
       await user.save();
@@ -71,8 +77,8 @@ class UserRepository {
 
   async findEntrolledCoursesByuserId(userId: string) {
     try {
-      const user = await userModel.findById(userId).populate("courses").exec();
-      const courses = user?.courses
+      const user = await userModel.findById(userId).populate("courses.course").exec();
+      const courses = user?.courses;
       return courses;
     } catch (error: any) {
       throw new Error(error);

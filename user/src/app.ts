@@ -26,7 +26,7 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin", adminRouter)
 
 // unknown route

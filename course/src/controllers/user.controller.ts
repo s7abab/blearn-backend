@@ -8,6 +8,9 @@ export const getEntrolledCourses = catchAsyncError(
     try {
       const { userId } = req.params;
       const courses = await userRepository.findEntrolledCoursesByuserId(userId);
+      if (!courses) {
+        return next(new ErrorHandler("Courses not found", 404));
+      }
       res.status(200).json({
         success: true,
         courses,

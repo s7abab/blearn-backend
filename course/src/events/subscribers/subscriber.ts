@@ -1,13 +1,13 @@
 import { IUser } from "../../@types/modelTypes/course";
 import connectToRabbitMQ from "../../config/rabbitmq";
-import { Order } from "../subjects/order.event";
-import { User } from "../subjects/user.events";
 import { PAYMENT_EXCHANGE } from "../exchanges/payment.exchange";
 import { USER_EXCHANGE } from "../exchanges/user.exchange";
 import { createEnrollment } from "../handlers/order.handler";
 import { createUser, updateUser } from "../handlers/user.handler";
 import { ORDER_CREATED } from "../queues/order.queues";
 import { USER_CREATED, USER_UPDATED } from "../queues/user.queues";
+import { Order } from "../subjects/order.event";
+import { User } from "../subjects/user.events";
 
 export async function subscribeRabbitmq() {
   try {
@@ -17,7 +17,7 @@ export async function subscribeRabbitmq() {
     await channel.assertExchange(USER_EXCHANGE, "direct", {
       durable: true,
     });
-    
+
     // payment exchange
     await channel.assertExchange(PAYMENT_EXCHANGE, "direct", {
       durable: true,
@@ -31,15 +31,14 @@ export async function subscribeRabbitmq() {
     await channel.assertQueue(ORDER_CREATED, { durable: true });
 
     // Binding queues for different event types
-
     // user
     channel.bindQueue(USER_CREATED, USER_EXCHANGE, User.USER_CREATED); //eventType as a routing key
     channel.bindQueue(USER_UPDATED, USER_EXCHANGE, User.USER_UPDATED);
-
     // payment
     channel.bindQueue(ORDER_CREATED, PAYMENT_EXCHANGE, Order.ORDER_CREATED);
 
     // Consume messages
+
     // user
     channel.consume(USER_CREATED, (msg) => {
       if (msg && msg.fields.routingKey === User.USER_CREATED) {
@@ -48,8 +47,10 @@ export async function subscribeRabbitmq() {
         createUser(eventPayload)
           .then(() => {
             channel.ack(msg);
+            console.log("User created successful")
           })
           .catch((error: any) => {
+            channel.nack(msg); // Negative Acknowledgement - message will be requeued
             console.log("Error in creating user", error);
           });
       }
@@ -59,8 +60,10 @@ export async function subscribeRabbitmq() {
         updateUser(eventPayload)
           .then(() => {
             channel.ack(msg);
+            console.log("User updated successful")
           })
           .catch((error: any) => {
+            channel.nack(msg);
             console.log("Error in updating user", error);
           });
       }
@@ -74,8 +77,10 @@ export async function subscribeRabbitmq() {
         createEnrollment(eventPayload)
           .then(() => {
             channel.ack(msg);
+            console.log("Order created successful")
           })
           .catch((error: any) => {
+            channel.nack(msg);
             console.log("Error in create enrollment", error);
           });
       }

@@ -1,11 +1,16 @@
-import { Document, Types } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
   name: string;
   email: string;
   role: string;
-  courses: [Types.ObjectId];
+  courses: [ICourseProgress];
+}
+
+export interface ICourseProgress extends Document {
+  course: mongoose.Types.ObjectId;
+  progress: number;
 }
 
 export interface IReview extends Document {
@@ -15,7 +20,7 @@ export interface IReview extends Document {
 }
 
 export interface ICourse extends Document {
-  instructorId: string;
+  instructorId: mongoose.Types.ObjectId;
   title: string;
   category: Types.ObjectId;
   description: string;

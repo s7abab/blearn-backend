@@ -9,7 +9,6 @@ import courseRepository from "../repositories/course.repository";
 export const createCourse = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     let {
-      id,
       title,
       description,
       category,
@@ -18,6 +17,7 @@ export const createCourse = catchAsyncError(
       price,
       discountPrice,
     } = req.body as ICourseRequestData;
+    const id = req?.user?.id
     try {
       if (
         !id ||
@@ -31,7 +31,7 @@ export const createCourse = catchAsyncError(
       ) {
         return next(new ErrorHandler("Fill all the fields", 400));
       }
-      category = new mongoose.Types.ObjectId();
+      category = new mongoose.Types.ObjectId(category);
       const course = await courseRepository.createCourse({
         instructorId: id,
         title,
@@ -42,7 +42,6 @@ export const createCourse = catchAsyncError(
         price,
         discountPrice,
       } as ICourse);
-
       res.status(200).json({
         success: true,
         message: "Course created successfully",

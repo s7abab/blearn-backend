@@ -26,9 +26,9 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1/courses", courseRoute);
-app.use("/api/v1/category", categoryRoute);
-app.use("/api/v1/courses", userRoute);
+app.use("/api/v1/course", courseRoute);
+app.use("/api/v1/course/category", categoryRoute);
+app.use("/api/v1/course/user", userRoute);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

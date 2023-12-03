@@ -25,7 +25,7 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1/payments", paymentRouter);
+app.use("/api/v1/payment", paymentRouter);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

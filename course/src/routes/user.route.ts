@@ -4,7 +4,6 @@ import { getEntrolledCourses } from "../controllers/user.controller";
 
 const router = express.Router();
 
-
-router.post("/enrolled-courses", getEntrolledCourses );
+router.get("/enrolled-courses/:userId", getEntrolledCourses);
 
 export default router;
