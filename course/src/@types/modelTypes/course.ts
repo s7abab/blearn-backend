@@ -20,7 +20,7 @@ export interface IReview extends Document {
 }
 
 export interface ICourse extends Document {
-  instructorId: mongoose.Types.ObjectId;
+  instructorId?: mongoose.Types.ObjectId;
   title: string;
   category: Types.ObjectId;
   description: string;
@@ -30,7 +30,7 @@ export interface ICourse extends Document {
   discountPrice: number;
   courseData?: Types.ObjectId[];
   tags?: string;
-  entrolls?: number;
+  enrolls?: Types.ObjectId[];
   revenue?: number;
   isBlock: boolean;
   level?: number;

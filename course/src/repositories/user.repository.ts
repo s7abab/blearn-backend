@@ -63,12 +63,19 @@ class UserRepository {
 
       // increment entroll +1 and add revenue
       const course = await courseModel.findById(courseId);
+      if (!course) {
+        throw new Error("Course not found");
+      }
+      // add userId to course
+      const addUserIdToCourse = course?.enrolls?.push(userid);
+
       const updatedCourse = await courseModel.findByIdAndUpdate(
         courseId,
-        { $inc: { entrolls: 1, revenue: course?.discountPrice } },
+        { $inc: { revenue: course?.discountPrice } },
         { new: true }
       );
       await user.save();
+      await course.save();
       return addCourse;
     } catch (error: any) {
       throw new Error(error);
@@ -77,7 +84,10 @@ class UserRepository {
 
   async findEntrolledCoursesByuserId(userId: string) {
     try {
-      const user = await userModel.findById(userId).populate("courses.course").exec();
+      const user = await userModel
+        .findById(userId)
+        .populate("courses.course")
+        .exec();
       const courses = user?.courses;
       return courses;
     } catch (error: any) {
