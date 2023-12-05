@@ -12,6 +12,10 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
     }
   );
 
+  const oneHourInMillis = 24 * 60 * 60 * 1000; // 1 hour in milliseconds
+  const expirationDate = new Date(Date.now() + oneHourInMillis);
+  res.cookie("token", token, { expires: expirationDate });
+
   return res.status(statusCode).json({
     success: true,
     user,
