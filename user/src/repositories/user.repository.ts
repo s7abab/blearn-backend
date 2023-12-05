@@ -47,6 +47,7 @@ class UserRepository {
       if (!user) {
         throw new Error("User not found");
       }
+      console.log(user)
       user.isBlock = !user.isBlock;
       await user.save();
       return user.isBlock;

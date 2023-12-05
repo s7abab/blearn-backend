@@ -79,7 +79,7 @@ export const blockUser = catchAsyncError(
       if (!id) {
         return new ErrorHandler("Invalid id", 400);
       }
-      const blockStatus = userRepository.toggleBlockStatus;
+      const blockStatus = await userRepository.toggleBlockStatus(id);
       let message = "";
       if (!blockStatus) {
         message = "User blocked";
