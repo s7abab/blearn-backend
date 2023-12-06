@@ -2,9 +2,8 @@ import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import paymentRepository from "../repositories/payment.repository";
-import { publishEvent } from "../events/publishers/publisher";
-import { PAYMENT_EXCHANGE } from "../events/exchanges/payment.exchange";
-import { Order } from "../events/subjects/order.event";
+import { Payment } from "../events/subjects";
+import { publishEvent } from "../events/publisher";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 interface IOrder {
@@ -41,12 +40,11 @@ export const createOrder = catchAsyncError(
       });
       // publish order created event
       const payload = {
+        subject: Payment.ORDER_CREATED,
         courseId,
         userId,
       };
       publishEvent({
-        exchage: PAYMENT_EXCHANGE,
-        type: Order.ORDER_CREATED,
         payload,
       });
 

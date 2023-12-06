@@ -1,5 +1,5 @@
 import mongoose, { Types } from "mongoose";
-import { ICourseProgress, IUser } from "../@types/modelTypes/course";
+import { ICourseProgress, IEnroll, IUser } from "../@types/modelTypes/course";
 import userModel from "../models/user.model";
 import courseModel from "../models/course.model";
 
@@ -45,7 +45,7 @@ class UserRepository {
     }
   }
 
-  async addCourseToUser(userId: string, courseId: string) {
+  async addCourseToUser({ courseId, userId }: IEnroll) {
     const courseid = new mongoose.Types.ObjectId(courseId);
     const userid = new mongoose.Types.ObjectId(userId);
     try {

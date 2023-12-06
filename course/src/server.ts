@@ -1,6 +1,6 @@
 import { app } from "./app";
 import connectDb from "./config/db";
-import { subscribeRabbitmq } from "./events/subscribers/subscriber";
+import { subscribeRabbitmq } from "./events/subscriber";
 require("dotenv").config();
 
 // create server
