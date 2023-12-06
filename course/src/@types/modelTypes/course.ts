@@ -19,8 +19,16 @@ export interface IReview extends Document {
   comment: string;
 }
 
+export interface ILesson extends Document {
+  type: string;
+  title:string;
+  url: string;
+  duration: number;
+
+}
+
 export interface ICourse extends Document {
-  instructorId?: mongoose.Types.ObjectId;
+  instructorId?: string;
   title: string;
   category: Types.ObjectId;
   description: string;
@@ -37,6 +45,7 @@ export interface ICourse extends Document {
   coupon?: Types.ObjectId[];
   reviews?: IReview[];
   rating?: number;
+  lessons?: ILesson[];
 }
 
 export interface ICategory extends Document {

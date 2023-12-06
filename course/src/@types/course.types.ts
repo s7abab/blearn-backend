@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export interface ICourseRequestData {
-  id:string;
+  id: string;
   title: string;
   category: string | Types.ObjectId;
   demoUrl: string;
@@ -11,3 +11,9 @@ export interface ICourseRequestData {
   price: number;
   discountPrice: number;
 }
+
+export enum LessonType {
+  VIDEO = "video",
+  DOC = "document",
+}
+

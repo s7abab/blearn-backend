@@ -22,6 +22,7 @@ import validator from "validator";
 import { publishEvent } from "../events/publishers/publisher";
 import { USER_EXCHANGE } from "../events/exchanges/user.exchange";
 import { User } from "../events/subjects/user.events";
+import { isBlock } from "typescript";
 
 // register user
 export const registerUser = catchAsyncError(
@@ -174,6 +175,9 @@ export const loginUser = catchAsyncError(
       if (!user) {
         return next(new ErrorHandler("User not found", 404));
       }
+      if (user?.isBlock) {
+        return next(new ErrorHandler("You are blocked by admin", 400));
+      }
       const isPasswordMatched = await userRepository.compareUserPassword(
         email,
         password
@@ -209,6 +213,10 @@ export const getUserInfo = catchAsyncError(
     try {
       const userId = req.user?.id;
       const user = await userRepository.findUserById(userId);
+      if (user?.isBlock) {
+        res.clearCookie("token");
+        return next(new ErrorHandler("You are blocked by admin", 400));
+      }
       if (user) {
         res.status(200).json({
           success: true,
