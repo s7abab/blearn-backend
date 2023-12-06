@@ -19,10 +19,8 @@ import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import userRepository from "../repositories/user.repository";
 import { IUser } from "../models/user.model";
 import validator from "validator";
-import { publishEvent } from "../events/publishers/publisher";
-import { USER_EXCHANGE } from "../events/exchanges/user.exchange";
-import { User } from "../events/subjects/user.events";
-import { isBlock } from "typescript";
+import { publishEvent } from "../events/publisher";
+import { User } from "../events/subjects";
 
 // register user
 export const registerUser = catchAsyncError(
@@ -138,14 +136,13 @@ export const activateUser = catchAsyncError(
       } as IUser);
 
       const payload = {
+        subject: User.USER_CREATED,
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
       };
       publishEvent({
-        exchage: USER_EXCHANGE,
-        type: User.USER_CREATED,
         payload,
       });
       res.status(201).json({
@@ -245,14 +242,13 @@ export const socialAuth = catchAsyncError(
           avatar,
         } as IUser);
         const payload = {
+          subject: User.USER_CREATED,
           _id: newUser._id,
           name: newUser.name,
           email: newUser.email,
           role: newUser.role,
         };
         publishEvent({
-          exchage: USER_EXCHANGE,
-          type: User.USER_CREATED,
           payload,
         });
         sendToken(newUser, 200, res);
@@ -293,14 +289,13 @@ export const updateUser = async (
     );
 
     const payload = {
+      subject: User.USER_UPDATED,
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
     };
     publishEvent({
-      exchage: USER_EXCHANGE,
-      type: User.USER_UPDATED,
       payload,
     });
 

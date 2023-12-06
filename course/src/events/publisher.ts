@@ -1,5 +1,5 @@
-import { IPublisherArgs } from "../../@types/eventsTypes/publisher.types";
-import connectToRabbitMQ from "../../config/rabbitmq";
+import { IPublisherArgs } from "../@types/eventsTypes/publisher.types";
+import connectToRabbitMQ from "../config/rabbitmq";
 
 export async function publishEvent({ exchage, type, payload }: IPublisherArgs) {
   try {
