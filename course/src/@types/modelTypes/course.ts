@@ -21,10 +21,18 @@ export interface IReview extends Document {
 
 export interface ILesson extends Document {
   type: string;
-  title:string;
+  title: string;
   url: string;
-  duration: number;
+  duration?: number;
+}
 
+export interface IModule extends Document {
+  title: string;
+  lessons: ILesson[];
+}
+
+export interface IModuleRequest extends IModule {
+  courseId: string;
 }
 
 export interface ICourse extends Document {
@@ -45,7 +53,8 @@ export interface ICourse extends Document {
   coupon?: Types.ObjectId[];
   reviews?: IReview[];
   rating?: number;
-  lessons?: ILesson[];
+  modules?: IModule[];
+  duration: number;
 }
 
 export interface ICategory extends Document {
