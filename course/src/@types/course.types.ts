@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { ILesson } from "./modelTypes/course";
 
 export interface ICourseRequestData {
   id: string;
@@ -10,6 +11,7 @@ export interface ICourseRequestData {
   preview: string;
   price: number;
   discountPrice: number;
+  duration: number;
 }
 
 export enum LessonType {
@@ -17,3 +19,7 @@ export enum LessonType {
   DOC = "document",
 }
 
+export interface ILessonRequest extends ILesson {
+  courseId: string;
+  index:number
+}

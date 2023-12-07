@@ -1,5 +1,10 @@
 import mongoose, { Schema } from "mongoose";
-import { ICourse, ILesson, IReview } from "../@types/modelTypes/course";
+import {
+  ICourse,
+  ILesson,
+  IModule,
+  IReview,
+} from "../@types/modelTypes/course";
 
 const reviewSchema = new Schema<IReview>({
   user: Object,
@@ -9,9 +14,14 @@ const reviewSchema = new Schema<IReview>({
 
 const lessonSchema = new Schema<ILesson>({
   type: { type: String },
-  title:{type:String},
+  title: { type: String },
   url: { type: String },
   duration: { type: Number },
+});
+
+const moduleSchema = new Schema<IModule>({
+  title: { type: String, required: true },
+  lessons: { type: [lessonSchema], default: [] },
 });
 
 const courseSchema: Schema<ICourse> = new Schema<ICourse>(
@@ -31,7 +41,8 @@ const courseSchema: Schema<ICourse> = new Schema<ICourse>(
     level: { type: Number, default: "0" },
     coupon: [{ type: Schema.Types.ObjectId }],
     reviews: [reviewSchema],
-    lessons: [lessonSchema],
+    modules: { type: [moduleSchema], default: [] },
+    duration: { type: Number, default: 0 },
   },
   {
     timestamps: true,

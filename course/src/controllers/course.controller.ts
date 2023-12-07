@@ -2,9 +2,10 @@ import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
-import { ICourseRequestData } from "../@types/course.types";
-import { ICourse, ILesson } from "../@types/modelTypes/course";
+import { ICourseRequestData, ILessonRequest } from "../@types/course.types";
+import { ICourse, IModule, IModuleRequest } from "../@types/modelTypes/course";
 import courseRepository from "../repositories/course.repository";
+import { getVideoDurationInSeconds } from "get-video-duration";
 
 export const createCourse = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -138,7 +139,7 @@ export const getCoursesForInstructors = catchAsyncError(
 );
 export const getSingleCourseForInstructors = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const courseId: string | undefined = req?.user?.id;
+    const { courseId } = req.params;
     const instructorId = req?.user?.id;
     try {
       if (!courseId) {
@@ -161,17 +162,26 @@ export const getSingleCourseForInstructors = catchAsyncError(
 
 export const addLesson = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { type, title, url, duration } = req.body as ILesson;
+    const { courseId, type, title, url,index } = req.body as ILessonRequest;
     try {
-      if (!type || !title || !url || !duration) {
+      if (!type || !title || !url ) {
         return next(new ErrorHandler("Please fill all fields", 400));
       }
+      let duration = 60;
+      if (type === "video") {
+        await getVideoDurationInSeconds(url).then((d) => {
+          duration = Math.round(d);
+        });
+      }
+
       await courseRepository.createLesson({
+        courseId,
         type,
         title,
         url,
         duration,
-      } as ILesson);
+        index
+      } as ILessonRequest);
 
       res.status(201).json({
         success: true,
@@ -196,6 +206,48 @@ export const findLessonsForInstructor = catchAsyncError(
       res.status(200).send({
         success: true,
         lessons,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+);
+
+export const addModule = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { courseId, title } = req.body as IModuleRequest;
+    try {
+      const module = await courseRepository.createModule({
+        courseId,
+        title,
+      } as IModuleRequest);
+
+      if (!module) {
+        return next(new ErrorHandler("Something went wrong", 400));
+      }
+
+      res.status(201).json({
+        success: true,
+        module,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+);
+
+export const getModules = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { courseId } = req.params;
+    try {
+      if (!courseId) {
+        return next(new ErrorHandler("CourseId is missing", 400));
+      }
+      console.log(courseId)
+      const modules = await courseRepository.getModules(courseId);
+      res.status(200).json({
+        success: true,
+        modules,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, error.statusCode || 500));

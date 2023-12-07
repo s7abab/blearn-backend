@@ -1,10 +1,12 @@
 import express from "express";
 import {
   addLesson,
+  addModule,
   createCourse,
   deleteCourse,
   getAllCourses,
   getCoursesForInstructors,
+  getModules,
   getSingleCourse,
   getSingleCourseForInstructors,
 } from "../controllers/course.controller";
@@ -49,12 +51,30 @@ router.get(
 );
 
 router.post(
+  "/add-module",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  addModule
+);
+
+router.get(
+  "/get-modules/:courseId",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  getModules
+);
+
+router.post(
   "/add-lesson",
   isAuthenticated,
   authorizeRoles(Roles.INSTRUCTOR),
   addLesson
 );
 
-router.get("/get-lessons-for-instructors", isAuthenticated, authorizeRoles(Roles.INSTRUCTOR),)
+router.get(
+  "/get-lessons-for-instructors",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR)
+);
 
 export default router;
