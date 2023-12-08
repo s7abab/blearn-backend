@@ -4,8 +4,12 @@ import {
   addModule,
   createCourse,
   deleteCourse,
+  deleteModule,
+  editCourse,
+  editModule,
   getAllCourses,
   getCoursesForInstructors,
+  getLessonsForInstructor,
   getModules,
   getSingleCourse,
   getSingleCourseForInstructors,
@@ -21,7 +25,7 @@ router.post(
   createCourse
 );
 
-router.put("/edit-course", isAuthenticated, authorizeRoles(Roles.INSTRUCTOR));
+router.put("/edit-course", isAuthenticated, authorizeRoles(Roles.INSTRUCTOR), editCourse);
 
 router.delete(
   "/delete-course",
@@ -57,6 +61,20 @@ router.post(
   addModule
 );
 
+router.put(
+  "/edit-module",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  editModule
+);
+
+router.delete(
+  "/delete-module",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  deleteModule
+);
+
 router.get(
   "/get-modules/:courseId",
   isAuthenticated,
@@ -74,7 +92,8 @@ router.post(
 router.get(
   "/get-lessons-for-instructors",
   isAuthenticated,
-  authorizeRoles(Roles.INSTRUCTOR)
+  authorizeRoles(Roles.INSTRUCTOR),
+  getLessonsForInstructor
 );
 
 export default router;

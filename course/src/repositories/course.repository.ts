@@ -6,7 +6,13 @@ import {
   IModuleRequest,
 } from "../@types/modelTypes/course";
 import courseModel from "../models/course.model";
-import { ILessonRequest } from "../@types/course.types";
+import {
+  ICourseRequestData,
+  ILessonGetRequest,
+  ILessonRequest,
+  IModuleDeleteRequest,
+  IModuleEditRequest,
+} from "../@types/course.types";
 
 class CourseRepository {
   constructor() {}
@@ -14,6 +20,17 @@ class CourseRepository {
   async createCourse(data: ICourse) {
     try {
       const course = await courseModel.create(data);
+      return course;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async findCourseAndUpdate(data: ICourseRequestData) {
+    try {
+      const course = await courseModel.findByIdAndUpdate(data._id, {
+        ...data,
+      });
       return course;
     } catch (error: any) {
       throw new Error(error);
@@ -91,10 +108,16 @@ class CourseRepository {
     }
   }
 
-  async findLessonsByinstructorId(instructorId: string) {
+  async findLessonsByinstructorId(data: ILessonGetRequest) {
     try {
-      const lessons = await courseModel.find({ instructorId });
-      return lessons;
+      const course = await courseModel.find({
+        instructorId: data.instructorId,
+        _id: data.courseId,
+      });
+      if (course[0].modules && data.index) {
+        const lesson = course[0].modules[data.index].lessons;
+        return lesson;
+      }
     } catch (error: any) {
       throw new Error(error);
     }
@@ -114,12 +137,46 @@ class CourseRepository {
     }
   }
 
-  async getModules(courseId: string) {
+  async findModules(courseId: string) {
     try {
       const course = await courseModel.findById(courseId);
       const modules = course?.modules;
-      console.log(modules);
       return modules;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async findModuleAndUpdate(data: IModuleEditRequest) {
+    try {
+      const course = await courseModel.findOne({
+        instructorId: data.instructorId,
+        _id: data.courseId,
+      });
+      if (course && course.modules) {
+        const moduleToUpdate = course.modules[data.index];
+        moduleToUpdate.title = data.title;
+        await course.save();
+
+        return moduleToUpdate;
+      }
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async findModuleAndDelete(data: IModuleDeleteRequest) {
+    try {
+      const course = await courseModel.findOne({
+        instructorId: data.instructorId,
+        _id: data.courseId,
+      });
+      if (course && course.modules) {
+        const courseTodelete = course.modules.splice(data.index, 1);
+        await course.save();
+
+        return courseTodelete;
+      }
     } catch (error: any) {
       throw new Error(error);
     }

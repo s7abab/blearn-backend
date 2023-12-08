@@ -36,6 +36,7 @@ export interface IModuleRequest extends IModule {
 }
 
 export interface ICourse extends Document {
+  _id?: Types.ObjectId;
   instructorId?: string;
   title: string;
   category: Types.ObjectId;
