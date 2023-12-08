@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { ILesson } from "./modelTypes/course";
 
 export interface ICourseRequestData {
-  id: string;
+  _id?: string;
   title: string;
   category: string | Types.ObjectId;
   demoUrl: string;
@@ -21,5 +21,20 @@ export enum LessonType {
 
 export interface ILessonRequest extends ILesson {
   courseId: string;
-  index:number
+  index: number;
+}
+
+export interface ILessonGetRequest {
+  courseId: string;
+  instructorId: string;
+  index: any;
+}
+
+export interface IModuleDeleteRequest {
+  courseId: string;
+  instructorId: string;
+  index: number;
+}
+export interface IModuleEditRequest extends IModuleDeleteRequest {
+  title: string;
 }
