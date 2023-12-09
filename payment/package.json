@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.7.0",
     "@s7abab/common": "^1.0.7",
     "@types/amqplib": "^0.10.4",
     "@types/cookie-parser": "^1.4.6",
@@ -28,5 +29,8 @@
     "stripe": "^14.7.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "prisma": "^5.7.0"
   }
 }

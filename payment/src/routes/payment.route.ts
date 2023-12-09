@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get("/stripepublishablekey", sendStripePublishableKey);
 
-router.post("/new-payment",isAuthenticated, newPayment);
+router.post("/new-payment", isAuthenticated, newPayment);
 
 router.post("/create-order", isAuthenticated, createOrder);
 

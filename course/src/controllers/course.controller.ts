@@ -327,24 +327,3 @@ export const getModules = catchAsyncError(
     }
   }
 );
-
-export const getLessonsForInstructor = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const instructorId = req?.user?.id;
-    const { courseId, index } = req.query;
-
-    try {
-      const lessons = await courseRepository.findLessonsByinstructorId({
-        instructorId,
-        courseId,
-        index,
-      } as ILessonGetRequest);
-      res.status(200).json({
-        success: true,
-        lessons,
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, error.statusCode || 500));
-    }
-  }
-);
