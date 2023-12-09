@@ -4,15 +4,10 @@ import { Request, Response, NextFunction } from "express";
 import paymentRepository from "../repositories/payment.repository";
 import { Payment } from "../events/subjects";
 import { publishEvent } from "../events/publisher";
+import { IOrder } from "../@types/order.types";
+import prisma from "../config/prismaClient";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-interface IOrder {
-  courseId: string;
-  payment_info: {
-    amount: number;
-    status: string;
-  };
-}
 export const createOrder = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -37,7 +32,7 @@ export const createOrder = catchAsyncError(
         userId: userId,
         price: price,
         payment_status: payment_info.status,
-      });
+      } as IOrder);
       // publish order created event
       const payload = {
         subject: Payment.ORDER_CREATED,

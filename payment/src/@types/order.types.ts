@@ -3,3 +3,14 @@ export enum PaymentStatus {
   COMPLETED = "succeeded",
   FAILED = "failed",
 }
+
+export interface IOrder {
+  userId: string;
+  courseId: string;
+  price: number;
+  payment_status: string;
+  payment_info: {
+    amount: number;
+    status: string;
+  };
+}

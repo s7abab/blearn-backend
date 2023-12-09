@@ -1,16 +1,18 @@
-import { IOrder } from "../@types/modelTypes/order";
-import orderModel from "../models/order.model";
+import { IOrder } from "../@types/order.types";
+import prisma from "../config/prismaClient";
 
 class PaymentRepository {
   constructor() {}
 
   async createOrder({ userId, courseId, payment_status, price }: IOrder) {
     try {
-      const order = await orderModel.create({
-        userId,
-        courseId,
-        payment_status,
-        price,
+      const order = await prisma.order.create({
+        data: {
+          userId,
+          courseId,
+          payment_status,
+          price,
+        },
       });
       return order;
     } catch (error: any) {

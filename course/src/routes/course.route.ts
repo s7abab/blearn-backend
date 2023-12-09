@@ -9,7 +9,6 @@ import {
   editModule,
   getAllCourses,
   getCoursesForInstructors,
-  getLessonsForInstructor,
   getModules,
   getSingleCourse,
   getSingleCourseForInstructors,
@@ -25,7 +24,12 @@ router.post(
   createCourse
 );
 
-router.put("/edit-course", isAuthenticated, authorizeRoles(Roles.INSTRUCTOR), editCourse);
+router.put(
+  "/edit-course",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  editCourse
+);
 
 router.delete(
   "/delete-course",
@@ -87,13 +91,6 @@ router.post(
   isAuthenticated,
   authorizeRoles(Roles.INSTRUCTOR),
   addLesson
-);
-
-router.get(
-  "/get-lessons-for-instructors",
-  isAuthenticated,
-  authorizeRoles(Roles.INSTRUCTOR),
-  getLessonsForInstructor
 );
 
 export default router;
