@@ -5,7 +5,7 @@ import paymentRepository from "../repositories/payment.repository";
 import { Payment } from "../events/subjects";
 import { publishEvent } from "../events/publisher";
 import { IOrder } from "../@types/order.types";
-import prisma from "../config/prismaClient";
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 export const createOrder = catchAsyncError(
