@@ -10,6 +10,7 @@ export interface IUser extends Document {
   password: string;
   avatar: string;
   role: string;
+  additional_info: [{}];
   isBlock: boolean;
   comparePassword(password: string): Promise<boolean>;
 }
@@ -38,6 +39,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: String,
       default: "user",
     },
+    additional_info: { type: [{}] },
     isBlock: { type: Boolean, default: false },
   },
   { timestamps: true }

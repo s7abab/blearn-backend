@@ -1,3 +1,4 @@
+import { Roles } from "@s7abab/common";
 import userModel, { IUser } from "../models/user.model";
 
 class UserRepository {
@@ -47,7 +48,7 @@ class UserRepository {
       if (!user) {
         throw new Error("User not found");
       }
-      console.log(user)
+      console.log(user);
       user.isBlock = !user.isBlock;
       await user.save();
       return user.isBlock;
@@ -120,6 +121,23 @@ class UserRepository {
       user.avatar = imageUrl;
       await user.save();
       return user;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async findUserAndUpdateAsInstructor(data: any) {
+    try {
+      const user = await this.findUserById(data.userId);
+      if (user) {
+        if (user.additional_info[0]) {
+          throw new Error("Additional data already added");
+        }
+        user.additional_info.push(data);
+        user.role = Roles.INSTRUCTOR;
+        await user?.save();
+        return user;
+      }
     } catch (error: any) {
       throw new Error(error);
     }

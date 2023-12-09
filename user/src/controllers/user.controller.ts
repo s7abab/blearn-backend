@@ -333,3 +333,27 @@ export const updateProfilePicture = catchAsyncError(
     }
   }
 );
+
+export const instructorApplication = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.body) {
+        return next(
+          new ErrorHandler("No data recieved in the request body", 400)
+        );
+      }
+      const userId = req?.user?.id;
+      const instructor = await userRepository.findUserAndUpdateAsInstructor({
+        ...req.body,
+        userId,
+      });
+
+      res.status(200).json({
+        success: true,
+        instructor,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+);

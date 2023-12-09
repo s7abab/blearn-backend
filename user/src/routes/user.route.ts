@@ -2,6 +2,7 @@ import express from "express";
 import {
   activateUser,
   getUserInfo,
+  instructorApplication,
   loginUser,
   logoutUser,
   registerUser,
@@ -25,8 +26,10 @@ router.get("/current-user", isAuthenticated, getUserInfo);
 
 router.post("/social-auth", socialAuth);
 
-router.put("/update-user", isAuthenticated, updateUser)
+router.put("/update-user", isAuthenticated, updateUser);
 
-router.put("/update-user-avatar", isAuthenticated, updateProfilePicture)
+router.put("/update-user-avatar", isAuthenticated, updateProfilePicture);
+
+router.post("/instructor-application",isAuthenticated, instructorApplication);
 
 export default router;
