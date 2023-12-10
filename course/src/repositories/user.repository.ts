@@ -44,56 +44,6 @@ class UserRepository {
       throw new Error(error);
     }
   }
-
-  async addCourseToUser({ courseId, userId }: IEnroll) {
-    const courseid = new mongoose.Types.ObjectId(courseId);
-    const userid = new mongoose.Types.ObjectId(userId);
-    try {
-      const user = await this.findUserById(userid);
-      if (!user) {
-        throw new Error("User not found");
-      }
-      // push course to user
-      const newCourse = {
-        course: courseid,
-        progress: 0,
-      } as ICourseProgress;
-
-      const addCourse = user.courses.push(newCourse);
-
-      // increment entroll +1 and add revenue
-      const course = await courseModel.findById(courseId);
-      if (!course) {
-        throw new Error("Course not found");
-      }
-      // add userId to course
-      const addUserIdToCourse = course?.enrolls?.push(userid);
-
-      const updatedCourse = await courseModel.findByIdAndUpdate(
-        courseId,
-        { $inc: { revenue: course?.discountPrice } },
-        { new: true }
-      );
-      await user.save();
-      await course.save();
-      return addCourse;
-    } catch (error: any) {
-      throw new Error(error);
-    }
-  }
-
-  async findEntrolledCoursesByuserId(userId: string) {
-    try {
-      const user = await userModel
-        .findById(userId)
-        .populate("courses.course")
-        .exec();
-      const courses = user?.courses;
-      return courses;
-    } catch (error: any) {
-      throw new Error(error);
-    }
-  }
 }
 
 export default new UserRepository();

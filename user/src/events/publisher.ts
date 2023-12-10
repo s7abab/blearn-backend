@@ -13,6 +13,5 @@ export const publishEvent = async ({ payload }: IPublisherArgs) => {
 
   setTimeout(() => {
     connection.close();
-    process.exit(0);
-  }, 1000);
+  }, 300);
 };

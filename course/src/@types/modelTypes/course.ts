@@ -46,12 +46,10 @@ export interface ICourse extends Document {
   price: number;
   discountPrice: number;
   courseData?: Types.ObjectId[];
-  tags?: string;
   enrolls?: Types.ObjectId[];
   revenue?: number;
   isBlock: boolean;
   level?: number;
-  coupon?: Types.ObjectId[];
   reviews?: IReview[];
   rating?: number;
   modules?: IModule[];

@@ -13,6 +13,7 @@ import { ICourse, IModule, IModuleRequest } from "../@types/modelTypes/course";
 import courseRepository from "../repositories/course.repository";
 import { getVideoDurationInSeconds } from "get-video-duration";
 import courseModel from "../models/course.model";
+import userRepository from "../repositories/user.repository";
 
 export const createCourse = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -321,6 +322,48 @@ export const getModules = catchAsyncError(
       res.status(200).json({
         success: true,
         modules,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+);
+
+export const getEntrolledCourses = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req?.user?.id;
+      const courses = await courseRepository.findEntrolledCoursesByuserId(
+        userId
+      );
+      if (!courses) {
+        return next(new ErrorHandler("Courses not found", 404));
+      }
+      res.status(200).json({
+        success: true,
+        courses,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+);
+
+export const getSingleEntrolledCourse = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { courseId } = req.params;
+      const userId = req?.user?.id;
+      const course = await courseRepository.findCourseByUserIdAndCourseId(
+        userId,
+        courseId
+      );
+      if (!course) {
+        return next(new ErrorHandler("Courses not found", 404));
+      }
+      res.status(200).json({
+        success: true,
+        course,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, error.statusCode || 500));

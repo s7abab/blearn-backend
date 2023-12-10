@@ -9,9 +9,11 @@ import {
   editModule,
   getAllCourses,
   getCoursesForInstructors,
+  getEntrolledCourses,
   getModules,
   getSingleCourse,
   getSingleCourseForInstructors,
+  getSingleEntrolledCourse,
 } from "../controllers/course.controller";
 import { Roles, authorizeRoles, isAuthenticated } from "@s7abab/common";
 
@@ -82,7 +84,7 @@ router.delete(
 router.get(
   "/get-modules/:courseId",
   isAuthenticated,
-  authorizeRoles(Roles.INSTRUCTOR),
+  // authorizeRoles(Roles.INSTRUCTOR),
   getModules
 );
 
@@ -91,6 +93,14 @@ router.post(
   isAuthenticated,
   authorizeRoles(Roles.INSTRUCTOR),
   addLesson
+);
+
+router.get("/enrolled-courses", isAuthenticated, getEntrolledCourses);
+
+router.get(
+  "/single-enrolled-course/:courseId",
+  isAuthenticated,
+  getSingleEntrolledCourse
 );
 
 export default router;
