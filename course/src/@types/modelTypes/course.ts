@@ -23,6 +23,7 @@ export interface ILesson extends Document {
   type: string;
   title: string;
   url: string;
+  lessonNo: number;
   duration?: number;
 }
 
@@ -54,6 +55,7 @@ export interface ICourse extends Document {
   rating?: number;
   modules?: IModule[];
   duration: number;
+  totalLessons: number;
 }
 
 export interface ICategory extends Document {

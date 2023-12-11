@@ -94,16 +94,17 @@ class CourseRepository {
   async createLesson(data: ILessonRequest) {
     try {
       const course = await this.findCourseById(data.courseId);
-      console.log(data.courseId)
       if (!course) {
         throw new Error("Course not found");
       }
+      const totalLessons = (course.totalLessons = course.totalLessons + 1);
       if (course.modules) {
         const lesson = course?.modules[data.index].lessons.push({
           title: data.title,
           duration: data.duration,
           type: data.type,
           url: data.url,
+          lessonNo: totalLessons,
         } as ILesson);
         course.duration += data.duration!;
         await course.save();

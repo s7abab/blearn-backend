@@ -194,9 +194,10 @@ export const getSingleCourseForInstructors = catchAsyncError(
 
 export const addLesson = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { courseId, type, title, url, index } = req.body as ILessonRequest;
+    const { courseId, type, title, url, index } =
+      req.body as ILessonRequest;
     try {
-      if (!type || !title || !url) {
+      if (!type || !title || !url ) {
         return next(new ErrorHandler("Please fill all fields", 400));
       }
       let duration = 60;
