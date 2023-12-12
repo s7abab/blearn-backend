@@ -10,7 +10,6 @@ export interface IUser extends Document {
 
 export interface ICourseProgress extends Document {
   course: mongoose.Types.ObjectId;
-  progress: number;
 }
 
 export interface IReview extends Document {
@@ -24,6 +23,7 @@ export interface ILesson extends Document {
   title: string;
   url: string;
   lessonNo: number;
+  progress: number;
   duration?: number;
 }
 
@@ -50,10 +50,10 @@ export interface ICourse extends Document {
   enrolls?: Types.ObjectId[];
   revenue?: number;
   isBlock: boolean;
-  level?: number;
   reviews?: IReview[];
   rating?: number;
   modules?: IModule[];
+  progress?: number;
   duration: number;
   totalLessons: number;
 }

@@ -7,10 +7,6 @@ const courseProgressSchema: Schema<ICourseProgress> = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
     },
-    progress: {
-      type: Number,
-      default: 0,
-    },
   },
   { _id: false }
 );

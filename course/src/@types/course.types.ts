@@ -30,6 +30,13 @@ export interface ILessonGetRequest {
   index: any;
 }
 
+export interface ILessonProgressTrackData {
+  courseId: string;
+  moduleId: string | undefined;
+  lessonId: string | undefined;
+  progress: number;
+}
+
 export interface IModuleDeleteRequest {
   courseId: string;
   instructorId: string;

@@ -18,6 +18,7 @@ const lessonSchema = new Schema<ILesson>({
   url: { type: String },
   lessonNo: { type: Number },
   duration: { type: Number },
+  progress: { type: Number, default: 0 },
 });
 
 const moduleSchema = new Schema<IModule>({
@@ -38,11 +39,11 @@ const courseSchema: Schema<ICourse> = new Schema<ICourse>(
     enrolls: [{ type: Schema.Types.ObjectId, ref: "User" }],
     revenue: { type: Number, default: 0 },
     isBlock: { type: Boolean, required: true, default: false },
-    level: { type: Number, default: "0" },
     reviews: [reviewSchema],
     modules: { type: [moduleSchema], default: [] },
     totalLessons: { type: Number, default: 0 },
     duration: { type: Number, default: 0 },
+    progress: { type: Number, default: 0 },
   },
   {
     timestamps: true,
