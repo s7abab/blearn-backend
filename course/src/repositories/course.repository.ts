@@ -4,13 +4,13 @@ import {
   ICourseProgress,
   IEnroll,
   ILesson,
-  IModule,
   IModuleRequest,
 } from "../@types/modelTypes/course";
 import courseModel from "../models/course.model";
 import {
   ICourseRequestData,
   ILessonGetRequest,
+  ILessonProgressTrackData,
   ILessonRequest,
   IModuleDeleteRequest,
   IModuleEditRequest,
@@ -106,7 +106,9 @@ class CourseRepository {
           url: data.url,
           lessonNo: totalLessons,
         } as ILesson);
-        course.duration += data.duration!;
+        if (data.type === "video") {
+          course.duration += data.duration!;
+        }
         await course.save();
         return lesson;
       }
@@ -199,7 +201,6 @@ class CourseRepository {
       // push course to user
       const newCourse = {
         course: courseid,
-        progress: 0,
       } as ICourseProgress;
 
       const addCourse = user.courses.push(newCourse);
@@ -259,6 +260,53 @@ class CourseRepository {
       }
 
       return foundCourse.course;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async findLessonAndUpdateProgresson(data: ILessonProgressTrackData) {
+    try {
+      let lessonId: any;
+      if (data.lessonId !== "first") {
+        lessonId = new mongoose.Types.ObjectId(data.lessonId);
+      }
+      const moduleId = new mongoose.Types.ObjectId(data.moduleId);
+      if (data.lessonId !== "first") {
+        lessonId = new mongoose.Types.ObjectId(data.lessonId);
+      }
+      const course = await this.findCourseById(data.courseId);
+      if (!course) {
+        throw new Error("Course not found");
+      }
+      // find module
+      const module = course.modules?.find((mod) => mod._id.equals(moduleId));
+      if (!module) {
+        throw new Error("Module not found");
+      }
+      if (data.lessonId === "first") {
+        lessonId = module.lessons[0]._id;
+      }
+      const lesson = module.lessons?.find((les) => les._id.equals(lessonId));
+      if (!lesson) {
+        throw new Error("Module not found");
+      }
+      if (lesson.progress === 100) {
+        return lesson;
+      }
+      if (
+        course &&
+        typeof course.progress === "number" &&
+        typeof lesson.duration === "number"
+      ) {
+        course.progress = (course.progress ?? 0) + lesson.duration;
+      }
+      lesson.progress = 100;
+
+      await course.save();
+      console.log(lesson, "fns");
+      return lesson;
+      // Find the lesson by lessonId in the module
     } catch (error: any) {
       throw new Error(error);
     }

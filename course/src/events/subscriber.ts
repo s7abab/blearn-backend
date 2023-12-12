@@ -1,4 +1,5 @@
 import connectToRabbitMQ from "../config/rabbitmq";
+import courseRepository from "../repositories/course.repository";
 import userRepository from "../repositories/user.repository";
 import { QUEUES } from "./queues";
 import { Payment, User } from "./subjects";
@@ -36,7 +37,7 @@ export async function subscribeRabbitmq() {
         const messageContent = msg.content.toString();
         const paymentData = JSON.parse(messageContent);
         if (paymentData.subject === Payment.ORDER_CREATED) {
-          await userRepository.addCourseToUser(paymentData);
+          await courseRepository.addCourseToUser(paymentData);
           console.log("Order created:", paymentData);
           channel.ack(msg);
         }

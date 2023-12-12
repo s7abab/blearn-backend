@@ -14,6 +14,7 @@ import {
   getSingleCourse,
   getSingleCourseForInstructors,
   getSingleEntrolledCourse,
+  trackLesson,
 } from "../controllers/course.controller";
 import { Roles, authorizeRoles, isAuthenticated } from "@s7abab/common";
 
@@ -102,5 +103,7 @@ router.get(
   isAuthenticated,
   getSingleEntrolledCourse
 );
+
+router.post("/track-lesson", isAuthenticated, trackLesson);
 
 export default router;

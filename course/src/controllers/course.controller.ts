@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import {
   ICourseRequestData,
   ILessonGetRequest,
+  ILessonProgressTrackData,
   ILessonRequest,
   IModuleDeleteRequest,
   IModuleEditRequest,
@@ -194,10 +195,9 @@ export const getSingleCourseForInstructors = catchAsyncError(
 
 export const addLesson = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { courseId, type, title, url, index } =
-      req.body as ILessonRequest;
+    const { courseId, type, title, url, index } = req.body as ILessonRequest;
     try {
-      if (!type || !title || !url ) {
+      if (!type || !title || !url) {
         return next(new ErrorHandler("Please fill all fields", 400));
       }
       let duration = 60;
@@ -365,6 +365,20 @@ export const getSingleEntrolledCourse = catchAsyncError(
       res.status(200).json({
         success: true,
         course,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+);
+
+export const trackLesson = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.body as ILessonProgressTrackData;
+    try {
+      await courseRepository.findLessonAndUpdateProgresson(data);
+      res.status(200).json({
+        success: true,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
