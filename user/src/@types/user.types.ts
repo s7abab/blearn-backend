@@ -2,7 +2,7 @@ export interface IRegisterUser {
   name: string;
   email: string;
   password: string;
-  confirmpassword?: string
+  confirmpassword?: string;
 }
 
 export interface IActivationToken {
@@ -34,8 +34,4 @@ export interface IUpdateUser {
 export interface IUpdatePassword {
   oldPassword: string;
   newPassword: string;
-}
-
-export interface IUpdateProfilePicture {
-  imageUrl: string;
 }

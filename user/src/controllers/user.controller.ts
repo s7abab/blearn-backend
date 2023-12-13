@@ -1,325 +1,130 @@
-require("dotenv").config();
 import { Request, Response, NextFunction } from "express";
-import jwt, { Secret } from "jsonwebtoken";
-import ejs from "ejs";
-import path from "path";
-import sendMail from "../utils/sendMail";
-import { sendToken } from "../utils/jwt";
-import {
-  IActivationRequest,
-  IActivationToken,
-  ILoginRequest,
-  IRegisterUser,
-  ISocialAuthBody,
-  IUpdateProfilePicture,
-  IUpdateUser,
-} from "../@types/user.types";
-import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import userRepository from "../repositories/user.repository";
-import { IUser } from "../models/user.model";
-import validator from "validator";
-import { publishEvent } from "../events/publisher";
-import { User } from "../events/subjects";
+import UserUsecase from "../usecases/user.usecase";
+import { IUpdateUser } from "../@types/user.types";
 
-// register user
-export const registerUser = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+class UserController {
+  private userUsecase: UserUsecase;
+  constructor(userUsecase: UserUsecase) {
+    this.userUsecase = userUsecase;
+  }
+
+  async registerUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, email, password, confirmpassword }: IRegisterUser =
-        req.body;
+      const token = await this.userUsecase.register(req.body);
 
-      // Validate the email address
-      if (!validator.isEmail(email)) {
-        return next(new ErrorHandler("Invalid email address", 400));
-      }
-
-      if (!validator.isStrongPassword(password)) {
-        return next(
-          new ErrorHandler(
-            "At least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character",
-            400
-          )
-        );
-      }
-
-      if (password !== confirmpassword) {
-        return next(
-          new ErrorHandler("Password and Confirm Password do not match", 400)
-        );
-      }
-
-      const isEmailExist = await userRepository.findUserByEmail(email);
-      if (isEmailExist) {
-        return next(new ErrorHandler("Email is already exist", 400));
-      }
-      const user: IRegisterUser = {
-        name,
-        email,
-        password,
-      };
-      const activationToken = createActivationToken(user);
-      const activationCode = activationToken.activationCode;
-      console.log(activationCode);
-
-      const data = { user: { name: user.name }, activationCode };
-      const html = await ejs.renderFile(
-        path.join(__dirname, "../mails/activation-mail.ejs"),
-        data
-      );
-
-      try {
-        await sendMail({
-          email: user.email,
-          subject: "Account Activation",
-          template: "activation-mail.ejs",
-          data,
-        });
-
-        res.status(201).json({
-          success: true,
-          message: `Please check your email: ${user.email} to activate your account.`,
-          activationToken: activationToken.token,
-        });
-      } catch (error: any) {
-        return next(new ErrorHandler(error.message, 400));
-      }
+      res.status(200).json({
+        success: true,
+        activationToken: token,
+        message: "Otp successfully sent to your email address.",
+      });
     } catch (error: any) {
-      return new ErrorHandler(error.message, 400);
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-// create activation token
-export const createActivationToken = (user: any): IActivationToken => {
-  const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
-  const token = jwt.sign(
-    {
-      user,
-      activationCode,
-    },
-    process.env.ACTIVATION_SECRET as Secret,
-    {
-      expiresIn: "2m",
-    }
-  );
-  return { token, activationCode };
-};
-
-// activate user
-export const activateUser = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async activateUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const { activation_token, activation_code } =
-        req.body as IActivationRequest;
+      const newUser = await this.userUsecase.activateUser(req.body);
 
-      const newUser = jwt.verify(
-        activation_token,
-        process.env.ACTIVATION_SECRET as string
-      ) as { user: IUser; activationCode: string };
-      if (newUser.activationCode !== activation_code) {
-        return next(new ErrorHandler("Invalid activation code", 400));
-      }
-
-      const { name, email, password } = newUser.user;
-
-      const existingUser = await userRepository.findUserByEmail(email);
-
-      if (existingUser) {
-        return next(new ErrorHandler("User already exist", 400));
-      }
-
-      const user: IUser = await userRepository.createUser({
-        name,
-        email,
-        password,
-      } as IUser);
-
-      const payload = {
-        subject: User.USER_CREATED,
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      };
-      publishEvent({
-        payload,
-      });
       res.status(201).json({
         success: true,
+        message: "Account activated successfully",
       });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-// login user
-export const loginUser = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async loginUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, password } = req.body as ILoginRequest;
+      const user = await this.userUsecase.login(req.body);
 
-      // Validate the email address
-      if (!validator.isEmail(email)) {
-        return next(new ErrorHandler("Invalid email address", 400));
-      }
-
-      if (!email || !password) {
-        return next(new ErrorHandler("Please enter email and password", 400));
-      }
-      const user = await userRepository.findUserByEmail(email);
-      if (!user) {
-        return next(new ErrorHandler("User not found", 404));
-      }
-      if (user?.isBlock) {
-        return next(new ErrorHandler("You are blocked by admin", 400));
-      }
-      const isPasswordMatched = await userRepository.compareUserPassword(
-        email,
-        password
-      );
-      if (!isPasswordMatched) {
-        return next(new ErrorHandler("Invalid email or password", 400));
-      }
-      sendToken(user, 200, res);
+      res.cookie("token", user.token, { expires: user.expires });
+      res.status(200).json({
+        success: true,
+        token: user.token,
+        user: user.user,
+      });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 500));
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-// logout user
-export const logoutUser = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async logoutUser(req: Request, res: Response, next: NextFunction) {
     try {
       res.clearCookie("token");
+
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
       });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-// get user info
-export const getUserInfo = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async getUserInfo(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.id;
-      const user = await userRepository.findUserById(userId);
-      if (user?.isBlock) {
-        res.clearCookie("token");
-        return next(new ErrorHandler("You are blocked by admin", 400));
-      }
-      if (user) {
-        res.status(200).json({
-          success: true,
-          user,
-        });
-      }
+      const user = await this.userUsecase.getOneUser(userId);
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-// social auth
-export const socialAuth = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async socialAuth(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, email, avatar } = req.body as ISocialAuthBody;
-      if (!name || !email || !avatar) {
-        return next(new ErrorHandler("Some fields are missing", 400));
-      }
-      const user: IUser = await userRepository.findUserByEmail(email);
-      if (!user) {
-        const newUser: IUser = await userRepository.createUser({
-          email,
-          name,
-          avatar,
-        } as IUser);
-        const payload = {
-          subject: User.USER_CREATED,
-          _id: newUser._id,
-          name: newUser.name,
-          email: newUser.email,
-          role: newUser.role,
-        };
-        publishEvent({
-          payload,
-        });
-        sendToken(newUser, 200, res);
-      } else {
-        sendToken(user, 200, res);
-      }
+      const user = await this.userUsecase.socialAuth(req.body);
+      res.cookie("token", user.token, { expires: user.expires });
+      res.status(200).json({
+        success: true,
+        token: user.token,
+        user: user.user,
+      });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-// update user
-export const updateUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { name, email }: IUpdateUser = req.body;
-    const userId: string | undefined = req.user?.id;
-
-    const updatedData: Partial<IUpdateUser> = {};
-    if (email) {
-      updatedData.email = email;
-    }
-    if (name) {
-      updatedData.name = name;
-    }
-
-    if (!userId) {
-      throw new Error("User ID not found");
-    }
-
-    const updatedUser = await userRepository.updateUserDetails(
-      userId,
-      updatedData
-    );
-
-    const payload = {
-      subject: User.USER_UPDATED,
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      role: updatedUser.role,
-    };
-    publishEvent({
-      payload,
-    });
-
-    res.status(201).json({
-      success: true,
-      user: updatedUser,
-    });
-  } catch (error: any) {
-    return next(new ErrorHandler(error.message, 400));
-  }
-};
-
-// update profile picture
-export const updateProfilePicture = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const { imageUrl } = req.body as IUpdateProfilePicture;
+      const { name, email } = req.body;
       const userId = req.user?.id;
 
-      if (!userId) {
-        return next(new ErrorHandler("User ID not found", 400));
+      const updatedData: Partial<IUpdateUser> = {};
+      if (email) {
+        updatedData.email = email;
       }
+      if (name) {
+        updatedData.name = name;
+      }
+      const updatedUser = await this.userUsecase.updateUserDetails(
+        userId,
+        updatedData
+      );
 
-      const updatedUser = await userRepository.updateUserProfilePicture(
+      res.status(201).json({
+        success: true,
+        user: updatedUser,
+        message: "User data updated",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
+  async updateProfilePicture(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { imageUrl } = req.body;
+      const userId = req.user?.id;
+
+      const updatedUser = await this.userUsecase.updateUserProfilePicture(
         userId,
         imageUrl
       );
@@ -327,23 +132,17 @@ export const updateProfilePicture = catchAsyncError(
       res.status(200).json({
         success: true,
         user: updatedUser,
+        message: "Profile picture updated successfully",
       });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const instructorApplication = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async instructorApplication(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!req.body) {
-        return next(
-          new ErrorHandler("No data recieved in the request body", 400)
-        );
-      }
       const userId = req?.user?.id;
-      const instructor = await userRepository.findUserAndUpdateAsInstructor({
+      const instructor = await this.userUsecase.findUserAndUpdateAsInstructor({
         ...req.body,
         userId,
       });
@@ -351,9 +150,89 @@ export const instructorApplication = catchAsyncError(
       res.status(200).json({
         success: true,
         instructor,
+        message: "Application sent successfully",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
+
+  // admin
+  async getUsers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await this.userUsecase.getUsersByRole("user");
+
+      res.status(200).send({
+        success: true,
+        users,
+      });
+    } catch (error: any) {
+      return new ErrorHandler(error.message, 500);
+    }
+  }
+
+  async getInstructors(req: Request, res: Response, next: NextFunction) {
+    try {
+      const instructors = await this.userUsecase.getUsersByRole("instructor");
+
+      res.status(200).send({
+        success: true,
+        instructors,
+      });
+    } catch (error: any) {
+      return new ErrorHandler(error.message, 500);
+    }
+  }
+
+  async getSingleUser(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    try {
+      const user = await this.userUsecase.getUserByIdAndRole(id, "user");
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return new ErrorHandler(error.message, 500);
+    }
+  }
+
+  async getSingleInstructor(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    try {
+      const user = await this.userUsecase.getUserByIdAndRole(id, "instructor");
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return new ErrorHandler(error.message, 500);
+    }
+  }
+
+  async blockUser(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    try {
+      if (!id) {
+        return new ErrorHandler("Invalid id", 400);
+      }
+      const blockStatus = await this.userUsecase.toggleBlockStatus(id);
+      let message = "";
+      if (blockStatus) {
+        message = "User blocked";
+      } else {
+        message = "User unblocked";
+      }
+      res.status(200).json({
+        success: true,
+        message,
+      });
+    } catch (error: any) {
+      return new ErrorHandler(error.message, 500);
+    }
+  }
+}
+
+export default UserController;

@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { IUser } from "../models/user.model";
+import { IUser } from "../frameworks/models/user.model";
 import { JwtPayload } from "jsonwebtoken";
 
 declare global {

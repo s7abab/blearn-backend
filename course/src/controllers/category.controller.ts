@@ -1,65 +1,45 @@
-import { catchAsyncError } from "@s7abab/common";
 import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import categoryModel from "../models/category.model";
-import {
-  ICategoryId,
-  ICreateCategory,
-  IEditCategory,
-} from "../@types/category.types";
-import { validateCategoryName } from "../utils/validations/category.validation";
-import CategoryRepository from "../repositories/category.repository";
+import { ICategory } from "../@types/category.types";
+import CategoryService from "../usecases/category.usecase";
+import { validateCategoryName } from "../frameworks/utils/validations/category.validation";
+import { isEmpty } from "../frameworks/utils/validations/common.validation";
 
-export const createCategory = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { name } = req.body as ICreateCategory;
-    if (!validateCategoryName({ name })) {
-      return next(new ErrorHandler("Invalid inputs", 400));
-    }
-    if (!name) {
-      return next(new ErrorHandler("Invalid name", 400));
-    }
+class CategoryController {
+  private categoryService: CategoryService;
+
+  constructor(categoryService: CategoryService) {
+    this.categoryService = categoryService;
+  }
+
+  async createCategory(req: Request, res: Response, next: NextFunction) {
     try {
-      const existingCategory = await CategoryRepository.findCategoryByName(name);
+      const { name } = req.body as ICategory;
 
-      if (existingCategory) {
-        return next(
-          new ErrorHandler("Category with the same name already exists", 400)
-        );
+      if (!name || !validateCategoryName({ name })) {
+        return next(new ErrorHandler("Invalid inputs", 400));
       }
-      const category = await CategoryRepository.createCategory(name);
+
+      const category = await this.categoryService.createCategory(name);
+
       res.status(201).json({
         success: true,
         message: "Category created successfully",
+        category,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
 
-export const editCategory = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { name, categoryId } = req.body as IEditCategory;
+  async editCategory(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!validateCategoryName({ name })) {
-        return next(new ErrorHandler("Invalid inputs", 400));
-      }
+      const { name, categoryId } = req.body as ICategory;
 
-      if (!name || !categoryId) {
-        return next(
-          new ErrorHandler("Invalid name or categoryId provided", 400)
-        );
+      if (isEmpty(name) || isEmpty(categoryId)) {
+        return next(new ErrorHandler("Invalid category data", 400));
       }
-
-      const existingCategory = await CategoryRepository.findCategoryByName(name);
-      if (existingCategory) {
-        return next(
-          new ErrorHandler("Category with the same name already exists", 409)
-        );
-      }
-
-      await CategoryRepository.updateCategory({
+      await this.categoryService.updateCategory({
         categoryId,
         name,
       });
@@ -72,24 +52,16 @@ export const editCategory = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
 
-export const unlistCategory = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { categoryId } = req.body as ICategoryId;
+  async unlistCategory(req: Request, res: Response, next: NextFunction) {
     try {
+      const { categoryId }: { categoryId: string } = req.body;
+
       if (!categoryId) {
-        return next(
-          new ErrorHandler("Invalid categoryId or isListed value provided", 400)
-        );
-      }
-      const category = await CategoryRepository.findCategoryById(categoryId);
-
-      if (!category) {
-        return next(new ErrorHandler("Category not found", 404));
+        return next(new ErrorHandler("Invalid categoryId provided", 400));
       }
 
-      await CategoryRepository.toggleCategoryListing(categoryId);
+      await this.categoryService.toggleCategoryListing(categoryId);
 
       res.status(200).json({
         success: true,
@@ -98,15 +70,11 @@ export const unlistCategory = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
 
-export const getAllCategory = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async getAllCategories(req: Request, res: Response, next: NextFunction) {
     try {
-      const categories = await CategoryRepository.findCategory();
-      if (!categories) {
-        return next(new ErrorHandler("Categories not found", 404));
-      }
+      const categories = await this.categoryService.getCategories();
+
       res.status(200).json({
         success: true,
         categories,
@@ -115,15 +83,12 @@ export const getAllCategory = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
-export const getSingleCategory = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { categoryId } = req.params;
+
+  async getSingleCategory(req: Request, res: Response, next: NextFunction) {
     try {
-      const category = await CategoryRepository.findCategoryById(categoryId)
-      if (!category) {
-        return next(new ErrorHandler("Categories not found", 404));
-      }
+      const { categoryId } = req.params;
+      const category = await this.categoryService.getOneCategory(categoryId);
+
       res.status(200).json({
         success: true,
         category,
@@ -132,4 +97,6 @@ export const getSingleCategory = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
+}
+
+export default CategoryController;

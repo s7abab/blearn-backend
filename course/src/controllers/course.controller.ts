@@ -1,57 +1,30 @@
-import { catchAsyncError } from "@s7abab/common";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
-import mongoose from "mongoose";
 import {
   ICourseRequestData,
-  ILessonGetRequest,
-  ILessonProgressTrackData,
   ILessonRequest,
   IModuleDeleteRequest,
   IModuleEditRequest,
 } from "../@types/course.types";
-import { ICourse, IModule, IModuleRequest } from "../@types/modelTypes/course";
-import courseRepository from "../repositories/course.repository";
+import { ICourse, IModuleRequest } from "../@types/modelTypes/course";
 import { getVideoDurationInSeconds } from "get-video-duration";
-import courseModel from "../models/course.model";
-import userRepository from "../repositories/user.repository";
+import CourseUsecase from "../usecases/course.usecase";
 
-export const createCourse = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    let {
-      title,
-      description,
-      category,
-      thumbnail,
-      demoUrl,
-      price,
-      discountPrice,
-    } = req.body as ICourseRequestData;
-    const id = req?.user?.id;
+class CourseController {
+  private courseUsecase: CourseUsecase;
+  constructor(courseUsecase: CourseUsecase) {
+    this.courseUsecase = courseUsecase;
+  }
+
+  async createCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      if (
-        !id ||
-        !title ||
-        !category ||
-        !demoUrl ||
-        !description ||
-        !price ||
-        !thumbnail ||
-        !discountPrice
-      ) {
-        return next(new ErrorHandler("Fill all the fields", 400));
-      }
-      category = new mongoose.Types.ObjectId(category);
-      const course = await courseRepository.createCourse({
+      const id = req?.user?.id;
+
+      const course: ICourse = await this.courseUsecase.createCourse({
         instructorId: id,
-        title,
-        category,
-        thumbnail,
-        description,
-        demoUrl,
-        price,
-        discountPrice,
+        ...req.body,
       } as ICourse);
+
       res.status(200).json({
         success: true,
         message: "Course created successfully",
@@ -61,22 +34,11 @@ export const createCourse = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
 
-export const editCourse = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const {
-      _id,
-      title,
-      description,
-      category,
-      thumbnail,
-      demoUrl,
-      price,
-      discountPrice,
-    } = req.body as ICourseRequestData;
+  async editCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      const course = await courseRepository.findCourseAndUpdate(req.body);
+      const course = await this.courseUsecase.updateCourse(req.body);
+
       res.status(200).json({
         success: true,
         course,
@@ -85,15 +47,11 @@ export const editCourse = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const getAllCourses = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async getAllCourses(req: Request, res: Response, next: NextFunction) {
     try {
-      const courses = await courseRepository.findCourses();
-      if (!courses) {
-        return next(new ErrorHandler("Courses not found", 404));
-      }
+      const courses: ICourse[] = await this.courseUsecase.getCourses();
+
       res.status(200).json({
         success: true,
         courses,
@@ -102,25 +60,13 @@ export const getAllCourses = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
 
-export const getSingleCourse = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { courseId } = req.params;
+  async getSingleCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!courseId) {
-        return next(new ErrorHandler("Invalid courseId provided", 400));
-      }
-
-      if (!mongoose.Types.ObjectId.isValid(courseId)) {
-        return next(new ErrorHandler("Invalid course ID", 400));
-      }
-
-      const course = await courseRepository.findCourseById(courseId);
-
-      if (!course) {
-        return next(new ErrorHandler("Course not found", 404));
-      }
+      const { courseId } = req.params;
+      const course: ICourse | null = await this.courseUsecase.getOneCourse(
+        courseId
+      );
 
       res.status(200).json({
         success: true,
@@ -130,16 +76,12 @@ export const getSingleCourse = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
 
-export const deleteCourse = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { user, courseId } = req.body;
+  async deleteCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!courseId) {
-        return next(new ErrorHandler("Invalid courseId", 400));
-      }
-      await courseRepository.findCourseByIdAndDelete(courseId);
+      const { courseId } = req.body;
+      await this.courseUsecase.deleteCourse(courseId);
+
       res.status(200).json({
         success: true,
         message: "Course deleted successfully",
@@ -148,18 +90,16 @@ export const deleteCourse = catchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
-);
 
-export const getCoursesForInstructors = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const instructorId: string | undefined = req?.user?.id;
+  async getCoursesForInstructors(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-      if (!instructorId) {
-        return next(new ErrorHandler("Instructor id missing", 400));
-      }
-      const courses = await courseRepository.findCoursesByInstructorId(
-        instructorId
-      );
+      const instructorId = req?.user?.id;
+      const courses: ICourse[] | null =
+        await this.courseUsecase.getCoursesForInstructor(instructorId);
 
       res.status(200).json({
         success: true,
@@ -169,20 +109,22 @@ export const getCoursesForInstructors = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
-export const getSingleCourseForInstructors = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { courseId } = req.params;
-    const instructorId = req?.user?.id;
+
+  async getSingleCourseForInstructors(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-      if (!courseId) {
-        return next(new ErrorHandler("CourseId id missing", 400));
-      }
-      const course =
-        await courseRepository.findCoursesByInstructorIdAndCourseId(
+      const { courseId } = req.params;
+      const instructorId = req?.user?.id;
+
+      const course: ICourse | null =
+        await this.courseUsecase.getOneCourseForInstructor(
           instructorId,
           courseId
         );
+
       res.status(200).json({
         success: true,
         course,
@@ -191,23 +133,18 @@ export const getSingleCourseForInstructors = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const addLesson = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { courseId, type, title, url, index } = req.body as ILessonRequest;
+  async addLesson(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!type || !title || !url) {
-        return next(new ErrorHandler("Please fill all fields", 400));
-      }
+      const { courseId, type, title, url, index } = req.body;
+
       let duration = 60;
       if (type === "video") {
-        await getVideoDurationInSeconds(url).then((d) => {
-          duration = Math.round(d);
-        });
+        const videoDuration = await getVideoDurationInSeconds(url);
+        duration = Math.round(videoDuration);
       }
 
-      await courseRepository.createLesson({
+      await this.courseUsecase.createLesson({
         courseId,
         type,
         title,
@@ -224,18 +161,18 @@ export const addLesson = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const findLessonsForInstructor = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const instructorId = req?.user?.id;
+  async findLessonsForInstructor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-      if (!instructorId) {
-        return next(new ErrorHandler("Instructor id is empty", 400));
-      }
-      const lessons = await courseRepository.findLessonsByinstructorId(
+      const instructorId = req?.user?.id;
+      const lessons = await this.courseUsecase.getLessonsForInstructor(
         instructorId
       );
+
       res.status(200).send({
         success: true,
         lessons,
@@ -244,13 +181,11 @@ export const findLessonsForInstructor = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const addModule = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { courseId, title } = req.body as IModuleRequest;
+  async addModule(req: Request, res: Response, next: NextFunction) {
     try {
-      const module = await courseRepository.createModule({
+      const { courseId, title } = req.body;
+      const module = await this.courseUsecase.createModule({
         courseId,
         title,
       } as IModuleRequest);
@@ -267,14 +202,12 @@ export const addModule = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const editModule = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const instructorId = req?.user?.id;
-    const { courseId, title, index } = req.body;
+  async editModule(req: Request, res: Response, next: NextFunction) {
     try {
-      const module = await courseRepository.findModuleAndUpdate({
+      const instructorId = req?.user?.id;
+      const { courseId, title, index } = req.body;
+      const module = await this.courseUsecase.updateModule({
         instructorId,
         courseId,
         title,
@@ -289,13 +222,12 @@ export const editModule = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
-export const deleteModule = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const instructorId = req?.user?.id;
-    const { courseId, index } = req.body;
+
+  async deleteModule(req: Request, res: Response, next: NextFunction) {
     try {
-      const module = await courseRepository.findModuleAndDelete({
+      const instructorId = req?.user?.id;
+      const { courseId, index } = req.body;
+      const module = await this.courseUsecase.deleteModule({
         instructorId,
         courseId,
         index,
@@ -309,17 +241,11 @@ export const deleteModule = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const getModules = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { courseId } = req.params;
+  async getModules(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!courseId) {
-        return next(new ErrorHandler("CourseId is missing", 400));
-      }
-
-      const modules = await courseRepository.findModules(courseId);
+      const { courseId } = req.params;
+      const modules = await this.courseUsecase.getModules(courseId);
       res.status(200).json({
         success: true,
         modules,
@@ -328,18 +254,13 @@ export const getModules = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const getEntrolledCourses = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async getEnrolledCourses(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req?.user?.id;
-      const courses = await courseRepository.findEntrolledCoursesByuserId(
-        userId
-      );
-      if (!courses) {
-        return next(new ErrorHandler("Courses not found", 404));
-      }
+      const courses: ICourse[] | null =
+        await this.courseUsecase.getEnrolledCoursesForUser(userId);
+
       res.status(200).json({
         success: true,
         courses,
@@ -348,20 +269,14 @@ export const getEntrolledCourses = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
 
-export const getSingleEntrolledCourse = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async getOneEnrolledCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId } = req.params;
       const userId = req?.user?.id;
-      const course = await courseRepository.findCourseByUserIdAndCourseId(
-        userId,
-        courseId
-      );
-      if (!course) {
-        return next(new ErrorHandler("Courses not found", 404));
-      }
+      const course: ICourse | null =
+        await this.courseUsecase.getOneEnrolledCourseForUser(userId, courseId);
+
       res.status(200).json({
         success: true,
         course,
@@ -370,18 +285,21 @@ export const getSingleEntrolledCourse = catchAsyncError(
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-);
+}
 
-export const trackLesson = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const data = req.body as ILessonProgressTrackData;
-    try {
-      await courseRepository.findLessonAndUpdateProgresson(data);
-      res.status(200).json({
-        success: true,
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, error.statusCode || 500));
-    }
-  }
-);
+export default CourseController;
+// class over
+
+// export const trackLesson = catchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const data = req.body as ILessonProgressTrackData;
+//     try {
+//       const course = await this.courseUsecase.findLessonAndUpdateProgresson(data);
+//       res.status(200).json({
+//         success: true,
+//       });
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, error.statusCode || 500));
+//     }
+//   }
+// );
