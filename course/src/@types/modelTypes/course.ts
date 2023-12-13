@@ -13,7 +13,7 @@ export interface ICourseProgress extends Document {
 }
 
 export interface IReview extends Document {
-  user: object;
+  user: string;
   rating: number;
   comment: string;
 }
@@ -36,6 +36,11 @@ export interface IModuleRequest extends IModule {
   courseId: string;
 }
 
+export interface IEnrolledUser {
+  userId: string;
+  progress: number;
+}
+
 export interface ICourse extends Document {
   _id?: Types.ObjectId;
   instructorId?: string;
@@ -51,11 +56,10 @@ export interface ICourse extends Document {
   revenue?: number;
   isBlock: boolean;
   reviews?: IReview[];
-  rating?: number;
   modules?: IModule[];
-  progress?: number;
   duration: number;
   totalLessons: number;
+  enrolledUsers: [IEnrolledUser];
 }
 
 export interface ICategory extends Document {
