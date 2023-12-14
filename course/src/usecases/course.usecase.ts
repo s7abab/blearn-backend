@@ -1,17 +1,16 @@
+import CourseRepository from "../repositories/course.repository";
+import Course from "../entities/course";
 import {
-  ICourse,
-  IEnroll,
-  ILesson,
+  IModule,
+  IModuleDeleteRequest,
   IModuleRequest,
-} from "../@types/modelTypes/course";
+} from "../interfaces/module.interface";
 import {
-  ICourseRequestData,
+  ILesson,
   ILessonGetRequest,
   ILessonRequest,
-  IModuleDeleteRequest,
-  IModuleEditRequest,
-} from "../@types/course.types";
-import CourseRepository from "../frameworks/repositories/course.repository";
+} from "../interfaces/lesson.interface";
+import { IEnroll } from "../interfaces/enrollment.interface";
 
 class CourseUsecase {
   private courseRepository: CourseRepository;
@@ -20,7 +19,7 @@ class CourseUsecase {
   }
 
   // course
-  async createCourse(data: ICourse) {
+  async createCourse(data: Course) {
     try {
       const course = await this.courseRepository.create(data);
       if (!course) {
@@ -32,7 +31,7 @@ class CourseUsecase {
     }
   }
 
-  async updateCourse(data: ICourseRequestData): Promise<ICourse | null> {
+  async updateCourse(data: Course) {
     try {
       const updatedCourse = await this.courseRepository.findByCourseIdAndUpdate(
         data
@@ -46,7 +45,7 @@ class CourseUsecase {
     }
   }
 
-  async getCourses(): Promise<ICourse[]> {
+  async getCourses() {
     try {
       const courses = await this.courseRepository.find();
       return courses;
@@ -55,7 +54,7 @@ class CourseUsecase {
     }
   }
 
-  async getOneCourse(courseId: string): Promise<ICourse | null> {
+  async getOneCourse(courseId: string) {
     try {
       const course = await this.courseRepository.findByCourseId(courseId);
       return course;
@@ -64,7 +63,7 @@ class CourseUsecase {
     }
   }
 
-  async deleteCourse(courseId: string): Promise<ICourse | null> {
+  async deleteCourse(courseId: string) {
     try {
       const course = await this.courseRepository.findByCourseIdAndDelete(
         courseId
@@ -75,9 +74,7 @@ class CourseUsecase {
     }
   }
   // get all courses for instructor
-  async getCoursesForInstructor(
-    instructorId: string
-  ): Promise<ICourse[] | null> {
+  async getCoursesForInstructor(instructorId: string) {
     try {
       const courses = await this.courseRepository.findByInstructorId(
         instructorId
@@ -91,7 +88,7 @@ class CourseUsecase {
   async getOneCourseForInstructor(
     instructorId: string,
     courseId: any
-  ): Promise<ICourse | null> {
+  ): Promise<Course | null> {
     try {
       const course = await this.courseRepository.findByInstructorIdAndCourseId(
         instructorId,
@@ -104,7 +101,7 @@ class CourseUsecase {
   }
 
   // Module
-  async createModule(data: IModuleRequest) {
+  async createModule(data: IModule) {
     try {
       const module = await this.courseRepository.createModule(data);
       if (!module) {
@@ -118,26 +115,24 @@ class CourseUsecase {
 
   async getModules(courseId: string) {
     try {
-      const course = await this.courseRepository.findByCourseId(courseId);
-      const modules = course?.modules;
+      const modules = await this.courseRepository.findModules(courseId);
+      if (!modules) {
+        throw new Error("Modules not found");
+      }
       return modules;
     } catch (error: any) {
       throw new Error(error);
     }
   }
 
-  async updateModule(data: IModuleEditRequest) {
+  async updateModule(data: IModuleRequest) {
     try {
-      const course = await this.courseRepository.findByInstructorIdAndCourseId(
-        data.instructorId,
-        data.courseId
+      const updatedModule = await this.courseRepository.findModuleAndUpdate(
+        data
       );
-      if (course && course.modules) {
-        const moduleToUpdate = course.modules[data.index];
-        moduleToUpdate.title = data.title;
-        await course.save();
 
-        return moduleToUpdate;
+      if (!updatedModule) {
+        throw new Error("Module not updated");
       }
     } catch (error: any) {
       throw new Error(error);
@@ -146,19 +141,13 @@ class CourseUsecase {
 
   async deleteModule(data: IModuleDeleteRequest) {
     try {
-      const course = await this.courseRepository.findByInstructorIdAndCourseId(
-        data.instructorId,
-        data.courseId
+      const deleteModule = await this.courseRepository.findModuleAndDelete(
+        data
       );
-      if (!course) {
-        throw new Error("Course not found");
+      if (!deleteModule) {
+        throw new Error("Module not deleted");
       }
-      if (course.modules) {
-        const courseTodelete = course.modules.splice(data.index, 1);
-        await course.save();
-
-        return courseTodelete;
-      }
+      return deleteModule;
     } catch (error: any) {
       throw new Error(error);
     }
@@ -166,27 +155,13 @@ class CourseUsecase {
 
   async createLesson(data: ILessonRequest) {
     try {
-      const course = await this.courseRepository.findByCourseId(data.courseId);
-      if (!course) {
-        throw new Error("Course not found");
+      const lesson = await this.courseRepository.createLesson(data);
+      if (!lesson) {
+        throw new Error("Lesson not created");
       }
-      const totalLessons = (course.totalLessons = course.totalLessons + 1);
-      if (course.modules) {
-        const lesson = course?.modules[data.index].lessons.push({
-          title: data.title,
-          duration: data.duration,
-          type: data.type,
-          url: data.url,
-          lessonNo: totalLessons,
-        } as ILesson);
-        if (data.type === "video") {
-          course.duration += data.duration!;
-        }
-        await course.save();
-        return lesson;
-      }
-    } catch (error: any) {
-      throw new Error(error);
+      return lesson;
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -209,18 +184,14 @@ class CourseUsecase {
   }
 
   // enroll
-  async enrollCourse({ courseId, userId }: IEnroll) {
+  async enrollCourse(data: IEnroll) {
     try {
-      const course = await this.courseRepository.findByCourseId(courseId);
-      if (!course) {
-        throw new Error("Course not found");
+      const enrolledCourse = await this.courseRepository.enrollCourse(data);
+      if (!enrolledCourse) {
+        throw new Error("Course not enrolled");
       }
-      // push enrolled user data
-      course.enrolledUsers.push({
-        userId: userId,
-        progress: 0,
-      });
-      await course.save();
+
+      return enrolledCourse;
     } catch (error: any) {
       throw new Error(error);
     }

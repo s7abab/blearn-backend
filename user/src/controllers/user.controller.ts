@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import UserUsecase from "../usecases/user.usecase";
-import { IUpdateUser } from "../@types/user.types";
+import { IUpdateUser } from "../interfaces/user.interface";
 
 class UserController {
   private userUsecase: UserUsecase;

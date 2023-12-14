@@ -1,14 +1,10 @@
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
-import {
-  ICourseRequestData,
-  ILessonRequest,
-  IModuleDeleteRequest,
-  IModuleEditRequest,
-} from "../@types/course.types";
-import { ICourse, IModuleRequest } from "../@types/modelTypes/course";
 import { getVideoDurationInSeconds } from "get-video-duration";
 import CourseUsecase from "../usecases/course.usecase";
+import { Course } from "../entities/course";
+import { ILessonRequest } from "../interfaces/lesson.interface";
+import { IModule } from "../interfaces/module.interface";
 
 class CourseController {
   private courseUsecase: CourseUsecase;
@@ -20,10 +16,10 @@ class CourseController {
     try {
       const id = req?.user?.id;
 
-      const course: ICourse = await this.courseUsecase.createCourse({
+      const course = await this.courseUsecase.createCourse({
         instructorId: id,
         ...req.body,
-      } as ICourse);
+      } as Course);
 
       res.status(200).json({
         success: true,
@@ -50,7 +46,7 @@ class CourseController {
 
   async getAllCourses(req: Request, res: Response, next: NextFunction) {
     try {
-      const courses: ICourse[] = await this.courseUsecase.getCourses();
+      const courses = await this.courseUsecase.getCourses();
 
       res.status(200).json({
         success: true,
@@ -64,9 +60,7 @@ class CourseController {
   async getSingleCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId } = req.params;
-      const course: ICourse | null = await this.courseUsecase.getOneCourse(
-        courseId
-      );
+      const course = await this.courseUsecase.getOneCourse(courseId);
 
       res.status(200).json({
         success: true,
@@ -98,8 +92,9 @@ class CourseController {
   ) {
     try {
       const instructorId = req?.user?.id;
-      const courses: ICourse[] | null =
-        await this.courseUsecase.getCoursesForInstructor(instructorId);
+      const courses = await this.courseUsecase.getCoursesForInstructor(
+        instructorId
+      );
 
       res.status(200).json({
         success: true,
@@ -119,11 +114,10 @@ class CourseController {
       const { courseId } = req.params;
       const instructorId = req?.user?.id;
 
-      const course: ICourse | null =
-        await this.courseUsecase.getOneCourseForInstructor(
-          instructorId,
-          courseId
-        );
+      const course = await this.courseUsecase.getOneCourseForInstructor(
+        instructorId,
+        courseId
+      );
 
       res.status(200).json({
         success: true,
@@ -188,7 +182,7 @@ class CourseController {
       const module = await this.courseUsecase.createModule({
         courseId,
         title,
-      } as IModuleRequest);
+      } as IModule);
 
       if (!module) {
         return next(new ErrorHandler("Something went wrong", 400));
@@ -212,7 +206,7 @@ class CourseController {
         courseId,
         title,
         index,
-      } as IModuleEditRequest);
+      });
 
       res.status(200).json({
         success: true,
@@ -231,7 +225,7 @@ class CourseController {
         instructorId,
         courseId,
         index,
-      } as IModuleDeleteRequest);
+      });
 
       res.status(200).json({
         success: true,
@@ -258,8 +252,9 @@ class CourseController {
   async getEnrolledCourses(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req?.user?.id;
-      const courses: ICourse[] | null =
-        await this.courseUsecase.getEnrolledCoursesForUser(userId);
+      const courses = await this.courseUsecase.getEnrolledCoursesForUser(
+        userId
+      );
 
       res.status(200).json({
         success: true,
@@ -274,8 +269,10 @@ class CourseController {
     try {
       const { courseId } = req.params;
       const userId = req?.user?.id;
-      const course: ICourse | null =
-        await this.courseUsecase.getOneEnrolledCourseForUser(userId, courseId);
+      const course = await this.courseUsecase.getOneEnrolledCourseForUser(
+        userId,
+        courseId
+      );
 
       res.status(200).json({
         success: true,

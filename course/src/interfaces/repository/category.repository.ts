@@ -1,4 +1,4 @@
-import { ICategory } from "../../../@types/category.types";
+import { ICategory } from "../../@types/category.types";
 
 interface ICategoryRepository {
   create(name: string): Promise<ICategory>;
