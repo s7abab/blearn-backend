@@ -1,24 +1,23 @@
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../frameworks/utils/sendMail";
-import { User } from "../frameworks/events/subjects";
-import { publishEvent } from "../frameworks/events/publisher";
-import JwtRepository from "../frameworks/repositories/jwt.repository";
-import IUser from "../entities/User";
-import UserRepository from "../frameworks/repositories/user.repository";
+import IUser from "../entities/user";
 import {
   IActivationRequest,
   ILoginRequest,
   IRegisterUser,
-} from "../@types/user.types";
+} from "../interfaces/user.interface";
+import RabbitMQService from "../frameworks/events/publisher";
+import UserRepository from "../repositories/user.repository";
+import JwtService from "../frameworks/utils/jwt";
 
 class UserUsecase {
   private userRepository: UserRepository;
-  private jwtRepository: JwtRepository;
+  private jwt: JwtService;
 
-  constructor(userRepository: UserRepository, jwtRepository: JwtRepository) {
+  constructor(userRepository: UserRepository, jwt: JwtService) {
     this.userRepository = userRepository;
-    this.jwtRepository = jwtRepository;
+    this.jwt = jwt;
   }
 
   async register(userData: IRegisterUser) {
@@ -40,7 +39,7 @@ class UserUsecase {
       };
 
       const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
-      const token = await this.jwtRepository.createActivationCode(
+      const token = await this.jwt.createActivationCode(
         user,
         activationCode
       );
@@ -69,7 +68,7 @@ class UserUsecase {
 
   async activateUser(data: IActivationRequest) {
     try {
-      const newUser = await this.jwtRepository.verifyActivationCode(data);
+      const newUser = await this.jwt.verifyActivationCode(data);
       if (newUser.activationCode !== data.activation_code) {
         throw new Error("Invalid activation code");
       }
@@ -85,17 +84,6 @@ class UserUsecase {
         email,
         password,
       } as IUser);
-
-      const payload = {
-        subject: User.USER_CREATED,
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      };
-      publishEvent({
-        payload,
-      });
     } catch (error) {
       throw error;
     }
@@ -107,9 +95,9 @@ class UserUsecase {
       let token;
       if (!user) {
         const newUser = await this.createUser(data);
-        token = this.jwtRepository.createToken(newUser);
+        token = this.jwt.createToken(newUser);
       }
-      token = this.jwtRepository.createToken(user as IUser);
+      token = this.jwt.createToken(user as IUser);
       return token;
     } catch (error) {
       throw error;
@@ -131,7 +119,7 @@ class UserUsecase {
     if (!isPasswordMatched) {
       throw new Error("Invalid email or password");
     }
-    const token = this.jwtRepository.createToken(user);
+    const token = this.jwt.createToken(user);
     return token;
   }
 
@@ -217,9 +205,21 @@ class UserUsecase {
         userId,
         updatedData
       );
+
       if (!updatedUser) {
         throw new Error("User not found");
       }
+
+      // rabbitmq
+      const rabbitMQService = new RabbitMQService("user_updates_exchange");
+
+      try {
+        await rabbitMQService.publishUserUpdate(updatedUser);
+        await rabbitMQService.close();
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
       return updatedUser;
     } catch (error) {
       throw error;

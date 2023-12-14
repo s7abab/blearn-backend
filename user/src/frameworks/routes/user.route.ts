@@ -1,14 +1,14 @@
 import express, { NextFunction, Request, Response } from "express";
 import { Roles, authorizeRoles, isAuthenticated } from "@s7abab/common";
-import UserRepository from "../repositories/user.repository";
-import UserService from "../../usecases/user.usecase";
 import UserController from "../../controllers/user.controller";
-import JwtRepository from "../repositories/jwt.repository";
+import UserRepository from "../../repositories/user.repository";
+import JwtService from "../utils/jwt";
+import UserUsecase from "../../usecases/user.usecase";
 
-const jwtRepository = new JwtRepository();
+const jwt = new JwtService();
 // main
 const userRepository = new UserRepository();
-const userUsecase = new UserService(userRepository, jwtRepository);
+const userUsecase = new UserUsecase(userRepository, jwt);
 const userController = new UserController(userUsecase);
 
 const router = express.Router();

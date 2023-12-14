@@ -1,6 +1,7 @@
-import categoryModel from "../models/category.model";
-import { ICategory } from "../../@types/category.types";
-import ICategoryRepository from "../../usecases/interfaces/repository/category.repository";
+import categoryModel from "../frameworks/models/category.model";
+import { ICategory } from "../interfaces/category.interface";
+import ICategoryRepository from "../interfaces/repository/category.repository";
+
 
 class CategoryRepository implements ICategoryRepository {
   constructor() {}

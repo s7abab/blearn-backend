@@ -1,11 +1,10 @@
 import mongoose, { Schema } from "mongoose";
-import {
-  ICourse,
-  IEnrolledUser,
-  ILesson,
-  IModule,
-  IReview,
-} from "../../@types/modelTypes/course";
+import { IReview } from "../../interfaces/review.interface";
+import { IModule } from "../../interfaces/module.interface";
+import { ILesson } from "../../interfaces/lesson.interface";
+import { IEnrolledUser } from "../../interfaces/enrollment.interface";
+import Course from "../../entities/course";
+
 
 const reviewSchema = new Schema<IReview>({
   user: String,
@@ -14,6 +13,7 @@ const reviewSchema = new Schema<IReview>({
 });
 
 const lessonSchema = new Schema<ILesson>({
+
   type: { type: String },
   title: { type: String },
   url: { type: String },
@@ -32,7 +32,7 @@ const enrolledUserSchema = new Schema<IEnrolledUser>({
   progress: { type: Number, default: 0 },
 });
 
-const courseSchema: Schema<ICourse> = new Schema<ICourse>(
+const courseSchema: Schema<Course> = new Schema<Course>(
   {
     instructorId: { type: String, required: true },
     title: { type: String, required: true },
@@ -55,6 +55,6 @@ const courseSchema: Schema<ICourse> = new Schema<ICourse>(
   }
 );
 
-const courseModel = mongoose.model<ICourse>("Course", courseSchema);
+const courseModel = mongoose.model<Course>("Course", courseSchema);
 
 export default courseModel;

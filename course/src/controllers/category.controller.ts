@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import { ICategory } from "../@types/category.types";
 import CategoryService from "../usecases/category.usecase";
 import { validateCategoryName } from "../frameworks/utils/validations/category.validation";
 import { isEmpty } from "../frameworks/utils/validations/common.validation";
+import { ICategory } from "../interfaces/category.interface";
 
 class CategoryController {
   private categoryService: CategoryService;
@@ -34,7 +34,7 @@ class CategoryController {
 
   async editCategory(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, categoryId } = req.body as ICategory;
+      const { name, categoryId } = req.body;
 
       if (isEmpty(name) || isEmpty(categoryId)) {
         return next(new ErrorHandler("Invalid category data", 400));

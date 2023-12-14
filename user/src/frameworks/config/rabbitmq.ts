@@ -1,17 +1,20 @@
-require("dotenv").config();
 import amqp from "amqplib";
+require("dotenv").config();
 
-const connectToRabbitMQ = async () => {
-  const Url = process.env.RABBITMQ_URL || ""
-    try {
-      const connection = await amqp.connect(Url);
-      const channel = await connection.createChannel();
-      console.log("RabbitMq Connected 🐰");
-      return { connection, channel };
-    } catch (error) {
-      console.error("Error connecting to RabbitMQ:", error);
-      throw error;
+class RabbitMQConnection {
+  private static connection: amqp.Connection | null = null;
+
+  static async getConnection(): Promise<amqp.Connection> {
+    if (!this.connection) {
+      try {
+        this.connection = await amqp.connect(process.env.RABBIT_MQ!);
+        console.log("RabbitMQ Connected 🐰");
+      } catch (error) {
+        throw new Error(`Error connecting to RabbitMQ: ${error}`);
+      }
     }
+    return this.connection;
   }
+}
 
-export default connectToRabbitMQ;
+export default RabbitMQConnection;

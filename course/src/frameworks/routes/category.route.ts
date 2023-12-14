@@ -1,11 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
 import { Roles, authorizeRoles, isAuthenticated } from "@s7abab/common";
-import CategoryRepository from "../repositories/category.repository";
-import CategoryService from "../../usecases/category.usecase";
 import CategoryController from "../../controllers/category.controller";
+import CategoryUsecase from "../../usecases/category.usecase";
+import CategoryRepository from "../../repositories/category.repository";
 
 const categoryRepository = new CategoryRepository();
-const categoryService = new CategoryService(categoryRepository);
+const categoryService = new CategoryUsecase(categoryRepository);
 const categoryController = new CategoryController(categoryService);
 
 const router = express.Router();

@@ -1,11 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
 import { Roles, authorizeRoles, isAuthenticated } from "@s7abab/common";
-import CourseRepository from "../repositories/course.repository";
-import CourseService from "../../usecases/course.usecase";
 import CourseController from "../../controllers/course.controller";
+import CourseRepository from "../../repositories/course.repository";
+import CourseUsecase from "../../usecases/course.usecase";
 
 const courseRepository = new CourseRepository();
-const courseUsecase = new CourseService(courseRepository);
+const courseUsecase = new CourseUsecase(courseRepository);
 const courseController = new CourseController(courseUsecase);
 
 const router = express.Router();
