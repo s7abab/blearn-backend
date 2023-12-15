@@ -5,37 +5,30 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
+
 spec:
   rules:
     - host: blearn.dev
       http:
         paths:
-          - path: /api/v1/auth/?(.*)
+          - path: /api/v1/user/?(.*)
             pathType: Prefix
             backend:
               service:
-                name: auth-srv
+                name: user-srv
                 port:
                   number: 8000
-          - path: /admin/?(.*)
+          - path: /api/v1/course/?(.*)
             pathType: Prefix
             backend:
               service:
-                name: auth-srv
-                port:
-                  number: 8000
-          - path: /courses/?(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: courses-srv
+                name: course-srv
                 port:
                   number: 8001
-          - path: /category/?(.*)
+          - path: /api/v1/payment/?(.*)
             pathType: Prefix
             backend:
               service:
-                name: courses-srv
+                name: payment-srv
                 port:
-                  number: 8001
-          
+                  number: 8002

@@ -8,14 +8,21 @@ import {
 import {
   ILesson,
   ILessonGetRequest,
+  ILessonProgressTrackData,
   ILessonRequest,
 } from "../interfaces/lesson.interface";
 import { IEnroll } from "../interfaces/enrollment.interface";
+import GetVideoDuration from "../frameworks/utils/get-video-duration";
 
 class CourseUsecase {
   private courseRepository: CourseRepository;
-  constructor(courseRepository: CourseRepository) {
+  private getVideoDuration: GetVideoDuration;
+  constructor(
+    courseRepository: CourseRepository,
+    getVideoDuration: GetVideoDuration
+  ) {
     this.courseRepository = courseRepository;
+    this.getVideoDuration = getVideoDuration;
   }
 
   // course
@@ -45,9 +52,9 @@ class CourseUsecase {
     }
   }
 
-  async getCourses() {
+  async getCourses(page: number, limit: number) {
     try {
-      const courses = await this.courseRepository.find();
+      const courses = await this.courseRepository.find(page, limit);
       return courses;
     } catch (error) {
       throw error;
@@ -155,6 +162,14 @@ class CourseUsecase {
 
   async createLesson(data: ILessonRequest) {
     try {
+      let duration = 60;
+      if (data.type === "video") {
+        const videoDuration = await this.getVideoDuration.getVideoDuration(
+          data.url
+        );
+        duration = Math.round(videoDuration);
+      }
+
       const lesson = await this.courseRepository.createLesson(data);
       if (!lesson) {
         throw new Error("Lesson not created");
@@ -186,7 +201,7 @@ class CourseUsecase {
   // enroll
   async enrollCourse(data: IEnroll) {
     try {
-      const enrolledCourse = await this.courseRepository.enrollCourse(data);
+      const enrolledCourse = await this.courseRepository.createEnroll(data);
       if (!enrolledCourse) {
         throw new Error("Course not enrolled");
       }
@@ -221,6 +236,36 @@ class CourseUsecase {
       return enrolledCourse;
     } catch (error: any) {
       throw new Error(error);
+    }
+  }
+
+  async updateProgresson(data: ILessonProgressTrackData) {
+    try {
+      const trackLesson =
+        await this.courseRepository.findLessonAndTrackProgression(data);
+      if (!trackLesson) {
+        throw new Error("An error occured while tracking progression");
+      }
+      return trackLesson;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getProgression(userId: string, courseId: string) {
+    try {
+      const progression =
+        await this.courseRepository.findProgressionByUserIdAndCourseId(
+          userId,
+          courseId
+        );
+      if (!progression) {
+        throw new Error("An error occured while fetching progression");
+      }
+      console.log(progression);
+      return progression;
+    } catch (error) {
+      throw error;
     }
   }
 }

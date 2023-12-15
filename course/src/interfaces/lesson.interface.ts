@@ -1,4 +1,5 @@
 export interface ILesson {
+  _id: any;
   type: string;
   title: string;
   url: string;
@@ -20,7 +21,7 @@ export interface ILessonGetRequest {
 
 export interface ILessonProgressTrackData {
   courseId: string;
-  moduleId: string | undefined;
-  lessonId: string | undefined;
+  lessonId:string;
+  userId: string;
   progress: number;
 }

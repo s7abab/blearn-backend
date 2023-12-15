@@ -4,11 +4,13 @@ import UserController from "../../controllers/user.controller";
 import UserRepository from "../../repositories/user.repository";
 import JwtService from "../utils/jwt";
 import UserUsecase from "../../usecases/user.usecase";
+import EventPublisher from "../rabbitmq/publisher";
 
 const jwt = new JwtService();
 // main
+const eventPublisher = new EventPublisher();
 const userRepository = new UserRepository();
-const userUsecase = new UserUsecase(userRepository, jwt);
+const userUsecase = new UserUsecase(userRepository, jwt, eventPublisher);
 const userController = new UserController(userUsecase);
 
 const router = express.Router();

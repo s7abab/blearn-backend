@@ -1,5 +1,5 @@
 export interface ICategory {
-  id: any;
+  categoryId: any;
   name: string;
   isListed: boolean;
 }

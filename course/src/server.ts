@@ -1,8 +1,7 @@
 require("dotenv").config();
 import { app } from "./frameworks/config/app";
 import connectDb from "./frameworks/config/db";
-import consumeRabbitmq from "./frameworks/events/handler";
-
+import consumeRabbitmq from "./frameworks/rabbitmq/middleware";
 
 consumeRabbitmq();
 // create server

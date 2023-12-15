@@ -1,5 +1,3 @@
-import ejs from "ejs";
-import path from "path";
 import sendMail from "../frameworks/utils/sendMail";
 import IUser from "../entities/user";
 import {
@@ -7,17 +5,25 @@ import {
   ILoginRequest,
   IRegisterUser,
 } from "../interfaces/user.interface";
-import RabbitMQService from "../frameworks/events/publisher";
+import RabbitMQService from "../frameworks/rabbitmq/publisher";
 import UserRepository from "../repositories/user.repository";
 import JwtService from "../frameworks/utils/jwt";
+import EventPublisher from "../frameworks/rabbitmq/publisher";
+import { Topics } from "../frameworks/rabbitmq/topics";
 
 class UserUsecase {
   private userRepository: UserRepository;
   private jwt: JwtService;
+  private eventPublisher: EventPublisher;
 
-  constructor(userRepository: UserRepository, jwt: JwtService) {
+  constructor(
+    userRepository: UserRepository,
+    jwt: JwtService,
+    eventPublisher: EventPublisher
+  ) {
     this.userRepository = userRepository;
     this.jwt = jwt;
+    this.eventPublisher = eventPublisher;
   }
 
   async register(userData: IRegisterUser) {
@@ -39,16 +45,10 @@ class UserUsecase {
       };
 
       const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
-      const token = await this.jwt.createActivationCode(
-        user,
-        activationCode
-      );
+      const token = await this.jwt.createActivationCode(user, activationCode);
       const data = { user: { name: user.name }, activationCode };
       console.log(activationCode);
-      const html = await ejs.renderFile(
-        path.join(__dirname, "../mails/activation-mail.ejs"),
-        data
-      );
+
       try {
         await sendMail({
           email: user.email,
@@ -123,6 +123,19 @@ class UserUsecase {
     return token;
   }
 
+  async compareUserPassword(email: string, password: string) {
+    try {
+      const isPasswordMatched =
+        await this.userRepository.findByEmailAndComparePassword(
+          email,
+          password
+        );
+      return isPasswordMatched;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getUsersByRole(role: string) {
     try {
       const users = await this.userRepository.findByRole(role);
@@ -177,20 +190,14 @@ class UserUsecase {
     try {
       const user = await this.userRepository.create(data);
       if (!user) throw new Error("User not created");
+      // publish user create event
+      await this.eventPublisher.publishUserCreate({
+        _id: user._id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+      });
       return user;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async compareUserPassword(email: string, password: string) {
-    try {
-      const isPasswordMatched =
-        await this.userRepository.findByEmailAndComparePassword(
-          email,
-          password
-        );
-      return isPasswordMatched;
     } catch (error) {
       throw error;
     }
@@ -209,17 +216,13 @@ class UserUsecase {
       if (!updatedUser) {
         throw new Error("User not found");
       }
-
-      // rabbitmq
-      const rabbitMQService = new RabbitMQService("user_updates_exchange");
-
-      try {
-        await rabbitMQService.publishUserUpdate(updatedUser);
-        await rabbitMQService.close();
-      } catch (error) {
-        console.error("Error:", error);
-      }
-
+      // publish user updated event
+      await this.eventPublisher.publishUserUpdate({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      });
       return updatedUser;
     } catch (error) {
       throw error;

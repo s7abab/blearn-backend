@@ -30,6 +30,7 @@ const moduleSchema = new Schema<IModule>({
 const enrolledUserSchema = new Schema<IEnrolledUser>({
   userId: { type: String },
   progress: { type: Number, default: 0 },
+  completedLessons: { type: [String], default: [] },
 });
 
 const courseSchema: Schema<Course> = new Schema<Course>(

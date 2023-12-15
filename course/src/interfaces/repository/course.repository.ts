@@ -1,10 +1,9 @@
-import { ICourseRequestData } from "../../@types/course.types";
 import { Course } from "../../entities/course";
 
 interface ICourseRepository {
   create(data: Course): Promise<Course | null>;
-  findByCourseIdAndUpdate(data: ICourseRequestData): Promise<Course | null>;
-  find(): Promise<Course[]>;
+  findByCourseIdAndUpdate(data: Course): Promise<Course | null>;
+  find(page: number, limit: number): Promise<Course[]>;
   findByCourseId(courseId: string): Promise<Course | null>;
   findByCourseIdAndDelete(courseId: string): Promise<Course | null>;
   findByInstructorId(instructorId: string): Promise<Course[] | null>;

@@ -42,7 +42,7 @@ class CategoryController {
       await this.categoryService.updateCategory({
         categoryId,
         name,
-      });
+      } as ICategory);
 
       res.status(200).json({
         success: true,

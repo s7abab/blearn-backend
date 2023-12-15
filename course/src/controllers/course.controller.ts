@@ -1,6 +1,5 @@
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
-import { getVideoDurationInSeconds } from "get-video-duration";
 import CourseUsecase from "../usecases/course.usecase";
 import { Course } from "../entities/course";
 import { ILessonRequest } from "../interfaces/lesson.interface";
@@ -46,7 +45,16 @@ class CourseController {
 
   async getAllCourses(req: Request, res: Response, next: NextFunction) {
     try {
-      const courses = await this.courseUsecase.getCourses();
+      const { page, limit } = req.query;
+      if (typeof page !== "string" || typeof limit !== "string") {
+        throw new Error("Page or limit is not provided or not a string");
+      }
+      const pageNumber: number = parseInt(page, 10);
+      const limitNumber: number = parseInt(limit, 10);
+      const courses = await this.courseUsecase.getCourses(
+        pageNumber,
+        limitNumber
+      );
 
       res.status(200).json({
         success: true,
@@ -132,18 +140,11 @@ class CourseController {
     try {
       const { courseId, type, title, url, index } = req.body;
 
-      let duration = 60;
-      if (type === "video") {
-        const videoDuration = await getVideoDurationInSeconds(url);
-        duration = Math.round(videoDuration);
-      }
-
       await this.courseUsecase.createLesson({
         courseId,
         type,
         title,
         url,
-        duration,
         index,
       } as ILessonRequest);
 
@@ -282,21 +283,38 @@ class CourseController {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
+
+  async trackLesson(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req?.user?.id;
+      const course = await this.courseUsecase.updateProgresson({
+        ...req.body,
+        userId,
+      });
+      res.status(200).json({
+        success: true,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
+  async getProgression(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { courseId } = req.params;
+      const userId = req?.user?.id;
+      const progression = await this.courseUsecase.getProgression(
+        userId,
+        courseId
+      );
+      res.status(200).json({
+        success: true,
+        progression,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
 }
 
 export default CourseController;
-// class over
-
-// export const trackLesson = catchAsyncError(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const data = req.body as ILessonProgressTrackData;
-//     try {
-//       const course = await this.courseUsecase.findLessonAndUpdateProgresson(data);
-//       res.status(200).json({
-//         success: true,
-//       });
-//     } catch (error: any) {
-//       return next(new ErrorHandler(error.message, error.statusCode || 500));
-//     }
-//   }
-// );

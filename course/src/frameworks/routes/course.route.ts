@@ -3,9 +3,11 @@ import { Roles, authorizeRoles, isAuthenticated } from "@s7abab/common";
 import CourseController from "../../controllers/course.controller";
 import CourseRepository from "../../repositories/course.repository";
 import CourseUsecase from "../../usecases/course.usecase";
+import GetVideoDuration from "../utils/get-video-duration";
 
+const getVideoDuration = new GetVideoDuration()
 const courseRepository = new CourseRepository();
-const courseUsecase = new CourseUsecase(courseRepository);
+const courseUsecase = new CourseUsecase(courseRepository, getVideoDuration);
 const courseController = new CourseController(courseUsecase);
 
 const router = express.Router();
@@ -115,6 +117,20 @@ router.get(
   isAuthenticated,
   (req: Request, res: Response, next: NextFunction) =>
     courseController.getOneEnrolledCourse(req, res, next)
+);
+
+router.post(
+  "/track-lesson",
+  isAuthenticated,
+  (req: Request, res: Response, next: NextFunction) =>
+    courseController.trackLesson(req, res, next)
+);
+
+router.get(
+  "/get-progression/:courseId",
+  isAuthenticated,
+  (req: Request, res: Response, next: NextFunction) =>
+    courseController.getProgression(req,res,next)
 );
 
 export default router;
