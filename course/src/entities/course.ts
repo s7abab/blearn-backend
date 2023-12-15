@@ -2,8 +2,7 @@ import { IEnrolledUser } from "../interfaces/enrollment.interface";
 import { IModule } from "../interfaces/module.interface";
 import { IReview } from "../interfaces/review.interface";
 
-
-export interface Course {
+export interface ICourse {
   _id: any;
   instructorId?: string;
   title: string;
@@ -16,10 +15,10 @@ export interface Course {
   revenue?: number;
   isBlock: boolean;
   reviews?: IReview[];
-  modules?: IModule[];
+  modules: IModule[];
   duration: number;
   totalLessons: number;
   enrolledUsers: [IEnrolledUser];
 }
 
-export default Course;
+export default ICourse;

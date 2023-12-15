@@ -8,16 +8,24 @@ build:
   local:
     push: false
   artifacts:
-    - image: s7abab/auth
-      context: auth
+    - image: s7abab/user
+      context: user
       docker:
         dockerfile: Dockerfile
       sync:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: s7abab/courses
-      context: courses
+    - image: s7abab/course
+      context: course
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: s7abab/payment
+      context: payment
       docker:
         dockerfile: Dockerfile
       sync:

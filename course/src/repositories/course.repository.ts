@@ -1,7 +1,11 @@
 import { Course } from "../entities/course";
 import courseModel from "../frameworks/models/course.model";
-import { IEnroll } from "../interfaces/enrollment.interface";
-import { ILesson, ILessonRequest } from "../interfaces/lesson.interface";
+import { IEnroll, IEnrolledUser } from "../interfaces/enrollment.interface";
+import {
+  ILesson,
+  ILessonProgressTrackData,
+  ILessonRequest,
+} from "../interfaces/lesson.interface";
 import {
   IModule,
   IModuleDeleteRequest,
@@ -34,9 +38,10 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async find(): Promise<Course[]> {
+  async find(page:number, limit:number): Promise<Course[]> {
     try {
-      const courses = await courseModel.find();
+      const courses = await courseModel.find().skip((page - 1) * limit)
+      .limit(limit);
       return courses;
     } catch (error) {
       throw error;
@@ -107,7 +112,6 @@ class CourseRepository implements ICourseRepository {
         _id: courseId,
         "enrolledUsers.userId": userId,
       });
-
       return enrolledCourse;
     } catch (error) {
       throw error;
@@ -202,7 +206,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async enrollCourse(data: IEnroll) {
+  async createEnroll(data: IEnroll) {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
@@ -211,12 +215,42 @@ class CourseRepository implements ICourseRepository {
       course.enrolledUsers.push({
         userId: data.userId,
         progress: 0,
-      });
+      } as IEnrolledUser);
       await course.save();
       return course;
     } catch (error) {
       throw error;
     }
+  }
+
+  async findLessonAndTrackProgression(data: ILessonProgressTrackData) {
+    try {
+      const course = await courseModel.findById(data.courseId);
+      if (!course) {
+        throw new Error("Course not found");
+      }
+      const user = course.enrolledUsers.find((user) => user.userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      if (user.completedLessons.includes(data.lessonId)) {
+        return true;
+      }
+      user.completedLessons.push(data.lessonId);
+      user.progress = user?.progress + data.progress;
+      await course.save();
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  async findProgressionByUserIdAndCourseId (userId:string, courseId:string) {
+    const course = await this.findEnrolledCourseByUserAndCourseId(userId, courseId);
+    const totalDuration = course?.duration;
+    const completedDuration = course?.enrolledUsers.find((user) => user.userId === userId)?.progress;
+    const progression = Math.floor((completedDuration! / totalDuration!) * 100)
+    return progression
   }
 }
 

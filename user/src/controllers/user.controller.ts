@@ -215,9 +215,6 @@ class UserController {
   async blockUser(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     try {
-      if (!id) {
-        return new ErrorHandler("Invalid id", 400);
-      }
       const blockStatus = await this.userUsecase.toggleBlockStatus(id);
       let message = "";
       if (blockStatus) {

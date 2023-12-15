@@ -1,6 +1,7 @@
 import { ILesson } from "./lesson.interface";
 
 export interface IModule {
+  _id:any;
   courseId:any;
   title: string;
   lessons: ILesson[];
