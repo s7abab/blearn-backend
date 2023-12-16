@@ -9,7 +9,7 @@ class EventPublisher {
   private exchangeName: string;
 
   constructor() {
-    this.exchangeName = Exchanges.USER_EXCHANGE;
+    this.exchangeName = Exchanges.PAYMENT_EXCHANGE;
   }
 
   private async ensureChannel(): Promise<void> {
@@ -19,13 +19,12 @@ class EventPublisher {
       durable: true,
     });
   }
-  // publish user update
-  public async publishUserCreate(data: any): Promise<void> {
+  // publish order
+  public async publishOrderCreate(data: any): Promise<void> {
     try {
       if (!this.channel) {
         await this.ensureChannel();
       }
-
       const message = JSON.stringify(data);
 
       await this.publishToQueue(
@@ -33,40 +32,10 @@ class EventPublisher {
         message,
         Topics.USER_CREATE
       );
-      await this.publishToQueue(
-        Queues.PAYMENT_QUEUE,
-        message,
-        Topics.USER_CREATE
-      );
 
-      console.log(`${Topics.USER_CREATE} published`);
+      console.log(`${Topics.ORDER_CREATE} published`);
     } catch (error) {
-      throw new Error(`Error publishing user update: ${error}`);
-    }
-  }
-  // publish user update
-  public async publishUserUpdate(data: any): Promise<void> {
-    try {
-      if (!this.channel) {
-        await this.ensureChannel();
-      }
-
-      const message = JSON.stringify( data );
-
-      await this.publishToQueue(
-        Queues.COURSE_QUEUE,
-        message,
-        Topics.USER_UPDATE
-      );
-      await this.publishToQueue(
-        Queues.PAYMENT_QUEUE,
-        message,
-        Topics.USER_UPDATE
-      );
-
-      console.log(`${Topics.USER_UPDATE} published`);
-    } catch (error) {
-      throw new Error(`Error publishing user update: ${error}`);
+      throw new Error(`Error publishing order create: ${error}`);
     }
   }
 

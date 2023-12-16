@@ -16,8 +16,8 @@ class UserUsecase {
   }
 
   public async updateUser(data: IUser): Promise<IUser | Error> {
-    console.log(data.updatedData)
-    const user = await this.userRepository.updateUser(data.updatedData);
+    console.log(data)
+    const user = await this.userRepository.updateUser(data);
     if (!user) {
       throw new Error("Failed to update user");
     }

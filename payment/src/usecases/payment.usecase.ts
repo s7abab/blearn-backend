@@ -1,16 +1,20 @@
+import EventPublisher from "../frameworks/rabbitmq/publisher";
 import StripeService from "../frameworks/utils/stripeService";
 import { IOrderRequest } from "../interfaces/order.interface";
 import PaymentRepository from "../repositories/payment.repository";
 
 class PaymentUsecase {
   private paymentRepository: PaymentRepository;
-  private stripeService : StripeService
+  private stripeService: StripeService;
+  private eventPublisher: EventPublisher;
   constructor(
     paymentRepository: PaymentRepository,
-    stripeService: StripeService
+    stripeService: StripeService,
+    eventPublisher: EventPublisher
   ) {
     this.paymentRepository = paymentRepository;
     this.stripeService = stripeService;
+    this.eventPublisher = eventPublisher;
   }
 
   async createOrder({ courseId, payment_info }: IOrderRequest, userId: string) {
@@ -31,6 +35,9 @@ class PaymentUsecase {
       if (!order) {
         throw new Error("Error while creating order");
       }
+      // publish order create event
+      await this.eventPublisher.publishOrderCreate(order);
+      
       return order;
     } catch (error) {
       throw error;

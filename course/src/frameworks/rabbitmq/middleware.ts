@@ -1,4 +1,3 @@
-import IUser from "../../entities/user";
 import UserRepository from "../../repositories/user.repository";
 import UserUsecase from "../../usecases/user.usecase";
 import RabbitMQConsumer from "./consume";
@@ -25,10 +24,9 @@ async function consumeRabbitmq() {
     );
 
     await paymentService.consumeFromQueue(
-      "order_service_queue",
-      "order.placed",
+      Queues.COURSE_QUEUE,
+      Topics.ORDER_CREATE,
       (msg) => {
-        console.log(msg);
         console.log(`Received event from ${Exchanges.PAYMENT_EXCHANGE}`);
       }
     );
