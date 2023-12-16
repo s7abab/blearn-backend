@@ -1,107 +1,47 @@
-import amqp from "amqplib";
-import RabbitMQConnection from "../config/rabbitmq";
-import { Exchanges } from "./exchanges";
-import { Queues } from "./queues";
-import { Topics } from "./topics";
+import { Channel, Connection } from "amqplib";
+import connect from "../config/rabbitmq";
 
 class EventPublisher {
-  private channel: amqp.Channel | null = null;
-  private exchangeName: string;
+  private channel: Channel | undefined;
+  private connection: Connection | undefined;
 
   constructor() {
-    this.exchangeName = Exchanges.USER_EXCHANGE;
+    this.channel = undefined;
+    this.connection = undefined;
   }
 
-  private async ensureChannel(): Promise<void> {
-    const connection = await RabbitMQConnection.getConnection();
-    this.channel = await connection.createChannel();
-    await this.channel.assertExchange(this.exchangeName, "direct", {
-      durable: true,
-    });
-  }
-  // publish user update
-  public async publishUserCreate(data: any): Promise<void> {
-    try {
-      if (!this.channel) {
-        await this.ensureChannel();
-      }
-
-      const message = JSON.stringify(data);
-
-      await this.publishToQueue(
-        Queues.COURSE_QUEUE,
-        message,
-        Topics.USER_CREATE
-      );
-      await this.publishToQueue(
-        Queues.PAYMENT_QUEUE,
-        message,
-        Topics.USER_CREATE
-      );
-
-      console.log(`${Topics.USER_CREATE} published`);
-    } catch (error) {
-      throw new Error(`Error publishing user update: ${error}`);
+  //to publish in a queue
+  async publish(
+    exchange: string,
+    routingKey: string,
+    data: unknown
+  ): Promise<boolean> {
+    await this.ensureConnection();
+    if (!this.channel || !this.connection) {
+      throw new Error("RabbitMQ connection not available");
     }
-  }
-  // publish user update
-  public async publishUserUpdate(data: any): Promise<void> {
+
     try {
-      if (!this.channel) {
-        await this.ensureChannel();
-      }
-
-      const message = JSON.stringify( data );
-
-      await this.publishToQueue(
-        Queues.COURSE_QUEUE,
-        message,
-        Topics.USER_UPDATE
+      await this.channel.assertExchange(exchange, "direct", { durable: true });
+      await this.channel.publish(
+        exchange,
+        routingKey,
+        Buffer.from(JSON.stringify(data)),
+        { persistent: true }
       );
-      await this.publishToQueue(
-        Queues.PAYMENT_QUEUE,
-        message,
-        Topics.USER_UPDATE
-      );
-
-      console.log(`${Topics.USER_UPDATE} published`);
-    } catch (error) {
-      throw new Error(`Error publishing user update: ${error}`);
+      return true;
+    } catch (err) {
+      console.error("Error in publish:", err);
+      return false;
     }
   }
 
-  private async publishToQueue(
-    queueName: string,
-    message: string,
-    routingKey: string
-  ): Promise<void> {
-    try {
-      if (!this.channel) {
-        throw new Error("Channel not initialized");
-      }
-
-      await this.channel.assertQueue(queueName, { durable: true });
-      await this.channel.bindQueue(queueName, this.exchangeName, routingKey);
-      await this.channel.sendToQueue(queueName, Buffer.from(message), {
-        persistent: true,
-      });
-      console.log(
-        `Message sent to queue '${queueName}' with routing key '${routingKey}'`
-      );
-    } catch (error) {
-      throw new Error(`Error publishing message to queue: ${error}`);
-    }
-  }
-
-  public async close(): Promise<void> {
-    try {
-      if (this.channel) {
-        await this.channel.close();
-        this.channel = null;
-        console.log("RabbitMQ Channel Closed");
-      }
-    } catch (error) {
-      throw new Error(`Error closing RabbitMQ channel: ${error}`);
+  private async ensureConnection() {
+    if (!this.channel) {
+      const { channel, connection } =
+        await connect();
+      this.channel = channel;
+      this.connection = connection;
     }
   }
 }

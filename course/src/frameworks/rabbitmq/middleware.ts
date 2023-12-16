@@ -1,37 +1,52 @@
+import CourseRepository from "../../repositories/course.repository";
 import UserRepository from "../../repositories/user.repository";
-import UserUsecase from "../../usecases/user.usecase";
-import RabbitMQConsumer from "./consume";
+import EventConsumer from "./consumer";
 import { Exchanges } from "./exchanges";
-import { Queues } from "./queues";
 import { Topics } from "./topics";
 
+const eventConsumer = new EventConsumer();
 const userRepository = new UserRepository();
-const userUsecase = new UserUsecase(userRepository);
+const courseRepository = new CourseRepository();
+// Define a callback function to process the received data
 
-async function consumeRabbitmq() {
-  const userService = new RabbitMQConsumer(Exchanges.USER_EXCHANGE);
-  const paymentService = new RabbitMQConsumer(Exchanges.PAYMENT_EXCHANGE);
+const processData = async (data: any) => {
+  console.log("Received data:", data);
+  switch (data.topic) {
+    case Topics.USER_CREATE:
+      const user = await userRepository.createUser(data);
+      break;
+    case Topics.USER_UPDATE:
+      const updatedUser = await userRepository.updateUser(data);
+      break;
+    case Topics.ORDER_CREATE:
+      const course = await courseRepository.createEnroll(data);
+      break;
 
-  try {
-    await userService.consumeFromQueue(
-      Queues.COURSE_QUEUE,
-      Topics.USER_UPDATE,
-      async (msg) => {
-        console.log(`Received event from ${Exchanges.USER_EXCHANGE}`);
-        // processing and saving data
-        await userUsecase.updateUser(msg as any);
-      }
-    );
-
-    await paymentService.consumeFromQueue(
-      Queues.COURSE_QUEUE,
-      Topics.ORDER_CREATE,
-      (msg) => {
-        console.log(`Received event from ${Exchanges.PAYMENT_EXCHANGE}`);
-      }
-    );
-  } catch (error) {
-    console.error("Error:", error);
+    default:
+      break;
   }
-}
-export default consumeRabbitmq;
+};
+
+// Function to start listening to the queue
+export const startListening = async () => {
+  try {
+    await eventConsumer.listen(
+      Exchanges.USER_EXCHANGE,
+      Topics.USER_UPDATE,
+      processData
+    );
+    await eventConsumer.listen(
+      Exchanges.USER_EXCHANGE,
+      Topics.USER_CREATE,
+      processData
+    );
+    await eventConsumer.listen(
+      Exchanges.PAYMENT_EXCHANGE,
+      Topics.ORDER_CREATE,
+      processData
+    );
+    console.log("Listening to the queue for incoming messages...");
+  } catch (error) {
+    console.error("Error starting the listener:", error);
+  }
+};

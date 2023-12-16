@@ -1,4 +1,6 @@
+import { Exchanges } from "../frameworks/rabbitmq/exchanges";
 import EventPublisher from "../frameworks/rabbitmq/publisher";
+import { Topics } from "../frameworks/rabbitmq/topics";
 import StripeService from "../frameworks/utils/stripeService";
 import { IOrderRequest } from "../interfaces/order.interface";
 import PaymentRepository from "../repositories/payment.repository";
@@ -35,9 +37,20 @@ class PaymentUsecase {
       if (!order) {
         throw new Error("Error while creating order");
       }
+      const data = {
+        topic: Topics.ORDER_CREATE,
+        userId: order.userId,
+        courseId: order.courseId,
+        price: order.price,
+        payment_status: order.payment_status,
+      };
       // publish order create event
-      await this.eventPublisher.publishOrderCreate(order);
-      
+      await this.eventPublisher.publish(
+        Exchanges.PAYMENT_EXCHANGE,
+        Topics.ORDER_CREATE,
+        data
+      );
+
       return order;
     } catch (error) {
       throw error;

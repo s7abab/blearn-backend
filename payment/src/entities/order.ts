@@ -1,4 +1,4 @@
-interface Order {
+interface IOrder {
   userId: string;
   courseId: string;
   price: number;
@@ -6,4 +6,4 @@ interface Order {
 }
 
 
-export default Order;
+export default IOrder;
