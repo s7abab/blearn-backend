@@ -1,14 +1,14 @@
 import sendMail from "../frameworks/utils/sendMail";
-import IUser from "../entities/user";
 import {
   IActivationRequest,
   ILoginRequest,
   IRegisterUser,
 } from "../interfaces/user.interface";
-import RabbitMQService from "../frameworks/rabbitmq/publisher";
 import UserRepository from "../repositories/user.repository";
 import JwtService from "../frameworks/utils/jwt";
 import EventPublisher from "../frameworks/rabbitmq/publisher";
+import IUser from "../entities/user";
+import { Exchanges } from "../frameworks/rabbitmq/exchanges";
 import { Topics } from "../frameworks/rabbitmq/topics";
 
 class UserUsecase {
@@ -191,12 +191,17 @@ class UserUsecase {
       const user = await this.userRepository.create(data);
       if (!user) throw new Error("User not created");
       // publish user create event
-      await this.eventPublisher.publishUserCreate({
-        _id: user._id,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-      });
+      await this.eventPublisher.publish(
+        Exchanges.USER_EXCHANGE,
+        Topics.USER_CREATE,
+        {
+          topic: Topics.USER_CREATE,
+          _id: user._id,
+          name: data.name,
+          email: data.email,
+          role: data.role,
+        }
+      );
       return user;
     } catch (error) {
       throw error;
@@ -216,13 +221,19 @@ class UserUsecase {
       if (!updatedUser) {
         throw new Error("User not found");
       }
-      // publish user updated event
-      await this.eventPublisher.publishUserUpdate({
+      const data = {
+        topic: Topics.USER_UPDATE,
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
-      });
+      };
+      // publish user updated event
+      await this.eventPublisher.publish(
+        Exchanges.USER_EXCHANGE,
+        Topics.USER_UPDATE,
+        data
+      );
       return updatedUser;
     } catch (error) {
       throw error;

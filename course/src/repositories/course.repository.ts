@@ -1,4 +1,4 @@
-import { Course } from "../entities/course";
+import ICourse from "../entities/course";
 import courseModel from "../frameworks/models/course.model";
 import { IEnroll, IEnrolledUser } from "../interfaces/enrollment.interface";
 import {
@@ -17,7 +17,7 @@ class CourseRepository implements ICourseRepository {
   constructor() {}
 
   // course
-  async create(data: Course): Promise<Course | null> {
+  async create(data: ICourse): Promise<ICourse | null> {
     try {
       const course = await courseModel.create(data);
       return course;
@@ -26,7 +26,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findByCourseIdAndUpdate(data: Course): Promise<Course | null> {
+  async findByCourseIdAndUpdate(data: ICourse): Promise<ICourse | null> {
     try {
       const { _id, ...updateData } = data;
       const course = await courseModel.findByIdAndUpdate(_id, updateData, {
@@ -38,7 +38,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async find(page:number, limit:number): Promise<Course[]> {
+  async find(page:number, limit:number): Promise<ICourse[]> {
     try {
       const courses = await courseModel.find().skip((page - 1) * limit)
       .limit(limit);
@@ -47,7 +47,7 @@ class CourseRepository implements ICourseRepository {
       throw error;
     }
   }
-  async findByCourseId(courseId: string): Promise<Course | null> {
+  async findByCourseId(courseId: string): Promise<ICourse | null> {
     try {
       const course = await courseModel.findById(courseId);
       return course;
@@ -56,7 +56,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findByCourseIdAndDelete(courseId: string): Promise<Course | null> {
+  async findByCourseIdAndDelete(courseId: string): Promise<ICourse | null> {
     try {
       const course = await courseModel.findByIdAndDelete(courseId);
       return course;
@@ -65,7 +65,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findByInstructorId(instructorId: string): Promise<Course[] | null> {
+  async findByInstructorId(instructorId: string): Promise<ICourse[] | null> {
     try {
       const courses = await courseModel.find({
         instructorId: instructorId,
@@ -79,7 +79,7 @@ class CourseRepository implements ICourseRepository {
   async findByInstructorIdAndCourseId(
     instructorId: string,
     courseId: string
-  ): Promise<Course | null> {
+  ): Promise<ICourse | null> {
     try {
       const course = await courseModel.findOne({
         _id: courseId,
@@ -91,7 +91,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findEnrolledCoursesByUserId(userId: string): Promise<Course[] | null> {
+  async findEnrolledCoursesByUserId(userId: string): Promise<ICourse[] | null> {
     try {
       const enrolledCourses = await courseModel.find({
         "enrolledUsers.userId": userId,
@@ -105,7 +105,7 @@ class CourseRepository implements ICourseRepository {
   async findEnrolledCourseByUserAndCourseId(
     userId: string,
     courseId: string
-  ): Promise<Course | null> {
+  ): Promise<ICourse | null> {
     try {
       // Find the enrolled course for the specific user and course
       const enrolledCourse = await courseModel.findOne({
@@ -123,7 +123,7 @@ class CourseRepository implements ICourseRepository {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
-        throw new Error("Course not found");
+        throw new Error("ICourse not found");
       }
       const module = course?.modules?.push(data);
       await course.save();
@@ -169,7 +169,7 @@ class CourseRepository implements ICourseRepository {
       instructorId: data.instructorId,
     });
     if (!course) {
-      throw new Error("Course not found");
+      throw new Error("ICourse not found");
     }
     if (course.modules) {
       const moduleTodelete = course.modules.splice(data.index, 1);
@@ -183,7 +183,7 @@ class CourseRepository implements ICourseRepository {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
-        throw new Error("Course not found");
+        throw new Error("ICourse not found");
       }
       const totalLessons = (course.totalLessons = course.totalLessons + 1);
       let lesson = null;
@@ -210,7 +210,7 @@ class CourseRepository implements ICourseRepository {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
-        throw new Error("Course not found");
+        throw new Error("ICourse not found");
       }
       course.enrolledUsers.push({
         userId: data.userId,
@@ -227,7 +227,7 @@ class CourseRepository implements ICourseRepository {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
-        throw new Error("Course not found");
+        throw new Error("ICourse not found");
       }
       const user = course.enrolledUsers.find((user) => user.userId);
       if (!user) {

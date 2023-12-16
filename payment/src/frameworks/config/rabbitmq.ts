@@ -1,18 +1,19 @@
-require("dotenv").config();
-import amqp from "amqplib";
+import amqp, { Channel, Connection } from "amqplib";
 
-const connectToRabbitMQ = async () => {
-  const Url = process.env.RABBITMQ_URL || ""
+
+const connect = async function (): Promise<{ connection: Connection | undefined, channel: Channel | undefined }> {
   try {
-    const connection = await amqp.connect(Url);
-    const channel = await connection.createChannel();
-    console.log("RabbitMq Connected 🐰");
-
+    let channel: Channel | undefined;
+    let connection: Connection | undefined;
+    const amqpServer = "amqp://localhost:5672";
+    connection = await amqp.connect(amqpServer);
+    channel = await connection.createChannel();
+    console.log("Channel created");
     return { connection, channel };
-  } catch (error) {
-    console.error("Error connecting to RabbitMQ:", error);
-    throw error;
+  } catch (err) {
+    console.error("Error connecting to RabbitMQ:", err);
+    throw err;
   }
 };
 
-export default connectToRabbitMQ;
+export  default connect;

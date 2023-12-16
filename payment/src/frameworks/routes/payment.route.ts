@@ -4,10 +4,12 @@ import PaymentUsecase from "../../usecases/payment.usecase";
 import PaymentController from "../../controllers/payment.controller";
 import PaymentRepository from "../../repositories/payment.repository";
 import StripeService from "../utils/stripeService";
+import EventPublisher from "../rabbitmq/publisher";
 
 const stripeService = new StripeService();
+const eventPublisher = new EventPublisher();
 const paymentRespository = new PaymentRepository();
-const paymentUsecase = new PaymentUsecase(paymentRespository, stripeService);
+const paymentUsecase = new PaymentUsecase(paymentRespository, stripeService, eventPublisher);
 const paymentController = new PaymentController(paymentUsecase);
 const router = express.Router();
 

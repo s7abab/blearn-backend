@@ -1,4 +1,4 @@
-interface User {
+interface IUser {
   _id: any;
   name: string;
   email: string;
@@ -9,4 +9,4 @@ interface User {
   isBlock: boolean;
 }
 
-export default User;
+export default IUser;

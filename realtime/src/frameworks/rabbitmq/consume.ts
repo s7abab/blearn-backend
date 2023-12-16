@@ -30,13 +30,13 @@ class RabbitMQConsumer {
       await this.channel!.assertQueue(queueName, { durable: true });
       await this.channel!.bindQueue(queueName, this.exchangeName, routingKey);
 
-      console.log(`Waiting for messages in queue '${queueName}'...`);
+      console.log(`Waiting for messages from '${this.exchangeName}'...`);
 
       this.channel!.consume(
         queueName,
         (msg) => {
           if (msg !== null) {
-            callback(JSON.parse(msg.content.toString()));
+            callback(JSON.parse(msg.content.toString()))
             this.channel?.ack(msg);
           }
         },
