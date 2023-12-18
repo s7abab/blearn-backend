@@ -17,8 +17,8 @@ class PaymentController {
       res.status(200).json({
         success: true,
       });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    } catch (error) {
+      return next(new ErrorHandler(error.message as Error.message , error.statusCode || 500));
     }
   }
 

@@ -6,7 +6,7 @@ interface IGetDuration {
 
 class GetVideoDuration implements IGetDuration {
   constructor() {}
-  async getVideoDuration(url: string) {
+  public async getVideoDuration(url: string) {
     try {
       const duration = await getVideoDurationInSeconds(url);
       return duration;

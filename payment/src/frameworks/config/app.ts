@@ -6,6 +6,7 @@ import morgan from "morgan";
 import cookieParser = require("cookie-parser");
 import { ErrorMiddleware } from "@s7abab/common";
 import paymentRouter from "../routes/payment.route";
+import analyticsRouter from "../routes/analytics.route";
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -26,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use("/api/v1/payment", paymentRouter);
+app.use("/api/v1/analytics", analyticsRouter);
+
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

@@ -1,9 +1,9 @@
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import CourseUsecase from "../usecases/course.usecase";
-import { Course } from "../entities/course";
 import { ILessonRequest } from "../interfaces/lesson.interface";
 import { IModule } from "../interfaces/module.interface";
+import ICourse from "../entities/course";
 
 class CourseController {
   private courseUsecase: CourseUsecase;
@@ -18,7 +18,7 @@ class CourseController {
       const course = await this.courseUsecase.createCourse({
         instructorId: id,
         ...req.body,
-      } as Course);
+      } as ICourse);
 
       res.status(200).json({
         success: true,
@@ -42,19 +42,29 @@ class CourseController {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-
-  async getAllCourses(req: Request, res: Response, next: NextFunction) {
+  async getCourses(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page, limit } = req.query;
-      if (typeof page !== "string" || typeof limit !== "string") {
-        throw new Error("Page or limit is not provided or not a string");
-      }
-      const pageNumber: number = parseInt(page, 10);
-      const limitNumber: number = parseInt(limit, 10);
-      const courses = await this.courseUsecase.getCourses(
-        pageNumber,
-        limitNumber
-      );
+      const courses = await this.courseUsecase.getCourses();
+
+      res.status(200).json({
+        success: true,
+        courses,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
+  async searchCourses(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { page, priceFilter, sortByEnrollments, searchKeyword } = req.query;
+
+      const courses = await this.courseUsecase.searchCourses({
+        page,
+        priceFilter,
+        sortByEnrollments,
+        searchKeyword,
+      } as any);
 
       res.status(200).json({
         success: true,

@@ -51,10 +51,19 @@ class CourseUsecase {
       throw error;
     }
   }
-
-  async getCourses(page: number, limit: number) {
+  async getCourses() {
     try {
-      const courses = await this.courseRepository.find(page, limit);
+      const courses = await this.courseRepository.findCourses();
+
+      return courses;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async searchCourses(filters: ICourseFilters) {
+    try {
+      const courses = await this.courseRepository.searchCourses(filters);
       return courses;
     } catch (error) {
       throw error;
@@ -170,7 +179,7 @@ class CourseUsecase {
         duration = Math.round(videoDuration);
       }
 
-      const lesson = await this.courseRepository.createLesson(data);
+      const lesson = await this.courseRepository.createLesson({...data, duration:duration});
       if (!lesson) {
         throw new Error("Lesson not created");
       }
