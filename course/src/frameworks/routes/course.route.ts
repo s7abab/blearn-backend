@@ -40,7 +40,12 @@ router.delete(
 router.get(
   "/get-all-courses",
   (req: Request, res: Response, next: NextFunction) =>
-    courseController.getAllCourses(req, res, next)
+    courseController.getCourses(req, res, next)
+);
+router.get(
+  "/search-courses",
+  (req: Request, res: Response, next: NextFunction) =>
+    courseController.searchCourses(req, res, next)
 );
 
 router.get(

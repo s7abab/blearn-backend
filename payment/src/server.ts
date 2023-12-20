@@ -1,9 +1,9 @@
 import { app } from "./frameworks/config/app";
 import connectDb from "./frameworks/config/db";
-import consumeRabbitmq from "./frameworks/rabbitmq/middleware";
+import { startListening } from "./frameworks/rabbitmq/middleware";
 require("dotenv").config();
 
-consumeRabbitmq();
+startListening()
 // create server
 app.listen(process.env.PORT || 8002, () => {
   connectDb();

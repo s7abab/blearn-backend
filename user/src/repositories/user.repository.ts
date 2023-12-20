@@ -1,12 +1,13 @@
 import { Roles } from "@s7abab/common";
 import IUserRepository from "../interfaces/repository/user.repository";
 import userModel from "../frameworks/models/user.model";
-import User from "../entities/user";
+import IUser from "../entities/user";
+import { IBankDetails } from "../interfaces/user.interface";
 
 class UserRepository implements IUserRepository {
   constructor() {}
 
-  async create(data: User): Promise<User | null> {
+  async create(data: IUser): Promise<IUser | null> {
     try {
       const user = await userModel.create(data);
       return user;
@@ -14,7 +15,7 @@ class UserRepository implements IUserRepository {
       throw error;
     }
   }
-  async findByRole(role: string): Promise<User[] | null> {
+  async findByRole(role: string): Promise<IUser[] | null> {
     try {
       const users = await userModel.find({ role });
       return users;
@@ -23,7 +24,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findById(userId: string): Promise<User | null> {
+  async findById(userId: string): Promise<IUser | null> {
     try {
       const user = await userModel.findById(userId);
       return user;
@@ -32,7 +33,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByIdAndRole(userId: string, role: string): Promise<User | null> {
+  async findByIdAndRole(userId: string, role: string): Promise<IUser | null> {
     try {
       const user = await userModel.findOne({ _id: userId, role });
       return user;
@@ -41,7 +42,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<IUser | null> {
     try {
       const user = await userModel.findOne({ email });
       return user;
@@ -50,11 +51,11 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByIdAndBlock(userId: string): Promise<User | null> {
+  async findByIdAndBlock(userId: string): Promise<IUser | null> {
     try {
       const user = await userModel.findById(userId);
       if (!user) {
-        throw new Error("User not found");
+        throw new Error("IUser not found");
       }
       user.isBlock = !user.isBlock;
       await user.save();
@@ -67,7 +68,7 @@ class UserRepository implements IUserRepository {
   async findByEmailAndComparePassword(email: string, password: string) {
     const user = await userModel.findOne({ email });
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("IUser not found");
     }
     const isPasswordMatched = await user.comparePassword(password);
     return isPasswordMatched;
@@ -76,11 +77,11 @@ class UserRepository implements IUserRepository {
   async findByIdAndUpdate(
     userId: string,
     data: { name?: string; email?: string }
-  ): Promise<User | null> {
+  ): Promise<IUser | null> {
     try {
       const user = await userModel.findById(userId);
       if (!user) {
-        throw new Error("User not found");
+        throw new Error("IUser not found");
       }
 
       if (data.email) {
@@ -124,11 +125,32 @@ class UserRepository implements IUserRepository {
       const user = await userModel.findById(userId);
 
       if (!user) {
-        throw new Error("User not found");
+        throw new Error("IUser not found");
       }
       user.avatar = imageUrl;
 
       await user.save();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findByIdAndUpdateBankDetails(
+    userId: string,
+    bankDetails: IBankDetails
+  ) {
+    try {
+      const user = await userModel.findByIdAndUpdate(
+        userId,
+        { bankDetails: bankDetails },
+        { new: true }
+      );
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
       return user;
     } catch (error) {
       throw error;

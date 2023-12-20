@@ -230,6 +230,21 @@ class UserController {
       return new ErrorHandler(error.message, 500);
     }
   }
+
+  async updateBankDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { bankDetails } = req.body;
+      const userId = req.user?.id;
+      await this.userUsecase.updateBankDetails(userId, bankDetails);
+
+      res.status(200).json({
+        success: true,
+        message: "Bank details updated successfully",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
 }
 
 export default UserController;

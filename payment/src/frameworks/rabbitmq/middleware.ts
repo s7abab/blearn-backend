@@ -1,27 +1,42 @@
-
-import RabbitMQConsumer from "./consumer";
+import UserRepository from "../../repositories/user.repository";
+import EventConsumer from "./consumer";
 import { Exchanges } from "./exchanges";
-import { Queues } from "./queues";
 import { Topics } from "./topics";
 
+const eventConsumer = new EventConsumer();
+const userRepository = new UserRepository();
+// Define a callback function to process the received data
 
+const processData = async (data: any) => {
+  console.log("Received data:", data);
+  switch (data.topic) {
+    case Topics.USER_CREATE:
+      await userRepository.createUser(data);
+      break;
+    case Topics.USER_UPDATE:
+      await userRepository.updateUser(data);
+      break;
 
-async function consumeRabbitmq() {
-  const userService = new RabbitMQConsumer(Exchanges.USER_EXCHANGE);
-
-  try {
-    await userService.consumeFromQueue(
-      Queues.COURSE_QUEUE,
-      Topics.ORDER_CREATE,
-      async (msg) => {
-        console.log(`Received event from ${Exchanges.USER_EXCHANGE}`);
-        // processing and saving data
-        console.log(msg)
-      }
-    );
-
-  } catch (error) {
-    console.error("Error:", error);
+    default:
+      break;
   }
-}
-export default consumeRabbitmq;
+};
+
+// Function to start listening to the queue
+export const startListening = async () => {
+  try {
+    await eventConsumer.listen(
+      Exchanges.USER_EXCHANGE,
+      Topics.USER_UPDATE,
+      processData
+    );
+    await eventConsumer.listen(
+      Exchanges.USER_EXCHANGE,
+      Topics.USER_CREATE,
+      processData
+    );
+    console.log("Listening to the queue for incoming messages...");
+  } catch (error) {
+    console.error("Error starting the listener:", error);
+  }
+};

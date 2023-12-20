@@ -17,7 +17,7 @@ class CourseRepository implements ICourseRepository {
   constructor() {}
 
   // course
-  async create(data: ICourse): Promise<ICourse | null> {
+  public async create(data: ICourse): Promise<ICourse | null> {
     try {
       const course = await courseModel.create(data);
       return course;
@@ -26,7 +26,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findByCourseIdAndUpdate(data: ICourse): Promise<ICourse | null> {
+  public async findByCourseIdAndUpdate(data: ICourse): Promise<ICourse | null> {
     try {
       const { _id, ...updateData } = data;
       const course = await courseModel.findByIdAndUpdate(_id, updateData, {
@@ -38,16 +38,56 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async find(page:number, limit:number): Promise<ICourse[]> {
+  async findCourses () : Promise<ICourse[]>{
     try {
-      const courses = await courseModel.find().skip((page - 1) * limit)
-      .limit(limit);
-      return courses;
+      const courses = await courseModel.find();
+      return courses
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async searchCourses(
+    filters: ICourseFilters
+  ): Promise<{ courses: ICourse[]; totalPages: number }> {
+    try {
+      const limit = 8;
+      let query = courseModel.find();
+      // Apply search if search keyword is provided
+      if (filters.searchKeyword) {
+        query = courseModel.find({
+          $or: [
+            { title: { $regex: new RegExp(filters.searchKeyword, "i") } }, // Case-insensitive search on the title field
+            { description: { $regex: new RegExp(filters.searchKeyword, "i") } }, // Case-insensitive search on the description field
+          ],
+        });
+      }
+
+      // Apply price sorting if provided
+      if (filters.priceFilter === "low") {
+        query = query.sort({ price: 1 }); // Sort by price in ascending order
+      } else if (filters.priceFilter === "high") {
+        query = query.sort({ price: -1 });
+      }
+
+      // Apply sorting by most enrolled
+      if (filters.sortByEnrollments) {
+        query = query.sort({ enrollments: -1 });
+      }
+
+      const courses = await query.skip((filters.page - 1) * limit).limit(limit);
+      const totalCoursesCount = await courseModel.countDocuments();
+
+      const totalPages = Math.ceil(totalCoursesCount / limit);
+
+      const data = { courses, totalPages };
+      return data;
     } catch (error) {
       throw error;
     }
   }
-  async findByCourseId(courseId: string): Promise<ICourse | null> {
+
+  public async findByCourseId(courseId: string): Promise<ICourse | null> {
     try {
       const course = await courseModel.findById(courseId);
       return course;
@@ -56,7 +96,9 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findByCourseIdAndDelete(courseId: string): Promise<ICourse | null> {
+  public async findByCourseIdAndDelete(
+    courseId: string
+  ): Promise<ICourse | null> {
     try {
       const course = await courseModel.findByIdAndDelete(courseId);
       return course;
@@ -65,7 +107,9 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findByInstructorId(instructorId: string): Promise<ICourse[] | null> {
+  public async findByInstructorId(
+    instructorId: string
+  ): Promise<ICourse[] | null> {
     try {
       const courses = await courseModel.find({
         instructorId: instructorId,
@@ -76,7 +120,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findByInstructorIdAndCourseId(
+  public async findByInstructorIdAndCourseId(
     instructorId: string,
     courseId: string
   ): Promise<ICourse | null> {
@@ -91,7 +135,9 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findEnrolledCoursesByUserId(userId: string): Promise<ICourse[] | null> {
+  public async findEnrolledCoursesByUserId(
+    userId: string
+  ): Promise<ICourse[] | null> {
     try {
       const enrolledCourses = await courseModel.find({
         "enrolledUsers.userId": userId,
@@ -102,7 +148,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findEnrolledCourseByUserAndCourseId(
+  public async findEnrolledCourseByUserAndCourseId(
     userId: string,
     courseId: string
   ): Promise<ICourse | null> {
@@ -119,7 +165,7 @@ class CourseRepository implements ICourseRepository {
   }
 
   // module
-  async createModule(data: IModule) {
+  public async createModule(data: IModule) {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
@@ -134,7 +180,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findModules(courseId: string) {
+  public async findModules(courseId: string) {
     try {
       const course = await this.findByCourseId(courseId);
       const modules = course?.modules;
@@ -145,7 +191,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findModuleAndUpdate(data: IModuleRequest) {
+  public async findModuleAndUpdate(data: IModuleRequest) {
     try {
       const course = await courseModel.findOne({
         _id: data.courseId,
@@ -163,7 +209,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findModuleAndDelete(data: IModuleDeleteRequest) {
+  public async findModuleAndDelete(data: IModuleDeleteRequest) {
     const course = await courseModel.findOne({
       _id: data.courseId,
       instructorId: data.instructorId,
@@ -179,7 +225,7 @@ class CourseRepository implements ICourseRepository {
   }
 
   // lesson
-  async createLesson(data: ILessonRequest) {
+  public async createLesson(data: ILessonRequest) {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
@@ -206,7 +252,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async createEnroll(data: IEnroll) {
+  public async createEnroll(data: IEnroll) {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
@@ -223,7 +269,7 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findLessonAndTrackProgression(data: ILessonProgressTrackData) {
+  public async findLessonAndTrackProgression(data: ILessonProgressTrackData) {
     try {
       const course = await courseModel.findById(data.courseId);
       if (!course) {
@@ -244,13 +290,21 @@ class CourseRepository implements ICourseRepository {
       throw error;
     }
   }
-  
-  async findProgressionByUserIdAndCourseId (userId:string, courseId:string) {
-    const course = await this.findEnrolledCourseByUserAndCourseId(userId, courseId);
+
+  public async findProgressionByUserIdAndCourseId(
+    userId: string,
+    courseId: string
+  ) {
+    const course = await this.findEnrolledCourseByUserAndCourseId(
+      userId,
+      courseId
+    );
     const totalDuration = course?.duration;
-    const completedDuration = course?.enrolledUsers.find((user) => user.userId === userId)?.progress;
-    const progression = Math.floor((completedDuration! / totalDuration!) * 100)
-    return progression
+    const completedDuration = course?.enrolledUsers.find(
+      (user) => user.userId === userId
+    )?.progress;
+    const progression = Math.floor((completedDuration! / totalDuration!) * 100);
+    return progression;
   }
 }
 

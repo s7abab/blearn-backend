@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.11.0",
+    "@opensearch-project/opensearch": "^2.4.0",
     "@s7abab/common": "^1.0.7",
     "@types/amqplib": "^0.10.4",
     "@types/cookie-parser": "^1.4.6",
