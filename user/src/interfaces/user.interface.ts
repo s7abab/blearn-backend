@@ -35,3 +35,10 @@ export interface IUpdatePassword {
   oldPassword: string;
   newPassword: string;
 }
+
+
+export interface IBankDetails {
+  name: string;
+  accountNumber: number;
+  ifscCode: number;
+} 

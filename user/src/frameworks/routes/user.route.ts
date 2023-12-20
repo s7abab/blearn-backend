@@ -107,4 +107,12 @@ router.put(
     userController.blockUser(req, res, next)
 );
 
+router.put(
+  "/update-bankdetails",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.updateBankDetails(req,res,next)
+);
+
 export default router;

@@ -1,6 +1,7 @@
 require("dotenv").config();
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import { IBankDetails } from "../../interfaces/user.interface";
 
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
@@ -13,6 +14,7 @@ export interface IUserSchema extends Document {
   role: string;
   additional_info: [{}];
   isBlock: boolean;
+  bankDetails: IBankDetails;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -33,6 +35,9 @@ const userSchema: Schema<IUserSchema> = new mongoose.Schema(
     password: {
       type: String,
       minlength: [6, "Password must be at least 6 characters long"],
+    },
+    bankDetails: {
+      type: { name: String, accountNumber: Number, ifscCode: Number },
     },
     avatar: { type: String },
     role: {
@@ -57,5 +62,8 @@ userSchema.methods.comparePassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const userModel: Model<IUserSchema> = mongoose.model<IUserSchema>("User", userSchema);
+const userModel: Model<IUserSchema> = mongoose.model<IUserSchema>(
+  "User",
+  userSchema
+);
 export default userModel;

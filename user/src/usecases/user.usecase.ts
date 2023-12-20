@@ -1,6 +1,7 @@
 import sendMail from "../frameworks/utils/sendMail";
 import {
   IActivationRequest,
+  IBankDetails,
   ILoginRequest,
   IRegisterUser,
 } from "../interfaces/user.interface";
@@ -266,6 +267,19 @@ class UserUsecase {
       throw error;
     }
   }
+
+  async updateBankDetails (userId: string, bankDetails: IBankDetails) {
+    try {
+      const user = await this.userRepository.findByIdAndUpdateBankDetails(userId, bankDetails);
+      if (!user) {
+        throw new Error("Bank details not updated");
+      }
+      console.log(user)
+      return user;
+    } catch (error) {
+      throw error
+    }
+  } 
 }
 
 export default UserUsecase;

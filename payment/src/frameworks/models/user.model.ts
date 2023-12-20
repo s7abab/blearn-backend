@@ -1,7 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 import IUser from "../../entities/user";
 
-
 const userSchema: Schema<IUser> = new Schema<IUser>(
   {
     _id: { type: Schema.Types.ObjectId, default: new Types.ObjectId() },
@@ -12,6 +11,8 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       required: true,
     },
     role: { type: String, default: "user" },
+    profit: {type:Number, required:true, default:0},
+    balance: { type: Number, required:true, default:0 },
   },
   {
     timestamps: true,

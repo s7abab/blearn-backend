@@ -24,7 +24,7 @@ class EventConsumer {
 
     try {
       await this.channel.assertExchange(exchange, "direct", { durable: true });
-      const queue = await this.channel.assertQueue(Queues.COURSE_QUEUE);
+      const queue = await this.channel.assertQueue(Queues.PAYMENT_QUEUE);
 
       await this.channel.bindQueue(queue.queue, exchange, routingKey);
 

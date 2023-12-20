@@ -2,11 +2,12 @@ import { Roles } from "@s7abab/common";
 import IUserRepository from "../interfaces/repository/user.repository";
 import userModel from "../frameworks/models/user.model";
 import IUser from "../entities/user";
+import { IBankDetails } from "../interfaces/user.interface";
 
 class UserRepository implements IUserRepository {
   constructor() {}
 
-  async create(data: IUser): Promise<IUser | null > {
+  async create(data: IUser): Promise<IUser | null> {
     try {
       const user = await userModel.create(data);
       return user;
@@ -129,6 +130,27 @@ class UserRepository implements IUserRepository {
       user.avatar = imageUrl;
 
       await user.save();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findByIdAndUpdateBankDetails(
+    userId: string,
+    bankDetails: IBankDetails
+  ) {
+    try {
+      const user = await userModel.findByIdAndUpdate(
+        userId,
+        { bankDetails: bankDetails },
+        { new: true }
+      );
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
       return user;
     } catch (error) {
       throw error;
