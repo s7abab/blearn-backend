@@ -11,7 +11,7 @@ class CourseController {
     this.courseUsecase = courseUsecase;
   }
 
-  async createCourse(req: Request, res: Response, next: NextFunction) {
+  public async createCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const id = req?.user?.id;
 
@@ -30,7 +30,7 @@ class CourseController {
     }
   }
 
-  async editCourse(req: Request, res: Response, next: NextFunction) {
+  public async editCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const course = await this.courseUsecase.updateCourse(req.body);
 
@@ -42,7 +42,7 @@ class CourseController {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-  async getCourses(req: Request, res: Response, next: NextFunction) {
+  public async getCourses(req: Request, res: Response, next: NextFunction) {
     try {
       const courses = await this.courseUsecase.getCourses();
 
@@ -55,7 +55,7 @@ class CourseController {
     }
   }
 
-  async searchCourses(req: Request, res: Response, next: NextFunction) {
+  public async searchCourses(req: Request, res: Response, next: NextFunction) {
     try {
       const { page, priceFilter, sortByEnrollments, searchKeyword } = req.query;
 
@@ -75,7 +75,11 @@ class CourseController {
     }
   }
 
-  async getSingleCourse(req: Request, res: Response, next: NextFunction) {
+  public async getSingleCourse(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { courseId } = req.params;
       const course = await this.courseUsecase.getOneCourse(courseId);
@@ -89,7 +93,7 @@ class CourseController {
     }
   }
 
-  async deleteCourse(req: Request, res: Response, next: NextFunction) {
+  public async deleteCourse(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId } = req.body;
       await this.courseUsecase.deleteCourse(courseId);
@@ -103,7 +107,7 @@ class CourseController {
     }
   }
 
-  async getCoursesForInstructors(
+  public async getCoursesForInstructors(
     req: Request,
     res: Response,
     next: NextFunction
@@ -123,7 +127,7 @@ class CourseController {
     }
   }
 
-  async getSingleCourseForInstructors(
+  public async getSingleCourseForInstructors(
     req: Request,
     res: Response,
     next: NextFunction
@@ -146,7 +150,7 @@ class CourseController {
     }
   }
 
-  async addLesson(req: Request, res: Response, next: NextFunction) {
+  public async addLesson(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId, type, title, url, index } = req.body;
 
@@ -167,7 +171,7 @@ class CourseController {
     }
   }
 
-  async findLessonsForInstructor(
+  public async findLessonsForInstructor(
     req: Request,
     res: Response,
     next: NextFunction
@@ -187,7 +191,7 @@ class CourseController {
     }
   }
 
-  async addModule(req: Request, res: Response, next: NextFunction) {
+  public async addModule(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId, title } = req.body;
       const module = await this.courseUsecase.createModule({
@@ -208,7 +212,7 @@ class CourseController {
     }
   }
 
-  async editModule(req: Request, res: Response, next: NextFunction) {
+  public async editModule(req: Request, res: Response, next: NextFunction) {
     try {
       const instructorId = req?.user?.id;
       const { courseId, title, index } = req.body;
@@ -228,7 +232,7 @@ class CourseController {
     }
   }
 
-  async deleteModule(req: Request, res: Response, next: NextFunction) {
+  public async deleteModule(req: Request, res: Response, next: NextFunction) {
     try {
       const instructorId = req?.user?.id;
       const { courseId, index } = req.body;
@@ -247,7 +251,7 @@ class CourseController {
     }
   }
 
-  async getModules(req: Request, res: Response, next: NextFunction) {
+  public async getModules(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId } = req.params;
       const modules = await this.courseUsecase.getModules(courseId);
@@ -260,7 +264,11 @@ class CourseController {
     }
   }
 
-  async getEnrolledCourses(req: Request, res: Response, next: NextFunction) {
+  public async getEnrolledCourses(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const userId = req?.user?.id;
       const courses = await this.courseUsecase.getEnrolledCoursesForUser(
@@ -276,7 +284,11 @@ class CourseController {
     }
   }
 
-  async getOneEnrolledCourse(req: Request, res: Response, next: NextFunction) {
+  public async getOneEnrolledCourse(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { courseId } = req.params;
       const userId = req?.user?.id;
@@ -294,7 +306,7 @@ class CourseController {
     }
   }
 
-  async trackLesson(req: Request, res: Response, next: NextFunction) {
+  public async trackLesson(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req?.user?.id;
       const course = await this.courseUsecase.updateProgresson({
@@ -309,7 +321,7 @@ class CourseController {
     }
   }
 
-  async getProgression(req: Request, res: Response, next: NextFunction) {
+  public async getProgression(req: Request, res: Response, next: NextFunction) {
     try {
       const { courseId } = req.params;
       const userId = req?.user?.id;

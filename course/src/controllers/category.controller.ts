@@ -12,7 +12,7 @@ class CategoryController {
     this.categoryService = categoryService;
   }
 
-  async createCategory(req: Request, res: Response, next: NextFunction) {
+  public async createCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const { name } = req.body as ICategory;
 
@@ -32,7 +32,7 @@ class CategoryController {
     }
   }
 
-  async editCategory(req: Request, res: Response, next: NextFunction) {
+  public async editCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, categoryId } = req.body;
 
@@ -53,7 +53,7 @@ class CategoryController {
     }
   }
 
-  async unlistCategory(req: Request, res: Response, next: NextFunction) {
+  public async unlistCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const { categoryId }: { categoryId: string } = req.body;
 
@@ -71,7 +71,11 @@ class CategoryController {
     }
   }
 
-  async getAllCategories(req: Request, res: Response, next: NextFunction) {
+  public async getAllCategories(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const categories = await this.categoryService.getCategories();
 
@@ -84,7 +88,11 @@ class CategoryController {
     }
   }
 
-  async getSingleCategory(req: Request, res: Response, next: NextFunction) {
+  public async getSingleCategory(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { categoryId } = req.params;
       const category = await this.categoryService.getOneCategory(categoryId);

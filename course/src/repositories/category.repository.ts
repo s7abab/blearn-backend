@@ -5,7 +5,7 @@ import ICategoryRepository from "../interfaces/repository/category.repository";
 class CategoryRepository implements ICategoryRepository {
   constructor() {}
 
-  async create(name: string): Promise<ICategory> {
+  public async create(name: string): Promise<ICategory> {
     try {
       const category = await categoryModel.create({ name });
       return category;
@@ -14,7 +14,7 @@ class CategoryRepository implements ICategoryRepository {
     }
   }
 
-  async findByIdAndUpdate(categoryId: string, name: string) {
+  public async findByIdAndUpdate(categoryId: string, name: string) {
     try {
       const category = await categoryModel.findByIdAndUpdate(
         categoryId,
@@ -27,7 +27,7 @@ class CategoryRepository implements ICategoryRepository {
     }
   }
 
-  async find() {
+  public async find() {
     try {
       const categories = await categoryModel.find();
       return categories;
@@ -36,7 +36,7 @@ class CategoryRepository implements ICategoryRepository {
     }
   }
 
-  async findById(categoryId: string) {
+  public async findById(categoryId: string) {
     try {
       const category = await categoryModel.findById(categoryId);
       return category;
@@ -45,7 +45,7 @@ class CategoryRepository implements ICategoryRepository {
     }
   }
 
-  async findByName(name: string) {
+  public async findByName(name: string) {
     try {
       const regexPattern = new RegExp(`^${name}$`, "i");
       // Find a category matching the name using the case-insensitive regex

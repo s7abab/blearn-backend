@@ -27,7 +27,7 @@ class UserUsecase {
     this.eventPublisher = eventPublisher;
   }
 
-  async register(userData: IRegisterUser) {
+  public async register(userData: IRegisterUser) {
     try {
       if (userData.password !== userData.confirmpassword) {
         throw new Error("Password not match");
@@ -67,7 +67,7 @@ class UserUsecase {
     }
   }
 
-  async activateUser(data: IActivationRequest) {
+  public async activateUser(data: IActivationRequest) {
     try {
       const newUser = await this.jwt.verifyActivationCode(data);
       if (newUser.activationCode !== data.activation_code) {
@@ -90,7 +90,7 @@ class UserUsecase {
     }
   }
 
-  async socialAuth(data: IUser) {
+  public async socialAuth(data: IUser) {
     try {
       const user = await this.getUserByEmail(data.email);
       let token;
@@ -105,7 +105,7 @@ class UserUsecase {
     }
   }
 
-  async login(data: ILoginRequest) {
+  public async login(data: ILoginRequest) {
     const user = await this.getUserByEmail(data.email);
     if (!user) {
       throw new Error("User not found");
@@ -124,7 +124,7 @@ class UserUsecase {
     return token;
   }
 
-  async compareUserPassword(email: string, password: string) {
+  public async compareUserPassword(email: string, password: string) {
     try {
       const isPasswordMatched =
         await this.userRepository.findByEmailAndComparePassword(
@@ -137,7 +137,7 @@ class UserUsecase {
     }
   }
 
-  async getUsersByRole(role: string) {
+  public async getUsersByRole(role: string) {
     try {
       const users = await this.userRepository.findByRole(role);
       return users;
@@ -146,7 +146,7 @@ class UserUsecase {
     }
   }
 
-  async getOneUser(userId: string) {
+  public async getOneUser(userId: string) {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user) throw new Error("User not found");
@@ -156,7 +156,7 @@ class UserUsecase {
     }
   }
 
-  async getUserByIdAndRole(userId: string, role: string) {
+  public async getUserByIdAndRole(userId: string, role: string) {
     try {
       const user = await this.userRepository.findByIdAndRole(userId, role);
       if (!user) throw new Error("User not found");
@@ -166,7 +166,7 @@ class UserUsecase {
     }
   }
 
-  async getUserByEmail(email: string): Promise<IUser | null> {
+  public async getUserByEmail(email: string): Promise<IUser | null> {
     try {
       const user = await this.userRepository.findByEmail(email);
       return user as IUser | null;
@@ -175,7 +175,7 @@ class UserUsecase {
     }
   }
 
-  async toggleBlockStatus(id: string) {
+  public async toggleBlockStatus(id: string) {
     try {
       const user = await this.userRepository.findByIdAndBlock(id);
       if (!user) {
@@ -187,7 +187,7 @@ class UserUsecase {
     }
   }
 
-  async createUser(data: IUser) {
+  public async createUser(data: IUser) {
     try {
       const user = await this.userRepository.create(data);
       if (!user) throw new Error("User not created");
@@ -209,7 +209,7 @@ class UserUsecase {
     }
   }
 
-  async updateUserDetails(
+  public async updateUserDetails(
     userId: string,
     updatedData: { name?: string; email?: string }
   ) {
@@ -241,7 +241,7 @@ class UserUsecase {
     }
   }
 
-  async updateUserProfilePicture(userId: string, imageUrl: string) {
+  public async updateUserProfilePicture(userId: string, imageUrl: string) {
     try {
       const user = await this.userRepository.findByIdAndUpdateAvatar(
         userId,
@@ -256,7 +256,7 @@ class UserUsecase {
     }
   }
 
-  async findUserAndUpdateAsInstructor(data: any) {
+  public async findUserAndUpdateAsInstructor(data: any) {
     try {
       const user = await this.userRepository.findByIdAndMakeInstructor(data);
       if (!user) {
@@ -268,18 +268,21 @@ class UserUsecase {
     }
   }
 
-  async updateBankDetails (userId: string, bankDetails: IBankDetails) {
+  public async updateBankDetails(userId: string, bankDetails: IBankDetails) {
     try {
-      const user = await this.userRepository.findByIdAndUpdateBankDetails(userId, bankDetails);
+      const user = await this.userRepository.findByIdAndUpdateBankDetails(
+        userId,
+        bankDetails
+      );
       if (!user) {
         throw new Error("Bank details not updated");
       }
-      console.log(user)
+      console.log(user);
       return user;
     } catch (error) {
-      throw error
+      throw error;
     }
-  } 
+  }
 }
 
 export default UserUsecase;

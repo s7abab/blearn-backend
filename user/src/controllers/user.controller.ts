@@ -9,7 +9,7 @@ class UserController {
     this.userUsecase = userUsecase;
   }
 
-  async registerUser(req: Request, res: Response, next: NextFunction) {
+  public async registerUser(req: Request, res: Response, next: NextFunction) {
     try {
       const token = await this.userUsecase.register(req.body);
 
@@ -23,7 +23,7 @@ class UserController {
     }
   }
 
-  async activateUser(req: Request, res: Response, next: NextFunction) {
+  public async activateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const newUser = await this.userUsecase.activateUser(req.body);
 
@@ -36,7 +36,7 @@ class UserController {
     }
   }
 
-  async loginUser(req: Request, res: Response, next: NextFunction) {
+  public async loginUser(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await this.userUsecase.login(req.body);
 
@@ -51,7 +51,7 @@ class UserController {
     }
   }
 
-  async logoutUser(req: Request, res: Response, next: NextFunction) {
+  public async logoutUser(req: Request, res: Response, next: NextFunction) {
     try {
       res.clearCookie("token");
 
@@ -64,7 +64,7 @@ class UserController {
     }
   }
 
-  async getUserInfo(req: Request, res: Response, next: NextFunction) {
+  public async getUserInfo(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.id;
       const user = await this.userUsecase.getOneUser(userId);
@@ -78,7 +78,7 @@ class UserController {
     }
   }
 
-  async socialAuth(req: Request, res: Response, next: NextFunction) {
+  public async socialAuth(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await this.userUsecase.socialAuth(req.body);
       res.cookie("token", user.token, { expires: user.expires });
@@ -92,7 +92,7 @@ class UserController {
     }
   }
 
-  async updateUser(req: Request, res: Response, next: NextFunction) {
+  public async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, email } = req.body;
       const userId = req.user?.id;
@@ -119,7 +119,11 @@ class UserController {
     }
   }
 
-  async updateProfilePicture(req: Request, res: Response, next: NextFunction) {
+  public async updateProfilePicture(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { imageUrl } = req.body;
       const userId = req.user?.id;
@@ -139,7 +143,11 @@ class UserController {
     }
   }
 
-  async instructorApplication(req: Request, res: Response, next: NextFunction) {
+  public async instructorApplication(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const userId = req?.user?.id;
       const instructor = await this.userUsecase.findUserAndUpdateAsInstructor({
@@ -158,7 +166,7 @@ class UserController {
   }
 
   // admin
-  async getUsers(req: Request, res: Response, next: NextFunction) {
+  public async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await this.userUsecase.getUsersByRole("user");
 
@@ -171,7 +179,7 @@ class UserController {
     }
   }
 
-  async getInstructors(req: Request, res: Response, next: NextFunction) {
+  public async getInstructors(req: Request, res: Response, next: NextFunction) {
     try {
       const instructors = await this.userUsecase.getUsersByRole("instructor");
 
@@ -184,7 +192,7 @@ class UserController {
     }
   }
 
-  async getSingleUser(req: Request, res: Response, next: NextFunction) {
+  public async getSingleUser(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     try {
       const user = await this.userUsecase.getUserByIdAndRole(id, "user");
@@ -198,7 +206,11 @@ class UserController {
     }
   }
 
-  async getSingleInstructor(req: Request, res: Response, next: NextFunction) {
+  public async getSingleInstructor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const { id } = req.params;
     try {
       const user = await this.userUsecase.getUserByIdAndRole(id, "instructor");
@@ -212,7 +224,7 @@ class UserController {
     }
   }
 
-  async blockUser(req: Request, res: Response, next: NextFunction) {
+  public async blockUser(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     try {
       const blockStatus = await this.userUsecase.toggleBlockStatus(id);
@@ -231,7 +243,11 @@ class UserController {
     }
   }
 
-  async updateBankDetails(req: Request, res: Response, next: NextFunction) {
+  public async updateBankDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { bankDetails } = req.body;
       const userId = req.user?.id;

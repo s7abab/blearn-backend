@@ -8,7 +8,7 @@ class PaymentController {
   constructor(paymentUsecase: PaymentUsecase) {
     this.paymentUsecase = paymentUsecase;
   }
-  async createOrder(req: Request, res: Response, next: NextFunction) {
+  public async createOrder(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req?.user?.id;
       const { courseId, payment_info } = req.body as IOrderRequest;
@@ -36,7 +36,7 @@ class PaymentController {
     }
   };
 
-  async newPayment(req: Request, res: Response, next: NextFunction) {
+  public async newPayment(req: Request, res: Response, next: NextFunction) {
     try {
       const client_secret = await this.paymentUsecase.newPayment(req.body.amount);
 

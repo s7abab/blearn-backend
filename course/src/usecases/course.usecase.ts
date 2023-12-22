@@ -6,7 +6,6 @@ import {
   IModuleRequest,
 } from "../interfaces/module.interface";
 import {
-  ILesson,
   ILessonGetRequest,
   ILessonProgressTrackData,
   ILessonRequest,
@@ -26,7 +25,7 @@ class CourseUsecase {
   }
 
   // course
-  async createCourse(data: Course) {
+  public async createCourse(data: Course) {
     try {
       const course = await this.courseRepository.create(data);
       if (!course) {
@@ -38,7 +37,7 @@ class CourseUsecase {
     }
   }
 
-  async updateCourse(data: Course) {
+  public async updateCourse(data: Course) {
     try {
       const updatedCourse = await this.courseRepository.findByCourseIdAndUpdate(
         data
@@ -51,7 +50,7 @@ class CourseUsecase {
       throw error;
     }
   }
-  async getCourses() {
+  public async getCourses() {
     try {
       const courses = await this.courseRepository.findCourses();
 
@@ -61,7 +60,7 @@ class CourseUsecase {
     }
   }
 
-  async searchCourses(filters: ICourseFilters) {
+  public async searchCourses(filters: ICourseFilters) {
     try {
       const courses = await this.courseRepository.searchCourses(filters);
       return courses;
@@ -70,7 +69,7 @@ class CourseUsecase {
     }
   }
 
-  async getOneCourse(courseId: string) {
+  public async getOneCourse(courseId: string) {
     try {
       const course = await this.courseRepository.findByCourseId(courseId);
       return course;
@@ -79,7 +78,7 @@ class CourseUsecase {
     }
   }
 
-  async deleteCourse(courseId: string) {
+  public async deleteCourse(courseId: string) {
     try {
       const course = await this.courseRepository.findByCourseIdAndDelete(
         courseId
@@ -90,7 +89,7 @@ class CourseUsecase {
     }
   }
   // get all courses for instructor
-  async getCoursesForInstructor(instructorId: string) {
+  public async getCoursesForInstructor(instructorId: string) {
     try {
       const courses = await this.courseRepository.findByInstructorId(
         instructorId
@@ -101,7 +100,7 @@ class CourseUsecase {
     }
   }
   // get one course for instructor
-  async getOneCourseForInstructor(
+  public async getOneCourseForInstructor(
     instructorId: string,
     courseId: any
   ): Promise<Course | null> {
@@ -117,7 +116,7 @@ class CourseUsecase {
   }
 
   // Module
-  async createModule(data: IModule) {
+  public async createModule(data: IModule) {
     try {
       const module = await this.courseRepository.createModule(data);
       if (!module) {
@@ -129,7 +128,7 @@ class CourseUsecase {
     }
   }
 
-  async getModules(courseId: string) {
+  public async getModules(courseId: string) {
     try {
       const modules = await this.courseRepository.findModules(courseId);
       if (!modules) {
@@ -141,7 +140,7 @@ class CourseUsecase {
     }
   }
 
-  async updateModule(data: IModuleRequest) {
+  public async updateModule(data: IModuleRequest) {
     try {
       const updatedModule = await this.courseRepository.findModuleAndUpdate(
         data
@@ -155,7 +154,7 @@ class CourseUsecase {
     }
   }
 
-  async deleteModule(data: IModuleDeleteRequest) {
+  public async deleteModule(data: IModuleDeleteRequest) {
     try {
       const deleteModule = await this.courseRepository.findModuleAndDelete(
         data
@@ -169,7 +168,7 @@ class CourseUsecase {
     }
   }
 
-  async createLesson(data: ILessonRequest) {
+  public async createLesson(data: ILessonRequest) {
     try {
       let duration = 60;
       if (data.type === "video") {
@@ -179,7 +178,10 @@ class CourseUsecase {
         duration = Math.round(videoDuration);
       }
 
-      const lesson = await this.courseRepository.createLesson({...data, duration:duration});
+      const lesson = await this.courseRepository.createLesson({
+        ...data,
+        duration: duration,
+      });
       if (!lesson) {
         throw new Error("Lesson not created");
       }
@@ -189,7 +191,7 @@ class CourseUsecase {
     }
   }
 
-  async getLessonsForInstructor(data: ILessonGetRequest) {
+  public async getLessonsForInstructor(data: ILessonGetRequest) {
     try {
       const course = await this.courseRepository.findByInstructorIdAndCourseId(
         data?.instructorId,
@@ -208,7 +210,7 @@ class CourseUsecase {
   }
 
   // enroll
-  async enrollCourse(data: IEnroll) {
+  public async enrollCourse(data: IEnroll) {
     try {
       const enrolledCourse = await this.courseRepository.createEnroll(data);
       if (!enrolledCourse) {
@@ -221,7 +223,7 @@ class CourseUsecase {
     }
   }
 
-  async getEnrolledCoursesForUser(userId: string) {
+  public async getEnrolledCoursesForUser(userId: string) {
     try {
       const courses = await this.courseRepository.findEnrolledCoursesByUserId(
         userId
@@ -232,7 +234,7 @@ class CourseUsecase {
     }
   }
 
-  async getOneEnrolledCourseForUser(userId: string, courseId: string) {
+  public async getOneEnrolledCourseForUser(userId: string, courseId: string) {
     try {
       const enrolledCourse =
         await this.courseRepository.findEnrolledCourseByUserAndCourseId(
@@ -248,7 +250,7 @@ class CourseUsecase {
     }
   }
 
-  async updateProgresson(data: ILessonProgressTrackData) {
+  public async updateProgresson(data: ILessonProgressTrackData) {
     try {
       const trackLesson =
         await this.courseRepository.findLessonAndTrackProgression(data);
@@ -261,7 +263,7 @@ class CourseUsecase {
     }
   }
 
-  async getProgression(userId: string, courseId: string) {
+  public async getProgression(userId: string, courseId: string) {
     try {
       const progression =
         await this.courseRepository.findProgressionByUserIdAndCourseId(

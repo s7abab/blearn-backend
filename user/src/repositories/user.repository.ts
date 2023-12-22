@@ -7,7 +7,7 @@ import { IBankDetails } from "../interfaces/user.interface";
 class UserRepository implements IUserRepository {
   constructor() {}
 
-  async create(data: IUser): Promise<IUser | null> {
+  public async create(data: IUser): Promise<IUser | null> {
     try {
       const user = await userModel.create(data);
       return user;
@@ -15,7 +15,7 @@ class UserRepository implements IUserRepository {
       throw error;
     }
   }
-  async findByRole(role: string): Promise<IUser[] | null> {
+  public async findByRole(role: string): Promise<IUser[] | null> {
     try {
       const users = await userModel.find({ role });
       return users;
@@ -24,7 +24,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findById(userId: string): Promise<IUser | null> {
+  public async findById(userId: string): Promise<IUser | null> {
     try {
       const user = await userModel.findById(userId);
       return user;
@@ -33,7 +33,10 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByIdAndRole(userId: string, role: string): Promise<IUser | null> {
+  public async findByIdAndRole(
+    userId: string,
+    role: string
+  ): Promise<IUser | null> {
     try {
       const user = await userModel.findOne({ _id: userId, role });
       return user;
@@ -42,7 +45,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByEmail(email: string): Promise<IUser | null> {
+  public async findByEmail(email: string): Promise<IUser | null> {
     try {
       const user = await userModel.findOne({ email });
       return user;
@@ -51,7 +54,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByIdAndBlock(userId: string): Promise<IUser | null> {
+  public async findByIdAndBlock(userId: string): Promise<IUser | null> {
     try {
       const user = await userModel.findById(userId);
       if (!user) {
@@ -65,7 +68,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByEmailAndComparePassword(email: string, password: string) {
+  public async findByEmailAndComparePassword(email: string, password: string) {
     const user = await userModel.findOne({ email });
     if (!user) {
       throw new Error("IUser not found");
@@ -74,7 +77,7 @@ class UserRepository implements IUserRepository {
     return isPasswordMatched;
   }
 
-  async findByIdAndUpdate(
+  public async findByIdAndUpdate(
     userId: string,
     data: { name?: string; email?: string }
   ): Promise<IUser | null> {
@@ -103,7 +106,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByIdAndMakeInstructor(data: any) {
+  public async findByIdAndMakeInstructor(data: any) {
     try {
       const user = await userModel.findById(data.userId);
       if (user) {
@@ -120,7 +123,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByIdAndUpdateAvatar(userId: string, imageUrl: string) {
+  public async findByIdAndUpdateAvatar(userId: string, imageUrl: string) {
     try {
       const user = await userModel.findById(userId);
 
@@ -136,7 +139,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findByIdAndUpdateBankDetails(
+  public async findByIdAndUpdateBankDetails(
     userId: string,
     bankDetails: IBankDetails
   ) {

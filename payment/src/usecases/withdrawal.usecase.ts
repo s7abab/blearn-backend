@@ -6,7 +6,7 @@ class WithdrawalUsecase {
     this.withdrawalRepository = withdrawalRepository;
   }
 
-  async withdrawMoney(userId: string) {
+  public async withdrawMoney(userId: string) {
     try {
       const withdrawal = await this.withdrawalRepository.findAndWithdraw(
         userId
@@ -20,7 +20,7 @@ class WithdrawalUsecase {
     }
   }
 
-  async getWithdrawals(userId: string) {
+  public async getWithdrawals(userId: string) {
     try {
       const withdrawals = await this.withdrawalRepository.findWithdrawals(
         userId
@@ -32,7 +32,7 @@ class WithdrawalUsecase {
     }
   }
 
-  async getPendingWithdrawals() {
+  public async getPendingWithdrawals() {
     try {
       const withdrawals =
         await this.withdrawalRepository.findPendingWithdrawals();
@@ -42,7 +42,7 @@ class WithdrawalUsecase {
     }
   }
 
-  async updateWithdrawalStatus(userId: string) {
+  public async updateWithdrawalStatus(userId: string) {
     try {
       const withdrawal =
         await this.withdrawalRepository.findTransactionAndMarkAsPaid(userId);
