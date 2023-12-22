@@ -38,16 +38,16 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findCourses () : Promise<ICourse[]>{
+  public async findCourses(): Promise<ICourse[]> {
     try {
       const courses = await courseModel.find();
-      return courses
+      return courses;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
-  async searchCourses(
+  public async searchCourses(
     filters: ICourseFilters
   ): Promise<{ courses: ICourse[]; totalPages: number }> {
     try {

@@ -5,7 +5,7 @@ import { IUserRepository } from "../interfaces/repository/user.repository";
 class UserRepository implements IUserRepository {
   constructor() {}
 
-  async createUser(data: IUser): Promise<IUser | null> {
+  public async createUser(data: IUser): Promise<IUser | null> {
     try {
       const user = await userModel.create(data);
       return user;
@@ -14,7 +14,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async updateUser(data: IUser): Promise<IUser | null> {
+  public async updateUser(data: IUser): Promise<IUser | null> {
     try {
       const existingUser = await userModel.findById(data._id);
       if (!existingUser) {

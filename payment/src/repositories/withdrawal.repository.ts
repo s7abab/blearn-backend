@@ -4,7 +4,7 @@ import withdrawalModel from "../frameworks/models/withdrawal.model";
 class WithdrawalRepository {
   constructor() {}
 
-  async findAndWithdraw(userId: string) {
+  public async findAndWithdraw(userId: string) {
     try {
       const user = await userModel.findById(userId);
       if (!user) throw new Error("User not found");
@@ -41,7 +41,7 @@ class WithdrawalRepository {
     }
   }
 
-  async findWithdrawals(userId: string) {
+  public async findWithdrawals(userId: string) {
     try {
       const withdrawals = await withdrawalModel.find({ userId: userId });
       const user = await userModel.findById(userId);
@@ -58,7 +58,7 @@ class WithdrawalRepository {
     }
   }
 
-  async findPendingWithdrawals() {
+  public async findPendingWithdrawals() {
     try {
       const withdrawals = await withdrawalModel.find({
         status:"pending"
@@ -69,7 +69,7 @@ class WithdrawalRepository {
     }
   }
 
-  async findTransactionAndMarkAsPaid(userId: string) {
+  public async findTransactionAndMarkAsPaid(userId: string) {
     try {
       const withdrawal = await withdrawalModel.findOneAndUpdate(
         { userId: userId, status: "pending" },

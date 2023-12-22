@@ -1,7 +1,6 @@
 import { ICategory } from "../interfaces/category.interface";
 import CategoryRepository from "../repositories/category.repository";
 
-
 class CategoryUsecase {
   private categoryRepository: CategoryRepository;
 
@@ -9,7 +8,7 @@ class CategoryUsecase {
     this.categoryRepository = categoryRepository;
   }
 
-  async createCategory(name: string) {
+  public async createCategory(name: string) {
     try {
       const existingCategory = await this.categoryRepository.findByName(name);
       if (existingCategory) {
@@ -28,7 +27,7 @@ class CategoryUsecase {
     }
   }
 
-  async updateCategory(data: ICategory) {
+  public async updateCategory(data: ICategory) {
     try {
       const existingCategory = await this.categoryRepository.findByName(
         data.name
@@ -52,7 +51,7 @@ class CategoryUsecase {
     }
   }
 
-  async getCategories() {
+  public async getCategories() {
     try {
       const categories = await this.categoryRepository.find();
       return categories;
@@ -61,7 +60,7 @@ class CategoryUsecase {
     }
   }
 
-  async getOneCategory(categoryId: string) {
+  public async getOneCategory(categoryId: string) {
     try {
       const category = await this.categoryRepository.findById(categoryId);
       if (!category) {
@@ -73,7 +72,7 @@ class CategoryUsecase {
     }
   }
 
-  async toggleCategoryListing(categoryId: string) {
+  public async toggleCategoryListing(categoryId: string) {
     const category = await this.categoryRepository.findById(categoryId);
     if (!category) {
       throw new Error("Category not found");

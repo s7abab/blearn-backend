@@ -8,7 +8,7 @@ class WithdrawalController {
     this.withdrawalUsecase = withdrawalUsecase;
   }
 
-  async withdrawMoney(req: Request, res: Response, next: NextFunction) {
+  public async withdrawMoney(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req?.user?.id;
       await this.withdrawalUsecase.withdrawMoney(userId);
@@ -22,7 +22,7 @@ class WithdrawalController {
     }
   }
 
-  async getWithdrawals(req: Request, res: Response, next: NextFunction) {
+  public async getWithdrawals(req: Request, res: Response, next: NextFunction) {
     try {
       const { userId } = req.params;
       const withdrawals = await this.withdrawalUsecase.getWithdrawals(userId);
@@ -35,7 +35,7 @@ class WithdrawalController {
     }
   }
 
-  async getPendingWithdrawals(req: Request, res: Response, next: NextFunction) {
+  public async getPendingWithdrawals(req: Request, res: Response, next: NextFunction) {
     try {
       const withdrawals = await this.withdrawalUsecase.getPendingWithdrawals();
       res.status(200).json({
@@ -47,7 +47,7 @@ class WithdrawalController {
     }
   }
 
-  async updateWithdrawalStatus(
+  public async updateWithdrawalStatus(
     req: Request,
     res: Response,
     next: NextFunction
