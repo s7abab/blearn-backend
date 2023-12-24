@@ -1,10 +1,10 @@
-import { ICompletedUser, IQuestion } from "../interfaces/exam.interface";
+import {  IQuestion } from "../interfaces/exam.interface";
 
 interface IExam {
   _id: any;
   courseId: string;
   questions: IQuestion[];
-  completedUsers: ICompletedUser[];
+  completedUsers: string[];
   totalQuestions: number;
   passMark: number;
 }

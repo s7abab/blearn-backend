@@ -79,6 +79,24 @@ class ExamRepository {
       throw error;
     }
   }
+
+  public async findExamAndAddCompletedUser(userId: string, courseId: string) {
+    try {
+      const exam = await examModel.findOne({ courseId });
+      if (!exam) throw new Error("Exam not found");
+      // Check if userId already exists in completedUsers array
+      const userExists = exam.completedUsers.includes(userId);
+
+      if (!userExists) {
+        exam.completedUsers.push(userId);
+        await exam.save();
+      }
+      return exam;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 }
 
 export default ExamRepository;
