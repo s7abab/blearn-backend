@@ -29,7 +29,7 @@ router.patch(
 router.get(
   "/get-exam/:courseId",
   isAuthenticated,
-  authorizeRoles(Roles.INSTRUCTOR),
+  authorizeRoles(Roles.INSTRUCTOR, Roles.USER),
   (req: Request, res: Response, next: NextFunction) =>
     examController.getExam(req, res, next)
 );
@@ -56,6 +56,13 @@ router.delete(
   authorizeRoles(Roles.INSTRUCTOR),
   (req: Request, res: Response, next: NextFunction) =>
     examController.deleteQuestion(req, res, next)
+);
+
+router.post(
+  "/add-completed-user",
+  isAuthenticated,
+  (req: Request, res: Response, next: NextFunction) =>
+    examController.addCompletedUser(req, res, next)
 );
 
 export default router;

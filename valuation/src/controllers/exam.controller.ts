@@ -88,6 +88,24 @@ class ExamController {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
+
+  public async addCompletedUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { courseId } = req.body;
+      const userId = req?.user?.id;
+      await this.examUsecase.addCompletedUser(userId, courseId);
+
+      res.status(200).json({
+        success: true,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
 }
 
 export default ExamController;

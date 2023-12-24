@@ -273,7 +273,6 @@ class CourseUsecase {
       if (!progression) {
         throw new Error("An error occured while fetching progression");
       }
-      console.log(progression);
       return progression;
     } catch (error) {
       throw error;

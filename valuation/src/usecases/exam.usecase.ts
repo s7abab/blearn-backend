@@ -78,6 +78,19 @@ class ExamUsecase {
       throw error;
     }
   }
+
+  public async addCompletedUser(userId: string, courseId: string) {
+    try {
+      const exam = await this.examRepository.findExamAndAddCompletedUser(
+        userId,
+        courseId
+      );
+      if (!exam) throw new Error("Error in adding completed user");
+      return exam;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default ExamUsecase;

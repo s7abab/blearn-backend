@@ -6,9 +6,3 @@ export interface IQuestion {
   optionD: string;
   correctAnswer: string;
 }
-
-export interface ICompletedUser {
-  userId: string;
-  completed: number;
-}
-
