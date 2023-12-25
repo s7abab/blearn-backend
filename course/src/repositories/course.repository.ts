@@ -74,6 +74,8 @@ class CourseRepository implements ICourseRepository {
       if (filters.sortByEnrollments) {
         query = query.sort({ enrollments: -1 });
       }
+      // Filter courses where totalLessons is greater than 5
+      query = query.find({ totalLessons: { $gt: 4 } });
 
       const courses = await query.skip((filters.page - 1) * limit).limit(limit);
       const totalCoursesCount = await courseModel.countDocuments();

@@ -11,22 +11,13 @@ class ExamController {
 
   public async createExam(req: Request, res: Response, next: NextFunction) {
     try {
-      const data: IExam = req.body;
-      await this.examUsecase.createExam(data);
+      const {courseId} = req.body;
+      await this.examUsecase.createExam(courseId);
 
       res.status(201).json({
         success: true,
         message: "Exam created successfully",
       });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, error.statusCode || 500));
-    }
-  }
-
-  public async updateExam(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { courseId, passMark } = req.body;
-      await this.examUsecase.updateExam(courseId, passMark);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }

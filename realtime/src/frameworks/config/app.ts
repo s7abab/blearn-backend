@@ -1,10 +1,13 @@
 require("dotenv").config();
 import express, { NextFunction, Request, Response } from "express";
-export const app = express();
 import cors from "cors";
 import morgan from "morgan";
-import cookieParser = require("cookie-parser");
+import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "@s7abab/common";
+
+import chatRouter from "../routes/chat.router";
+
+export const app = express();
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -24,7 +27,7 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-// app.use("/api/v1/payment", paymentRouter);
+app.use("/api/v1/chat", chatRouter);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

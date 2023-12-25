@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 export const app = express();
 import cors from "cors";
 import morgan from "morgan";
-import cookieParser = require("cookie-parser");
+import cookieParser from "cookie-parser"
 import { ErrorMiddleware } from "@s7abab/common";
 import courseRoute from "../routes/course.route";
 import categoryRoute from "../routes/category.route";

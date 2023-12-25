@@ -6,8 +6,8 @@ const examSchema: Schema<IExam> = new Schema<IExam>(
     courseId: { type: String, required: true },
     questions: { type: [{}], default: [] },
     completedUsers: { type: [{}], default: [] },
-    totalQuestions: { type: Number, required: true },
-    passMark: { type: Number, required: true },
+    totalQuestions: { type: Number, required: true, default: 10 },
+    passMark: { type: Number, required: true, default: 7 },
   },
   {
     timestamps: true,

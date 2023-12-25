@@ -5,26 +5,14 @@ import { IQuestion } from "../interfaces/exam.interface";
 class ExamRepository {
   constructor() {}
 
-  public async createExam(data: IExam) {
+  public async createExam(courseId:string) {
     try {
-      console.log(data);
       const exam = await examModel.create({
-        courseId: data.courseId,
-        totalQuestions: data.totalQuestions,
-        passMark: data.passMark,
+        courseId,
       });
       return exam;
     } catch (error) {
       console.log(error);
-      throw error;
-    }
-  }
-
-  public async findByIdAndUpdatePassMark(courseId: string, passMark: number) {
-    try {
-      const exam = await examModel.findByIdAndUpdate(courseId, { passMark });
-      return exam;
-    } catch (error) {
       throw error;
     }
   }

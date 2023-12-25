@@ -8,22 +8,10 @@ class ExamUsecase {
     this.examRepository = examRepository;
   }
 
-  public async createExam(data: IExam) {
+  public async createExam(courseId: string) {
     try {
-      const exam = await this.examRepository.createExam(data);
+      const exam = await this.examRepository.createExam(courseId);
       if (!exam) throw new Error("Error creating exam");
-      return exam;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async updateExam(courseId: string, passMark: number) {
-    try {
-      const exam = await this.examRepository.findByIdAndUpdatePassMark(
-        courseId,
-        passMark
-      );
       return exam;
     } catch (error) {
       throw error;
