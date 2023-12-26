@@ -5,7 +5,8 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "@s7abab/common";
 
-import chatRouter from "../routes/chat.router";
+import chatRouter from "../routes/chatRoom.router";
+import messageRouter from "../routes/message.router";
 
 export const app = express();
 
@@ -27,7 +28,8 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1/chat", chatRouter);
+app.use("/api/v1/realtime/chatRoom", chatRouter);
+app.use("/api/v1/realtime/message", messageRouter);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

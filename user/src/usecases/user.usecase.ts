@@ -201,6 +201,7 @@ class UserUsecase {
           name: data.name,
           email: data.email,
           role: data.role,
+          avatar: data.avatar,
         }
       );
       return user;
@@ -228,6 +229,7 @@ class UserUsecase {
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
+        avatar: updatedUser.avatar,
       };
       // publish user updated event
       await this.eventPublisher.publish(

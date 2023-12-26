@@ -2,8 +2,9 @@ import IMessage from "./message";
 
 interface IChatRoom {
   name: string;
-  admins: [{}];
-  members: [{}];
+  description: string;
+  courseId: string;
+  members: [{ userId: string; isAdmin: boolean; isCreator: boolean }];
   messages: [IMessage];
 }
 
