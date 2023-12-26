@@ -21,7 +21,7 @@ router.get(
   "/get-messages/:chatRoomId",
   isAuthenticated,
   (req: Request, res: Response, next: NextFunction) =>
-    messageController.createMessage(req, res, next)
+    messageController.getMessages(req, res, next)
 );
 
 export default router;

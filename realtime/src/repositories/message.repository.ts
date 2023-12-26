@@ -1,5 +1,4 @@
 import IMessage from "../entities/message";
-import chatRoomModel from "../frameworks/models/chatRoom.model";
 import messageModel from "../frameworks/models/message.model";
 
 class MessageRepository {
@@ -16,11 +15,10 @@ class MessageRepository {
 
   public async findByChatRoomId(chatRoomId: string) {
     try {
-      const messages = await chatRoomModel
-        .findById(chatRoomId)
-        .populate("messages");
+      const messages = await messageModel.find({ chatRoomId }).exec();
       return messages;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }

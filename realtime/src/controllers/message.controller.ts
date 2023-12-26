@@ -24,7 +24,7 @@ class MessageController {
 
   public async getMessages(req: Request, res: Response, next: NextFunction) {
     try {
-      const { chatRoomId } = req.body;
+      const { chatRoomId } = req.params;
       const messages = await this.messageUsecase.getMessagesByChatRoomId(
         chatRoomId
       );
