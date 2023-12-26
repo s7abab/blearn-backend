@@ -1,56 +1,71 @@
 import { Server, Socket } from "socket.io";
 import IMessage from "../entities/message";
+import { SOCKET_EVENTS } from "../enums/socketEvents.enum";
+import { Server as HttpServer } from "http";
+import MessageRepository from "./message.repository";
 
 class SocketIORepository {
   private io: Server;
   private users: Map<string, number>;
+  private httpServer: HttpServer;
+  private messageRepository: MessageRepository;
 
-  constructor(io: Server) {
-    this.io = io;
-    this.setupSocketEvents();
+  constructor(httpServer: HttpServer) {
+    this.httpServer = httpServer;
+    this.io = new Server(httpServer, {
+      cors: {
+        origin: "http://localhost:3000",
+        credentials: true,
+      },
+    });
     this.users = new Map();
+    this.messageRepository = new MessageRepository();
+    this.setupSocketEvents();
   }
 
   private setupSocketEvents() {
-    this.io.on("connection", (socket: Socket) => {
+    this.io.on(SOCKET_EVENTS.CONNECTION, (socket: Socket) => {
       console.log("A user connected", socket.id);
 
-      socket.on("disconnect", () => {
+      socket.on(SOCKET_EVENTS.DISCONNECT, () => {
         console.log("A user disconnected");
         // Clean up user-related data or perform necessary actions
       });
 
-      socket.on("joinRoom", (roomId: string, userId: string) =>
-        this.handleJoinRoom(socket, roomId)
+      socket.on(SOCKET_EVENTS.JOIN_ROOM, (roomId: string, userId: string) =>
+        this.joinRoom(socket, roomId)
       );
-      socket.on("leaveRoom", (roomId: string) =>
-        this.handleLeaveRoom(socket, roomId)
+      socket.on(SOCKET_EVENTS.LEAVE_ROOM, (roomId: string) =>
+        this.leaveRoom(socket, roomId)
       );
-      socket.on("chatMessage", (roomId: string, message: IMessage) =>
-        this.handleChatMessage(socket, roomId, message)
+      socket.on(
+        SOCKET_EVENTS.CHAT_MESSAGE,
+        (roomId: string, message: IMessage) =>
+          this.chatMessage(socket, roomId, message)
       );
     });
   }
 
-  private handleJoinRoom(socket: Socket, roomId: string) {
+  private joinRoom(socket: Socket, roomId: string) {
     const userCount = this.users.get(roomId) || 0;
     this.users.set(roomId, userCount + 1);
     socket.join(roomId);
     console.log(`User joined room ${roomId}`);
   }
 
-  private handleLeaveRoom(socket: Socket, roomId: string) {
+  private leaveRoom(socket: Socket, roomId: string) {
     const userCount = this.users.get(roomId) || 0;
     this.users.set(roomId, userCount - 1);
     socket.leave(roomId);
     console.log(`User left room ${roomId}`);
-    // Optionally, emit a message to the user confirming the room leave
-    // socket.emit('roomLeft', `Left room ${roomId}`);
   }
 
-  private handleChatMessage(socket: Socket, roomId: string, message: IMessage) {
+  private async chatMessage(socket: Socket, roomId: string, message: IMessage) {
+    console.log(message, "room", roomId);
+
+    // save message to database
+    await this.messageRepository.create(message);
     this.io.to(roomId).emit("message", message);
-    // Optionally, handle and broadcast different message types (images, documents, etc.)
   }
 }
 
