@@ -13,7 +13,7 @@ class UserRepository implements IUserRepository {
       throw error;
     }
   }
-
+  
   public async updateUser(data: IUser): Promise<IUser | null> {
     try {
       const existingUser = await userModel.findById(data._id);
@@ -23,10 +23,10 @@ class UserRepository implements IUserRepository {
       existingUser.name = data.name;
       existingUser.email = data.email;
       existingUser.role = data.role;
-
+      existingUser.avatar = data.avatar;
       const user = await existingUser.save();
 
-      return existingUser;
+      return user;
     } catch (error) {
       throw error;
     }

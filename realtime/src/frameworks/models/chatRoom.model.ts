@@ -1,7 +1,7 @@
 import { Document, Schema, model, Types } from "mongoose";
 
 interface IMember {
-  userId: Types.ObjectId;
+  userId: Schema.Types.ObjectId;
   isAdmin: boolean;
   isCreator: boolean;
 }
