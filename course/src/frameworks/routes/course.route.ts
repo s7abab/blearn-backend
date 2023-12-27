@@ -5,7 +5,7 @@ import CourseRepository from "../../repositories/course.repository";
 import CourseUsecase from "../../usecases/course.usecase";
 import GetVideoDuration from "../utils/get-video-duration";
 
-const getVideoDuration = new GetVideoDuration()
+const getVideoDuration = new GetVideoDuration();
 const courseRepository = new CourseRepository();
 const courseUsecase = new CourseUsecase(courseRepository, getVideoDuration);
 const courseController = new CourseController(courseUsecase);
@@ -110,6 +110,14 @@ router.post(
     courseController.addLesson(req, res, next)
 );
 
+router.put(
+  "/update-lesson",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  (req: Request, res: Response, next: NextFunction) =>
+    courseController.updateLesson(req, res, next)
+);
+
 router.get(
   "/enrolled-courses",
   isAuthenticated,
@@ -135,7 +143,7 @@ router.get(
   "/get-progression/:courseId",
   isAuthenticated,
   (req: Request, res: Response, next: NextFunction) =>
-    courseController.getProgression(req,res,next)
+    courseController.getProgression(req, res, next)
 );
 
 export default router;

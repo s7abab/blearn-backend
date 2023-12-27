@@ -171,6 +171,20 @@ class CourseController {
     }
   }
 
+  public async updateLesson(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = req.body as ILessonRequest;
+
+      await this.courseUsecase.updateLesson(data);
+      res.status(200).json({
+        success: true,
+        message: "Lesson updated successfully",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
   public async findLessonsForInstructor(
     req: Request,
     res: Response,

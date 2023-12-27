@@ -180,10 +180,33 @@ class CourseUsecase {
 
       const lesson = await this.courseRepository.createLesson({
         ...data,
-        duration: duration,
+        duration,
       });
       if (!lesson) {
         throw new Error("Lesson not created");
+      }
+      return lesson;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async updateLesson(data: ILessonRequest) {
+    try {
+      let duration = 60;
+      if (data.type === "video") {
+        const videoDuration = await this.getVideoDuration.getVideoDuration(
+          data.url
+        );
+        duration = Math.round(videoDuration);
+      }
+
+      const lesson = await this.courseRepository.findLessonsAndUpdate({
+        ...data,
+        duration,
+      });
+      if (!lesson) {
+        throw new Error("Lesson not updated");
       }
       return lesson;
     } catch (error) {

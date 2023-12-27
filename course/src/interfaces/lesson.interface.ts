@@ -5,12 +5,13 @@ export interface ILesson {
   url: string;
   lessonNo: number;
   progress: number;
-  duration?: number;
+  duration: number;
 }
 
 export interface ILessonRequest extends ILesson {
   courseId: string;
   index: number;
+  lessonIndex:number
 }
 
 export interface ILessonGetRequest {

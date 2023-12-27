@@ -254,6 +254,37 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
+  public async findLessonsAndUpdate(data: ILessonRequest) {
+    try {
+      const course = await courseModel.findById(data.courseId);
+
+      if (!course) {
+        throw new Error("Course not found");
+      }
+
+      const moduleIndex = data.index;
+      const lessonIndex = data.lessonIndex;
+
+      // Update the lesson with new data
+      course.modules[moduleIndex].lessons[lessonIndex].title = data.title;
+      course.modules[moduleIndex].lessons[lessonIndex].duration = data.duration;
+      course.modules[moduleIndex].lessons[lessonIndex].type = data.type;
+      course.modules[moduleIndex].lessons[lessonIndex].url = data.url;
+
+      if (data.type === "video") {
+        // Add the difference in duration between the new and old values
+        const oldDuration =
+          course.modules[moduleIndex].lessons[lessonIndex].duration || 0;
+        course.duration += data.duration - oldDuration;
+      }
+
+      await course.save();
+      return course;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   public async createEnroll(data: IEnroll) {
     try {
       const course = await courseModel.findById(data.courseId);
