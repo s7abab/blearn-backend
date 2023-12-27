@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import ExamUsecase from "../usecases/exam.usecase";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import IExam from "../entities/exam";
 
 class ExamController {
   private examUsecase: ExamUsecase;

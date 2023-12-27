@@ -18,14 +18,6 @@ router.post(
     examController.createExam(req, res, next)
 );
 
-router.patch(
-  "/update-exam",
-  isAuthenticated,
-  authorizeRoles(Roles.INSTRUCTOR),
-  (req: Request, res: Response, next: NextFunction) =>
-    examController.updateExam(req, res, next)
-);
-
 router.get(
   "/get-exam/:courseId",
   isAuthenticated,
