@@ -3,10 +3,12 @@ import express, { NextFunction, Request, Response } from "express";
 export const app = express();
 import cors from "cors";
 import morgan from "morgan";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "@s7abab/common";
+
 import courseRoute from "../routes/course.route";
 import categoryRoute from "../routes/category.route";
+import feedbackRoute from "../routes/feedback.route";
 // body parser
 app.use(express.json({ limit: "50mb" }));
 // cookie parser
@@ -27,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 // routes
 app.use("/api/v1/course", courseRoute);
 app.use("/api/v1/course/category", categoryRoute);
+app.use("/api/v1/course/feedback", feedbackRoute);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

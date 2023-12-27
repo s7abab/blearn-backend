@@ -1,7 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 import IUser from "../../entities/user";
 
-
 const userSchema: Schema<IUser> = new Schema<IUser>(
   {
     _id: { type: Schema.Types.ObjectId, default: new Types.ObjectId() },
@@ -11,6 +10,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       unique: true,
       required: true,
     },
+    avatar: { type: String, default: "" },
     role: { type: String, default: "user" },
   },
   {
