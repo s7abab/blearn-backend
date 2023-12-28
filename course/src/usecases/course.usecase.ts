@@ -12,6 +12,7 @@ import {
 } from "../interfaces/lesson.interface";
 import { IEnroll } from "../interfaces/enrollment.interface";
 import GetVideoDuration from "../frameworks/utils/get-video-duration";
+import axios from "axios";
 
 class CourseUsecase {
   private courseRepository: CourseRepository;
@@ -171,9 +172,13 @@ class CourseUsecase {
   public async createLesson(data: ILessonRequest) {
     try {
       let duration = 60;
+      const res = await axios.get(
+        `http://localhost:8005/api/v1/get-url?fileName=${data.url}`
+      );
+      console.log(res.data);
       if (data.type === "video") {
         const videoDuration = await this.getVideoDuration.getVideoDuration(
-          data.url
+          res.data
         );
         duration = Math.round(videoDuration);
       }
