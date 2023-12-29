@@ -12,6 +12,7 @@ import {
   IModuleRequest,
 } from "../interfaces/module.interface";
 import ICourseRepository from "../interfaces/repository/course.repository";
+import { redis } from "../frameworks/config/redis";
 
 class CourseRepository implements ICourseRepository {
   constructor() {}
@@ -40,6 +41,7 @@ class CourseRepository implements ICourseRepository {
 
   public async findCourses(): Promise<ICourse[]> {
     try {
+      console.log("first");
       const courses = await courseModel.find();
       return courses;
     } catch (error) {
@@ -52,6 +54,17 @@ class CourseRepository implements ICourseRepository {
   ): Promise<{ courses: ICourse[]; totalPages: number }> {
     try {
       const limit = 8;
+
+      let cacheKey = `search:${JSON.stringify(filters)}`; // Creating a unique cache key based on the filters
+
+      // Check if the search results exist in Redis cache
+      const cachedResults = await redis.get(cacheKey);
+
+      if (cachedResults) {
+        console.log("Search results found in Redis cache");
+        return JSON.parse(cachedResults); // Return cached search results
+      }
+
       let query = courseModel.find();
       // Apply search if search keyword is provided
       if (filters.searchKeyword) {
@@ -83,6 +96,15 @@ class CourseRepository implements ICourseRepository {
       const totalPages = Math.ceil(totalCoursesCount / limit);
 
       const data = { courses, totalPages };
+
+      // Set the search results in Redis cache for future use with an expiration time (e.g., 1 hour)
+      await redis.set(
+        cacheKey,
+        JSON.stringify(data),
+        "EX",
+        process.env.REDIS_EXPIRATION_TIME!
+      ); // EX stands for expiration time in seconds
+
       return data;
     } catch (error) {
       throw error;
@@ -140,10 +162,28 @@ class CourseRepository implements ICourseRepository {
   public async findEnrolledCoursesByUserId(
     userId: string
   ): Promise<ICourse[] | null> {
+    // Check if the search results exist in Redis cache
+    const cachedResults = await redis.get(`enrolledCourses:${userId}`);
+
+    if (cachedResults) {
+      console.log("Search results found in Redis cache");
+      return JSON.parse(cachedResults); // Return cached search results
+    }
+
     try {
       const enrolledCourses = await courseModel.find({
         "enrolledUsers.userId": userId,
       });
+
+      // Cache the search results in Redis
+      if (enrolledCourses) {
+        redis.set(
+          `enrolledCourses:${userId}`,
+          JSON.stringify(enrolledCourses),
+          "EX",
+          process.env.REDIS_EXPIRATION_TIME!
+        );
+      }
       return enrolledCourses;
     } catch (error) {
       throw error;

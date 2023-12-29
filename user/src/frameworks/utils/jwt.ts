@@ -5,24 +5,49 @@ import {
   IActivationRequest,
   IRegisterUser,
 } from "../../interfaces/user.interface";
+import { redis } from "../config/redis";
 
 class JwtService {
   constructor() {}
 
-  async createToken(
-    user: IUser
-  ): Promise<{ token: string; expires: Date; user: IUser }> {
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET as Secret,
-      {
-        expiresIn: "3d",
-      }
-    );
-
-    const oneHourInMillis = 24 * 60 * 60 * 1000; // 1 hour in milliseconds
-    const expirationDate = new Date(Date.now() + oneHourInMillis);
-    return { token, expires: expirationDate, user };
+  // Method to create both access and refresh tokens and set them in Redis
+  public async createToken(user: IUser) {
+    try {
+      // Create access token
+      const accessToken = jwt.sign(
+        { id: user._id, email: user.email, role: user.role },
+        process.env.JWT_SECRET as Secret,
+        { expiresIn: "1m" }
+      );
+      // Create refresh token
+      const refreshToken = jwt.sign(
+        { id: user._id, email: user.email, role: user.role },
+        process.env.REFRESH_TOKEN_SECRET as Secret,
+        { expiresIn: "3d" }
+      );
+      const userWithRefreshToken = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        refreshToken,
+      };
+      // Convert the object to a string
+      const userWithRefreshTokenString = JSON.stringify(userWithRefreshToken);
+      // Set refresh token in Redis with an expiration time
+      redis.set(
+        user._id.toString(),
+        userWithRefreshTokenString,
+        "EX",
+        3 * 24 * 60 * 60
+      ); // Expires in 3 days
+      const oneHourInMillis = 24 * 60 * 60 * 1000; // 1 hour in milliseconds
+      const expirationDate = new Date(Date.now() + oneHourInMillis);
+      return { token: accessToken, expirationDate, user, refreshToken };
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   async createActivationCode(

@@ -1,3 +1,4 @@
+require("dotenv").config();
 import CourseRepository from "../repositories/course.repository";
 import Course from "../entities/course";
 import {
@@ -5,6 +6,7 @@ import {
   IModuleDeleteRequest,
   IModuleRequest,
 } from "../interfaces/module.interface";
+import axios from "axios";
 import {
   ILessonGetRequest,
   ILessonProgressTrackData,
@@ -12,7 +14,6 @@ import {
 } from "../interfaces/lesson.interface";
 import { IEnroll } from "../interfaces/enrollment.interface";
 import GetVideoDuration from "../frameworks/utils/get-video-duration";
-import axios from "axios";
 
 class CourseUsecase {
   private courseRepository: CourseRepository;
@@ -51,6 +52,7 @@ class CourseUsecase {
       throw error;
     }
   }
+
   public async getCourses() {
     try {
       const courses = await this.courseRepository.findCourses();
@@ -173,9 +175,9 @@ class CourseUsecase {
     try {
       let duration = 60;
       const res = await axios.get(
-        `http://localhost:8005/api/v1/get-url?fileName=${data.url}`
+        `${process.env.CLOUD_SRV}/api/v1/get-url?fileName=${data.url}`
       );
-      console.log(res.data);
+
       if (data.type === "video") {
         const videoDuration = await this.getVideoDuration.getVideoDuration(
           res.data
