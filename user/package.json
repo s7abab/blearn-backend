@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@s7abab/common": "^1.0.13",
+    "@s7abab/common": "^1.0.18",
     "@types/amqplib": "^0.10.4",
     "@types/bcryptjs": "^2.4.4",
     "@types/cookie-parser": "^1.4.4",

@@ -30,8 +30,10 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) =>
   userController.loginUser(req, res, next)
 );
 
-router.get("/logout", (req: Request, res: Response, next: NextFunction) =>
-  userController.logoutUser(req, res, next)
+router.post(
+  "/logout",
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.logoutUser(req, res, next)
 );
 
 router.get(
@@ -112,7 +114,7 @@ router.put(
   isAuthenticated,
   authorizeRoles(Roles.INSTRUCTOR),
   (req: Request, res: Response, next: NextFunction) =>
-    userController.updateBankDetails(req,res,next)
+    userController.updateBankDetails(req, res, next)
 );
 
 export default router;

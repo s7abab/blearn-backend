@@ -96,9 +96,9 @@ class UserUsecase {
       let token;
       if (!user) {
         const newUser = await this.createUser(data);
-        token = this.jwt.createToken(newUser);
+        token = await this.jwt.createToken(newUser);
       }
-      token = this.jwt.createToken(user as IUser);
+      token = await this.jwt.createToken(user as IUser);
       return token;
     } catch (error) {
       throw error;
@@ -120,7 +120,7 @@ class UserUsecase {
     if (!isPasswordMatched) {
       throw new Error("Invalid email or password");
     }
-    const token = this.jwt.createToken(user);
+    const token = await this.jwt.createToken(user);
     return token;
   }
 
@@ -151,6 +151,17 @@ class UserUsecase {
       const user = await this.userRepository.findById(userId);
       if (!user) throw new Error("User not found");
       return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async logout(userId: string) {
+    try {
+      const logoutUser = await this.userRepository.findUserAndDeleteFromRedis(
+        userId
+      );
+      return logoutUser;
     } catch (error) {
       throw error;
     }

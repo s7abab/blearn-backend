@@ -3,6 +3,7 @@ import IUserRepository from "../interfaces/repository/user.repository";
 import userModel from "../frameworks/models/user.model";
 import IUser from "../entities/user";
 import { IBankDetails } from "../interfaces/user.interface";
+import { redis } from "../frameworks/config/redis";
 
 class UserRepository implements IUserRepository {
   constructor() {}
@@ -29,6 +30,17 @@ class UserRepository implements IUserRepository {
       const user = await userModel.findById(userId);
       return user;
     } catch (error: any) {
+      throw error;
+    }
+  }
+
+  public async findUserAndDeleteFromRedis(userId: string) {
+    try {
+      const deletedKeysCount = await redis.del(userId.toString());
+      console.log(`Deleted ${deletedKeysCount} keys from Redis`);
+      return deletedKeysCount;
+    } catch (error: any) {
+      console.log(error)
       throw error;
     }
   }
