@@ -5,6 +5,7 @@ export interface IModule {
   courseId:any;
   title: string;
   lessons: ILesson[];
+  createdAt:Date;
 }
 
 export interface IModuleDeleteRequest {

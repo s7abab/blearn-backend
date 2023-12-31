@@ -152,15 +152,9 @@ class CourseController {
 
   public async addLesson(req: Request, res: Response, next: NextFunction) {
     try {
-      const { courseId, type, title, url, index } = req.body;
+      const lessonData = req.body;
 
-      await this.courseUsecase.createLesson({
-        courseId,
-        type,
-        title,
-        url,
-        index,
-      } as ILessonRequest);
+      await this.courseUsecase.createLesson(lessonData);
 
       res.status(201).json({
         success: true,

@@ -5,7 +5,6 @@ import { ILesson } from "../../interfaces/lesson.interface";
 import { IEnrolledUser } from "../../interfaces/enrollment.interface";
 import Course from "../../entities/course";
 
-
 const reviewSchema = new Schema<IReview>({
   user: String,
   rating: { type: Number, default: 0 },
@@ -13,7 +12,6 @@ const reviewSchema = new Schema<IReview>({
 });
 
 const lessonSchema = new Schema<ILesson>({
-
   type: { type: String },
   title: { type: String },
   url: { type: String },
@@ -25,6 +23,7 @@ const lessonSchema = new Schema<ILesson>({
 const moduleSchema = new Schema<IModule>({
   title: { type: String, required: true },
   lessons: { type: [lessonSchema], default: [] },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const enrolledUserSchema = new Schema<IEnrolledUser>({

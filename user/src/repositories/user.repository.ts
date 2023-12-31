@@ -27,7 +27,16 @@ class UserRepository implements IUserRepository {
 
   public async findById(userId: string): Promise<IUser | null> {
     try {
+      const cachedData = await redis.get(userId);
+      if (cachedData) {
+        console.log("User data fetched from Redis");
+        return JSON.parse(cachedData);
+      }
       const user = await userModel.findById(userId);
+
+      // set data into redis
+      await redis.set(userId, JSON.stringify(user));
+
       return user;
     } catch (error: any) {
       throw error;
@@ -40,7 +49,7 @@ class UserRepository implements IUserRepository {
       console.log(`Deleted ${deletedKeysCount} keys from Redis`);
       return deletedKeysCount;
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       throw error;
     }
   }
@@ -110,8 +119,9 @@ class UserRepository implements IUserRepository {
       if (data.name) {
         user.name = data.name;
       }
-
+      // set data into redis
       await user.save();
+      await redis.set(userId, JSON.stringify(user));
       return user;
     } catch (error) {
       throw error;
@@ -145,6 +155,7 @@ class UserRepository implements IUserRepository {
       user.avatar = imageUrl;
 
       await user.save();
+      await redis.set(userId, JSON.stringify(user));
       return user;
     } catch (error) {
       throw error;

@@ -13,6 +13,7 @@ import {
 } from "../interfaces/module.interface";
 import ICourseRepository from "../interfaces/repository/course.repository";
 import { redis } from "../frameworks/config/redis";
+import { ObjectId } from "mongodb";
 
 class CourseRepository implements ICourseRepository {
   constructor() {}
@@ -41,7 +42,6 @@ class CourseRepository implements ICourseRepository {
 
   public async findCourses(): Promise<ICourse[]> {
     try {
-      console.log("first");
       const courses = await courseModel.find();
       return courses;
     } catch (error) {
@@ -273,15 +273,20 @@ class CourseRepository implements ICourseRepository {
       if (!course) {
         throw new Error("ICourse not found");
       }
-      const totalLessons = (course.totalLessons = course.totalLessons + 1);
       let lesson = null;
       if (course.modules) {
-        lesson = course?.modules[data.index].lessons.push({
+        // converting modulesId string to objectId
+        const moduleId = new ObjectId(data.moduleId);
+
+        // find the index using the converted moduleId
+        const moduleIndex = course.modules.findIndex((module) =>
+          module._id.equals(moduleId)
+        );
+        lesson = course?.modules[moduleIndex].lessons.push({
           title: data.title,
           duration: data.duration,
           type: data.type,
           url: data.url,
-          lessonNo: totalLessons,
         } as ILesson);
         if (data.type === "video") {
           course.duration += data.duration!;
@@ -301,8 +306,10 @@ class CourseRepository implements ICourseRepository {
       if (!course) {
         throw new Error("Course not found");
       }
-
-      const moduleIndex = data.index;
+      // find index of the module
+      const moduleIndex = course.modules.findIndex(
+        (module) => module._id === data.moduleId
+      );
       const lessonIndex = data.lessonIndex;
 
       // Update the lesson with new data

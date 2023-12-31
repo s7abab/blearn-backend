@@ -40,14 +40,7 @@ class UserController {
     try {
       const user = await this.userUsecase.login(req.body);
 
-      res.cookie("token", user.token, { expires: user.expirationDate });
-      // Set the HTTP-only cookie with the refresh token
-      res.cookie("refreshToken", user.refreshToken, {
-        expires: user.expirationDate,
-        httpOnly: true,
-        secure: true,
-      });
-
+      res.cookie("token", user.token, { expires: user.expires });
       res.status(200).json({
         success: true,
         token: user.token,
@@ -62,11 +55,8 @@ class UserController {
     try {
       const { userId } = req.body;
       await this.userUsecase.logout(userId);
-
-      // Clear the cookies on the client side
+      
       res.clearCookie("token");
-      res.clearCookie("refreshToken");
-
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
@@ -93,14 +83,7 @@ class UserController {
   public async socialAuth(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await this.userUsecase.socialAuth(req.body);
-
-      res.cookie("token", user.token, { expires: user.expirationDate });
-      // Set the HTTP-only cookie with the refresh token
-      res.cookie("refreshToken", user.refreshToken, {
-        expires: user.expirationDate,
-        httpOnly: true,
-        secure: true,
-      });
+      res.cookie("token", user.token, { expires: user.expires });
       res.status(200).json({
         success: true,
         token: user.token,

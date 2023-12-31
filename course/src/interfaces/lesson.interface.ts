@@ -3,15 +3,14 @@ export interface ILesson {
   type: string;
   title: string;
   url: string;
-  lessonNo: number;
   progress: number;
   duration: number;
 }
 
 export interface ILessonRequest extends ILesson {
   courseId: string;
-  index: number;
-  lessonIndex:number
+  moduleId: string;
+  lessonIndex: number;
 }
 
 export interface ILessonGetRequest {
@@ -22,7 +21,7 @@ export interface ILessonGetRequest {
 
 export interface ILessonProgressTrackData {
   courseId: string;
-  lessonId:string;
+  lessonId: string;
   userId: string;
   progress: number;
 }

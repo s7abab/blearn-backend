@@ -189,6 +189,7 @@ class CourseUsecase {
         ...data,
         duration,
       });
+
       if (!lesson) {
         throw new Error("Lesson not created");
       }

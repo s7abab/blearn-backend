@@ -9,7 +9,7 @@ import { getObjectSignedUrl, uploadFile } from "./services/s3";
 const app = express();
 
 app.use(cors());
-app.use(morgan("dev"))
+app.use(morgan("dev"));
 dotenv.config();
 
 app.use(express.static("public"));
@@ -41,11 +41,11 @@ app.post("/api/v1/upload", upload.single("file"), async (req, res) => {
 });
 
 app.get("/api/v1/get-url", async (req, res) => {
-  try {
+  try { 
     const fileUrl = await getObjectSignedUrl(req.query.fileName as string);
     const url = fileUrl.replace(
       process.env.S3_DOMAIN as string,
-      process.env.CLOUDFRONT_DOMAIN as string
+      process.env.CLOUDFRONT_DOMAIN as string 
     );
     res.status(200).json(url);
   } catch (err) {
