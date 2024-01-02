@@ -251,9 +251,10 @@ class UserController {
     next: NextFunction
   ) {
     try {
-      const { bankDetails } = req.body;
+      const data = req.body;
+
       const userId = req.user?.id;
-      await this.userUsecase.updateBankDetails(userId, bankDetails);
+      await this.userUsecase.updateBankDetails(userId, data);
 
       res.status(200).json({
         success: true,

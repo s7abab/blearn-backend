@@ -11,9 +11,9 @@ class PaymentController {
   public async createOrder(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req?.user?.id;
-      const { courseId, payment_info } = req.body as IOrderRequest;
+      const { courseId, payment_info, instructorId } = req.body as IOrderRequest;
 
-      await this.paymentUsecase.createOrder({ courseId, payment_info }, userId);
+      await this.paymentUsecase.createOrder({ courseId, payment_info, instructorId }, userId);
       res.status(200).json({
         success: true,
       });

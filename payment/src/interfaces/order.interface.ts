@@ -4,6 +4,7 @@ export interface PaymentInfo {
 }
 export interface IOrderRequest {
   courseId: string;
+  instructorId:string;
   payment_info: {
     status: string;
     amount: number;

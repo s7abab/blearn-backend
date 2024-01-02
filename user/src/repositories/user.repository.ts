@@ -184,11 +184,10 @@ class UserRepository implements IUserRepository {
         { bankDetails: bankDetails },
         { new: true }
       );
-
       if (!user) {
         throw new Error("User not found");
       }
-
+      await redis.set(userId, JSON.stringify(user));
       return user;
     } catch (error) {
       throw error;

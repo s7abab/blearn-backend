@@ -19,7 +19,7 @@ class PaymentUsecase {
     this.eventPublisher = eventPublisher;
   }
 
-  public async createOrder({ courseId, payment_info }: IOrderRequest, userId: string) {
+  public async createOrder({ courseId, payment_info, instructorId }: IOrderRequest, userId: string) {
     try {
       const paymentIntent = await this.stripeService.retrievePaymentIntent(
         payment_info
@@ -30,6 +30,7 @@ class PaymentUsecase {
       const order = await this.paymentRepository.createOrder({
         courseId: courseId,
         userId: userId,
+        instructorId,
         price: price,
         payment_status: payment_info.status,
       });
