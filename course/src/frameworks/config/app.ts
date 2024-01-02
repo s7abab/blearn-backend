@@ -9,6 +9,7 @@ import { ErrorMiddleware } from "@s7abab/common";
 import courseRoute from "../routes/course.route";
 import categoryRoute from "../routes/category.route";
 import feedbackRoute from "../routes/feedback.route";
+import userRoute from "../routes/user.route";
 // body parser
 app.use(express.json({ limit: "50mb" }));
 // cookie parser
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/course", courseRoute);
 app.use("/api/v1/course/category", categoryRoute);
 app.use("/api/v1/course/feedback", feedbackRoute);
+app.use("/api/v1/course/user", userRoute);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

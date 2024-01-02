@@ -97,14 +97,6 @@ class CourseRepository implements ICourseRepository {
 
       const data = { courses, totalPages };
 
-      // Set the search results in Redis cache for future use with an expiration time (e.g., 1 hour)
-      await redis.set(
-        cacheKey,
-        JSON.stringify(data),
-        "EX",
-        process.env.REDIS_EXPIRATION_TIME!
-      ); // EX stands for expiration time in seconds
-
       return data;
     } catch (error) {
       throw error;
@@ -160,31 +152,31 @@ class CourseRepository implements ICourseRepository {
   }
 
   public async findEnrolledCoursesByUserId(
-  userId: string,
-  page: number,
-  limit: number =8
-): Promise<{ courses: ICourse[], totalPages: number } | null> {
-  try {
-    const skip = (page - 1) * limit;
+    userId: string,
+    page: number,
+    limit: number = 8
+  ): Promise<{ courses: ICourse[]; totalPages: number } | null> {
+    try {
+      const skip = (page - 1) * limit;
 
-    const enrolledCourses = await courseModel.find({
-      "enrolledUsers.userId": userId,
-    })
-    .skip(skip)
-    .limit(limit);
+      const enrolledCourses = await courseModel
+        .find({
+          "enrolledUsers.userId": userId,
+        })
+        .skip(skip)
+        .limit(limit);
 
-    const totalCourses = await courseModel.countDocuments({
-      "enrolledUsers.userId": userId,
-    });
+      const totalCourses = await courseModel.countDocuments({
+        "enrolledUsers.userId": userId,
+      });
 
-    const totalPages = Math.ceil(totalCourses / limit);
+      const totalPages = Math.ceil(totalCourses / limit);
 
-    return { courses: enrolledCourses, totalPages };
-  } catch (error) {
-    throw error;
+      return { courses: enrolledCourses, totalPages };
+    } catch (error) {
+      throw error;
+    }
   }
-}
-
 
   public async findEnrolledCourseByUserAndCourseId(
     userId: string,
@@ -340,6 +332,10 @@ class CourseRepository implements ICourseRepository {
         userId: data.userId,
         progress: 0,
       } as IEnrolledUser);
+
+      if (course.revenue && data.price) {
+        course.revenue = course.revenue + data.price;
+      }
       await course.save();
       return course;
     } catch (error) {

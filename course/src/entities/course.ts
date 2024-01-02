@@ -1,6 +1,5 @@
 import { IEnrolledUser } from "../interfaces/enrollment.interface";
 import { IModule } from "../interfaces/module.interface";
-import { IReview } from "../interfaces/review.interface";
 
 export interface ICourse {
   _id: any;
@@ -14,9 +13,12 @@ export interface ICourse {
   discountPrice: number;
   revenue?: number;
   isBlock: boolean;
-  reviews?: IReview[];
   modules: IModule[];
   duration: number;
+  rating: {
+    average: number;
+    count: number;
+  };
   totalLessons: number;
   enrolledUsers: [IEnrolledUser];
 }

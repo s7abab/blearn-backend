@@ -15,7 +15,6 @@ const lessonSchema = new Schema<ILesson>({
   type: { type: String },
   title: { type: String },
   url: { type: String },
-  lessonNo: { type: Number },
   duration: { type: Number },
   progress: { type: Number, default: 0 },
 });
@@ -48,7 +47,10 @@ const courseSchema: Schema<Course> = new Schema<Course>(
     totalLessons: { type: Number, default: 0 },
     duration: { type: Number, default: 0 },
     enrolledUsers: { type: [enrolledUserSchema], default: [] },
-    reviews: [reviewSchema],
+    rating: {
+      type: { average: Number, count: Number },
+      default: { average: 0, count: 0 },
+    },
   },
   {
     timestamps: true,

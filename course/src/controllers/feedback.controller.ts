@@ -32,7 +32,6 @@ class FeedbackController {
 
       res.status(201).json({
         success: true,
-        message: "Feedback added",
         feedbacks,
       });
     } catch (error: any) {

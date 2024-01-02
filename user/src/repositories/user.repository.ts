@@ -85,6 +85,8 @@ class UserRepository implements IUserRepository {
       }
       user.isBlock = !user.isBlock;
       await user.save();
+      // update user information in redis
+      await redis.set(userId, JSON.stringify(user));
       return user;
     } catch (error) {
       throw error;
