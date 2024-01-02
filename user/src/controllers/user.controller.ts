@@ -55,7 +55,7 @@ class UserController {
     try {
       const { userId } = req.body;
       await this.userUsecase.logout(userId);
-      
+
       res.clearCookie("token");
       res.status(200).json({
         success: true,
@@ -258,6 +258,54 @@ class UserController {
       res.status(200).json({
         success: true,
         message: "Bank details updated successfully",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
+  public async getApplications(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const applications = await this.userUsecase.getApplications();
+      res.status(200).json({
+        success: true,
+        applications,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
+  public async getApplication(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId } = req.params;
+    
+      const application = await this.userUsecase.getApplication(userId);
+      res.status(200).json({
+        success: true,
+        application,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
+  public async changeStatusOfAppications(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { userId, status } = req.body;
+      await this.userUsecase.changeApplicationStatus(userId, status);
+
+      res.status(200).send({
+        success: true,
+        message: "Application status changed",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, error.statusCode || 500));

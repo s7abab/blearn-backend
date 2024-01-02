@@ -8,9 +8,9 @@ import {
 import UserRepository from "../repositories/user.repository";
 import JwtService from "../frameworks/utils/jwt";
 import EventPublisher from "../frameworks/rabbitmq/publisher";
-import IUser from "../entities/user";
 import { Exchanges } from "../frameworks/rabbitmq/exchanges";
 import { Topics } from "../frameworks/rabbitmq/topics";
+import IUser from "../entities/User";
 
 class UserUsecase {
   private userRepository: UserRepository;
@@ -80,7 +80,7 @@ class UserUsecase {
       if (existingUser) {
         throw new Error("User already exist");
       }
-      const user: IUser = await this.createUser({
+      const user = await this.createUser({
         name,
         email,
         password,
@@ -117,6 +117,7 @@ class UserUsecase {
       data.email,
       data.password
     );
+
     if (!isPasswordMatched) {
       throw new Error("Invalid email or password");
     }
@@ -290,8 +291,46 @@ class UserUsecase {
       if (!user) {
         throw new Error("Bank details not updated");
       }
-      console.log(user);
       return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async getApplications() {
+    try {
+      const applications = await this.userRepository.findApplications();
+      return applications;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async getApplication(userId: string) {
+    try {
+      const user = (await this.userRepository.findById(userId)) as any;
+      const application = {
+        _id: user?._id,
+        avatar: user?.avatar,
+        name: user?.name,
+        email: user?.email,
+        status: user?.applicationStatus,
+        docUrl: user?.additional_info[1].docUrl,
+        info: user?.additional_info[0],
+      };
+      return application;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async changeApplicationStatus(userId: string, status: string) {
+    try {
+      const application = await this.userRepository.changeStatusOfApplication(
+        userId,
+        status
+      );
+      return application;
     } catch (error) {
       throw error;
     }

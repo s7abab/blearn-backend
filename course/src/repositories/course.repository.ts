@@ -160,35 +160,31 @@ class CourseRepository implements ICourseRepository {
   }
 
   public async findEnrolledCoursesByUserId(
-    userId: string
-  ): Promise<ICourse[] | null> {
-    // Check if the search results exist in Redis cache
-    const cachedResults = await redis.get(`enrolledCourses:${userId}`);
+  userId: string,
+  page: number,
+  limit: number =8
+): Promise<{ courses: ICourse[], totalPages: number } | null> {
+  try {
+    const skip = (page - 1) * limit;
 
-    if (cachedResults) {
-      console.log("Search results found in Redis cache");
-      return JSON.parse(cachedResults); // Return cached search results
-    }
+    const enrolledCourses = await courseModel.find({
+      "enrolledUsers.userId": userId,
+    })
+    .skip(skip)
+    .limit(limit);
 
-    try {
-      const enrolledCourses = await courseModel.find({
-        "enrolledUsers.userId": userId,
-      });
+    const totalCourses = await courseModel.countDocuments({
+      "enrolledUsers.userId": userId,
+    });
 
-      // Cache the search results in Redis
-      if (enrolledCourses) {
-        redis.set(
-          `enrolledCourses:${userId}`,
-          JSON.stringify(enrolledCourses),
-          "EX",
-          process.env.REDIS_EXPIRATION_TIME!
-        );
-      }
-      return enrolledCourses;
-    } catch (error) {
-      throw error;
-    }
+    const totalPages = Math.ceil(totalCourses / limit);
+
+    return { courses: enrolledCourses, totalPages };
+  } catch (error) {
+    throw error;
   }
+}
+
 
   public async findEnrolledCourseByUserAndCourseId(
     userId: string,
@@ -277,7 +273,6 @@ class CourseRepository implements ICourseRepository {
       if (course.modules) {
         // converting modulesId string to objectId
         const moduleId = new ObjectId(data.moduleId);
-
         // find the index using the converted moduleId
         const moduleIndex = course.modules.findIndex((module) =>
           module._id.equals(moduleId)
@@ -291,6 +286,9 @@ class CourseRepository implements ICourseRepository {
         if (data.type === "video") {
           course.duration += data.duration!;
         }
+        // Increment totalLessons count
+        course.totalLessons += 1;
+
         await course.save();
       }
       return lesson;

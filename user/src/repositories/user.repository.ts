@@ -1,9 +1,10 @@
 import { Roles } from "@s7abab/common";
 import IUserRepository from "../interfaces/repository/user.repository";
 import userModel from "../frameworks/models/user.model";
-import IUser from "../entities/user";
 import { IBankDetails } from "../interfaces/user.interface";
 import { redis } from "../frameworks/config/redis";
+import IUser from "../entities/User";
+import appicationStatus from "../enums/applicationStatus.enum";
 
 class UserRepository implements IUserRepository {
   constructor() {}
@@ -69,6 +70,7 @@ class UserRepository implements IUserRepository {
   public async findByEmail(email: string): Promise<IUser | null> {
     try {
       const user = await userModel.findOne({ email });
+
       return user;
     } catch (error) {
       throw error;
@@ -90,12 +92,17 @@ class UserRepository implements IUserRepository {
   }
 
   public async findByEmailAndComparePassword(email: string, password: string) {
-    const user = await userModel.findOne({ email });
-    if (!user) {
-      throw new Error("IUser not found");
+    try {
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        throw new Error("IUser not found");
+      }
+      const isPasswordMatched = await user.comparePassword(password);
+      return isPasswordMatched;
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-    const isPasswordMatched = await user.comparePassword(password);
-    return isPasswordMatched;
   }
 
   public async findByIdAndUpdate(
@@ -132,12 +139,15 @@ class UserRepository implements IUserRepository {
     try {
       const user = await userModel.findById(data.userId);
       if (user) {
-        if (user.additional_info[0]) {
+        if (user.additional_info.length > 2) {
           throw new Error("Additional data already added");
         }
+        if (user.additional_info.length > 0) {
+          user.applicationStatus = appicationStatus.PENDING;
+        }
         user.additional_info.push(data);
-        user.role = Roles.INSTRUCTOR;
         await user?.save();
+        await redis.set(user._id, JSON.stringify(user));
       }
       return user;
     } catch (error) {
@@ -178,6 +188,34 @@ class UserRepository implements IUserRepository {
       }
 
       return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async findApplications() {
+    try {
+      const applications = await userModel.find({
+        applicationStatus: appicationStatus.PENDING,
+      });
+      return applications;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async changeStatusOfApplication(userId: string, status: string) {
+    try {
+      let role = "";
+      if (status === appicationStatus.APPROVED) {
+        role = Roles.INSTRUCTOR;
+      } else role = Roles.USER;
+
+      const application = await userModel.findByIdAndUpdate(userId, {
+        applicationStatus: status,
+        role,
+      });
+      return application;
     } catch (error) {
       throw error;
     }

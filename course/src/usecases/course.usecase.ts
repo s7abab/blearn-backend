@@ -254,10 +254,11 @@ class CourseUsecase {
     }
   }
 
-  public async getEnrolledCoursesForUser(userId: string) {
+  public async getEnrolledCoursesForUser(userId: string, page: number) {
     try {
       const courses = await this.courseRepository.findEnrolledCoursesByUserId(
-        userId
+        userId,
+        page
       );
       return courses;
     } catch (error: any) {

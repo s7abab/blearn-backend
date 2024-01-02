@@ -30,10 +30,8 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) =>
   userController.loginUser(req, res, next)
 );
 
-router.post(
-  "/logout",
-  (req: Request, res: Response, next: NextFunction) =>
-    userController.logoutUser(req, res, next)
+router.post("/logout", (req: Request, res: Response, next: NextFunction) =>
+  userController.logoutUser(req, res, next)
 );
 
 router.get(
@@ -115,6 +113,24 @@ router.put(
   authorizeRoles(Roles.INSTRUCTOR),
   (req: Request, res: Response, next: NextFunction) =>
     userController.updateBankDetails(req, res, next)
+);
+
+router.get(
+  "/get-applications",
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.getApplications(req, res, next)
+);
+
+router.get(
+  "/get-application/:userId",
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.getApplication(req, res, next)
+);
+
+router.put(
+  "/change_status_of_applications",
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.changeStatusOfAppications(req, res, next)
 );
 
 export default router;

@@ -2,11 +2,11 @@ require("dotenv").config();
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import { IBankDetails } from "../../interfaces/user.interface";
+import appicationStatus from "../../enums/applicationStatus.enum";
 
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
 export interface IUserSchema extends Document {
-  id: any;
   name: string;
   email: string;
   password: string;
@@ -15,6 +15,7 @@ export interface IUserSchema extends Document {
   additional_info: [{}];
   isBlock: boolean;
   bankDetails: IBankDetails;
+  applicationStatus: appicationStatus;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -43,6 +44,16 @@ const userSchema: Schema<IUserSchema> = new mongoose.Schema(
     role: {
       type: String,
       default: "user",
+    },
+    applicationStatus: {
+      type: String,
+      enum: [
+        appicationStatus.NONE,
+        appicationStatus.PENDING,
+        appicationStatus.APPROVED,
+        appicationStatus.REJECTED,
+      ],
+      default: appicationStatus.NONE,
     },
     additional_info: { type: [{}] },
     isBlock: { type: Boolean, default: false },

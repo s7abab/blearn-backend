@@ -279,8 +279,10 @@ class CourseController {
   ) {
     try {
       const userId = req?.user?.id;
+      const { page } = req.query;
       const courses = await this.courseUsecase.getEnrolledCoursesForUser(
-        userId
+        userId,
+        page as any
       );
 
       res.status(200).json({

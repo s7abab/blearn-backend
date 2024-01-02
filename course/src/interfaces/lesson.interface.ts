@@ -5,6 +5,7 @@ export interface ILesson {
   url: string;
   progress: number;
   duration: number;
+  totalLessons: number;
 }
 
 export interface ILessonRequest extends ILesson {

@@ -14,7 +14,11 @@ interface ICourseRepository {
     instructorId: string,
     courseId: any
   ): Promise<ICourse | null>;
-  findEnrolledCoursesByUserId(userId: string): Promise<ICourse[] | null>;
+  findEnrolledCoursesByUserId(
+    userId: string,
+    page?: number,
+    limit?: number
+  ): Promise<{ courses: ICourse[]; totalPages: number } | null>;
   findEnrolledCourseByUserAndCourseId(
     userId: string,
     courseId: string
