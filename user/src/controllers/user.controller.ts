@@ -284,7 +284,7 @@ class UserController {
   public async getApplication(req: Request, res: Response, next: NextFunction) {
     try {
       const { userId } = req.params;
-    
+
       const application = await this.userUsecase.getApplication(userId);
       res.status(200).json({
         success: true,
@@ -307,6 +307,23 @@ class UserController {
       res.status(200).send({
         success: true,
         message: "Application status changed",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+
+  public async getUsersDataForAdmin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const data = await this.userUsecase.getUsersDataForAdmin();
+
+      res.status(200).json({
+        success: true,
+        data,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, error.statusCode || 500));

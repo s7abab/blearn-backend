@@ -221,5 +221,44 @@ class UserRepository implements IUserRepository {
       throw error;
     }
   }
+  // users and instructors data for admin dashboard
+  public async findUsersDataForAdminDashboard() {
+    try {
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const usersCountByMonth = [];
+
+      // Loop through each month (from January: 0 to December: 11)
+      for (let month = 0; month < 12; month++) {
+        const firstDayOfMonth = new Date(currentYear, month, 1);
+        const lastDayOfMonth = new Date(currentYear, month + 1, 0);
+
+        // Querying the database to count users created within the current month
+        const usersCount = await userModel.countDocuments({
+          createdAt: {
+            $gte: firstDayOfMonth,
+            $lte: lastDayOfMonth,
+          },
+        });
+
+        usersCountByMonth.push({
+          month: month + 1, // Adding 1 to month to display as 1-based index (January is 1, February is 2, and so on)
+          count: usersCount, // User count for this month
+        });
+      }
+
+      // total users 
+      const users = await userModel.find().countDocuments()
+      const instructors = await userModel.find({role:Roles.INSTRUCTOR}).countDocuments()
+      const data = {
+        usersData :usersCountByMonth,
+        users,
+        instructors
+      }
+      return data
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 export default UserRepository;
