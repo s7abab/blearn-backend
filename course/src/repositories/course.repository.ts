@@ -380,6 +380,34 @@ class CourseRepository implements ICourseRepository {
     const progression = Math.floor((completedDuration! / totalDuration!) * 100);
     return progression;
   }
+
+  // course data for instructor dahsboard
+  public async createCourseData(instructorId: string) {
+    try {
+      const courses = await courseModel.find({ instructorId });
+      const courseData = {
+        totalCourses: courses.length,
+        totalEnrolled: courses.reduce((total, course) => {
+          return total + course.enrolledUsers.length;
+        }, 0),
+        totalCompletedUsers: courses.reduce((count, course) => {
+          return (
+            count +
+            course.enrolledUsers.reduce((completedCount, user) => {
+              if (user.progress === 100) {
+                return completedCount + 1;
+              }
+              return completedCount;
+            }, 0)
+          );
+        }, 0),
+      };
+ 
+      return courseData;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default CourseRepository;

@@ -28,8 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use("/api/v1/payment", paymentRouter);
-app.use("/api/v1/analytics", analyticsRouter);
-app.use("/api/v1/withdrawals", withdrawalRouter);
+app.use("/api/v1/payment/analytics", analyticsRouter);
+app.use("/api/v1/payment/withdrawals", withdrawalRouter);
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

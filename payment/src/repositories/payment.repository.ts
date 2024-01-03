@@ -16,6 +16,7 @@ class PaymentRepository implements IPaymentRepository {
     try {
       const order = await orderModel.create({
         userId,
+        instructorId,
         courseId,
         payment_status,
         price,

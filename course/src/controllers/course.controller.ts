@@ -347,6 +347,21 @@ class CourseController {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
+
+  // get course data for dashboard
+  public async getCourseData(req: Request, res: Response, next: NextFunction) {
+    try {
+      const instructorId = req.user?.id
+      const courseData = await this.courseUsecase.getCourseData(instructorId);
+
+      res.status(200).json({
+        success: true,
+        courseData,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
 }
 
 export default CourseController;
