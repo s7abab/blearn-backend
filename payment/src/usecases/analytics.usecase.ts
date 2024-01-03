@@ -16,6 +16,30 @@ class AnalyticsUsecase {
       throw error;
     }
   }
+
+  // total revenue of instructor
+  public async getTotalRevenueOfInstructor(instructorId: string) {
+    try {
+      const totalRevenue =
+        await this.analyticsRepository.findTotalRevenueOfInstructor(
+          instructorId
+        );
+      return totalRevenue;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // total revenue of admin
+  public async getTotalRevenueOfAdmin() {
+    try {
+      const totalRevenue =
+        await this.analyticsRepository.findTotalRevenueOfAdmin();
+      return totalRevenue;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default AnalyticsUsecase;

@@ -146,4 +146,12 @@ router.get(
     courseController.getProgression(req, res, next)
 );
 
+router.get(
+  "/get-course-data",
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
+  (req: Request, res: Response, next: NextFunction) =>
+    courseController.getCourseData(req, res, next)
+);
+
 export default router;

@@ -5,6 +5,7 @@ import { PaymentStatus } from "../../enums/payment.enum";
 const orderSchema: Schema<Order> = new Schema<Order>(
   {
     userId: { type: String, required: true },
+    instructorId: {type:String, required:true},
     courseId: { type: String, required: true },
     price: { type: Number, required: true },
     payment_status: {

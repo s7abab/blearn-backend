@@ -310,6 +310,16 @@ class CourseUsecase {
       throw error;
     }
   }
+
+  // get course data for dashboard
+  public async getCourseData (instructorId:string){
+    try {
+      const courseData  = await this.courseRepository.createCourseData(instructorId);
+      return courseData;
+    } catch (error) {
+      throw error
+    }
+  }
 }
 
 export default CourseUsecase;
