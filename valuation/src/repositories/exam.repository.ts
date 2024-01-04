@@ -4,7 +4,7 @@ import { IQuestion } from "../interfaces/exam.interface";
 
 class ExamRepository {
   constructor() {}
-
+  // create exam
   public async createExam(courseId:string) {
     try {
       const exam = await examModel.create({
@@ -16,7 +16,7 @@ class ExamRepository {
       throw error;
     }
   }
-
+// get exam
   public async findExamByCourseId(courseId: string) {
     try {
       const exam = await examModel.findOne({ courseId });
