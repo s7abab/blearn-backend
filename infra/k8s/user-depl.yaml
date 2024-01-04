@@ -36,7 +36,32 @@ spec:
                 secretKeyRef:
                   name: rabbit-mq
                   key: RABBIT_MQ
-                  
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: smtp-host
+                  key: SMTP_HOST
+            - name: SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: smtp-port
+                  key: SMTP_PORT
+            - name: SMTP_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: smtp-service
+                  key: SMTP_SERVICE
+            - name: SMTP_MAIL
+              valueFrom:
+                secretKeyRef:
+                  name: smtp-mail
+                  key: SMTP_MAIL
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: port
+                  key: PORT
+
 ---
 apiVersion: v1
 kind: Service
