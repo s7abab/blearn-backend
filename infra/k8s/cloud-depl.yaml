@@ -49,7 +49,7 @@ spec:
             - name: CLOUDFRONT_DOMAIN
               valueFrom:
                 secretKeyRef:
-                  name: s3-domain
+                  name: cloudfront-domain
                   key:  CLOUDFRONT_DOMAIN
 ---
 apiVersion: v1
