@@ -11,7 +11,7 @@ new SocketIORepository(server); // Initialize Socket.IO
 startListening();
 
 // create server
-server.listen(process.env.PORT || 8004, () => {
-  connectDb();
+app.listen(process.env.PORT || 3000, () => {
   console.log(`Server running ${process.env.PORT}`);
 });
+

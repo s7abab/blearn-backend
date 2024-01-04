@@ -14,6 +14,6 @@ startListening();
 redis;
 
 // create server
-app.listen(8001, () => {
-  console.log(`Server running 8001`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running ${process.env.PORT}`);
 });
