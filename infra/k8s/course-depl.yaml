@@ -15,6 +15,47 @@ spec:
       containers:
         - name: course
           image: s7abab/course
+          env:
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: port
+                  key:  PORT
+            - name: ORGIN
+              valueFrom:
+                secretKeyRef:
+                  name: orgin
+                  key: ORGIN
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: course-mongo
+                  key: MONGO_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_SECRET
+            - name: RABBIT_MQ
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-mq
+                  key: RABBIT_MQ
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: redis-url
+                  key: REDIS_URL
+            - name: REDIS_EXPIRATION_TIME
+              valueFrom:
+                secretKeyRef:
+                  name: redis-expiration-time
+                  key: REDIS_EXPIRATION_TIME
+            - name: CLOUD_SRV
+              valueFrom:
+                secretKeyRef:
+                  name: cloud-srv
+                  key: CLOUD_SRV
 ---
 apiVersion: v1
 kind: Service

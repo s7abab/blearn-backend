@@ -15,6 +15,42 @@ spec:
       containers:
         - name: cloud
           image: s7abab/cloud
+          env:
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: port
+                  key:  PORT
+            - name: AWS_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: aws-bucket-name
+                  key:  AWS_BUCKET_NAME
+            - name: AWS_BUCKET_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aws-bucket-region
+                  key:  AWS_BUCKET_REGION
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-access-key
+                  key:  AWS_ACCESS_KEY
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret-access-key
+                  key:  AWS_SECRET_ACCESS_KEY
+            - name: S3_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: s3-domain
+                  key:  S3_DOMAIN
+            - name: CLOUDFRONT_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: s3-domain
+                  key:  CLOUDFRONT_DOMAIN
 ---
 apiVersion: v1
 kind: Service
