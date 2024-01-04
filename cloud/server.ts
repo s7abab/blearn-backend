@@ -40,7 +40,7 @@ app.post("/api/v1/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-app.get("/api/v1/get-url", async (req, res) => {
+app.get("/api/v1/upload", async (req, res) => {
   try { 
     const fileUrl = await getObjectSignedUrl(req.query.fileName as string);
     const url = fileUrl.replace(

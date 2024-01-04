@@ -32,3 +32,24 @@ spec:
                 name: payment-srv
                 port:
                   number: 8002
+          - path: /api/v1/valuation/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: valuation-srv
+                port:
+                  number: 8003
+          - path: /api/v1/realtime/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: realtime-srv
+                port:
+                  number: 8004
+          - path: /api/v1/upload/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: cloud-srv
+                port:
+                  number: 8005

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: realtime-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: realtime
+  template:
+    metadata:
+      labels:
+        app: realtime
+    spec:
+      containers:
+        - name: realtime
+          image: s7abab/realtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: realtime-srv
+spec:
+  selector:
+    app: realtime
+  ports:
+    - name: realtime
+      protocol: TCP
+      port: 8004
+      targetPort: 8004

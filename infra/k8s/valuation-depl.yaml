@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valuation-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: valuation
+  template:
+    metadata:
+      labels:
+        app: valuation
+    spec:
+      containers:
+        - name: valuation
+          image: s7abab/valuation
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: valuation-srv
+spec:
+  selector:
+    app: valuation
+  ports:
+    - name: valuation
+      protocol: TCP
+      port: 8003
+      targetPort: 8003

@@ -32,3 +32,27 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: s7abab/valuation
+      context: valuation
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: s7abab/realtime
+      context: realtime
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: s7abab/cloud
+      context: cloud
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

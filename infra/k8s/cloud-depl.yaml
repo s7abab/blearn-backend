@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud
+  template:
+    metadata:
+      labels:
+        app: cloud
+    spec:
+      containers:
+        - name: cloud
+          image: s7abab/cloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-srv
+spec:
+  selector:
+    app: cloud
+  ports:
+    - name: cloud
+      protocol: TCP
+      port: 8005
+      targetPort: 8005
