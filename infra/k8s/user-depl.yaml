@@ -29,18 +29,13 @@ spec:
             - name: MONGO_URL
               valueFrom:
                 secretKeyRef:
-                  name: auth-mongo
+                  name: user-mongo
                   key: MONGO_URL
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
                   name: redis-url
                   key: REDIS_URL
-            - name: ACTIVATION_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: activation-secret
-                  key: ACTIVATION_SECRET
             - name: ACTIVATION_SECRET
               valueFrom:
                 secretKeyRef:
