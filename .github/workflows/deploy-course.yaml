@@ -16,7 +16,7 @@ jobs:
      - name: Build Docker Image
        run: |
          cd course
-         docker build -t s7abab/user .
+         docker build -t s7abab/course .
      - name: Login to Docker Hub
        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
        env:
