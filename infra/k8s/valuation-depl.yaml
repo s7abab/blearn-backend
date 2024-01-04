@@ -21,11 +21,6 @@ spec:
                 secretKeyRef:
                   name: port
                   key:  PORT
-            - name: ORGIN
-              valueFrom:
-                secretKeyRef:
-                  name: orgin
-                  key: ORGIN
             - name: MONGO_URL
               valueFrom:
                 secretKeyRef:
