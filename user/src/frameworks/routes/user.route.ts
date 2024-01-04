@@ -133,4 +133,12 @@ router.put(
     userController.changeStatusOfAppications(req, res, next)
 );
 
+router.get(
+  "/get-users-data-for-Admin",
+  isAuthenticated,
+  authorizeRoles(Roles.ADMIN),
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.getUsersDataForAdmin(req, res, next)
+);
+
 export default router;

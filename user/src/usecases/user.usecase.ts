@@ -335,6 +335,15 @@ class UserUsecase {
       throw error;
     }
   }
+
+  public async getUsersDataForAdmin() {
+    try {
+      const data = await this.userRepository.findUsersDataForAdminDashboard();
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default UserUsecase;
