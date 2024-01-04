@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 require("dotenv").config();
 
 const dbUrl: string | undefined = process.env.MONGO_URL;
-
+// mongodb database connection
 const connectDb = async () => {
   try {
     if (dbUrl) {
@@ -11,7 +11,7 @@ const connectDb = async () => {
       });
     }
   } catch (error: any) {
-    console.log(error.message);
+    console.log(error.message)
     setTimeout(connectDb, 5000);
   }
 };
