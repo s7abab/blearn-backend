@@ -1,11 +1,12 @@
 import { Secret } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
-import IUser from "../../entities/user";
+
 import {
   IActivationRequest,
   IRegisterUser,
 } from "../../interfaces/user.interface";
 import { redis } from "../config/redis";
+import IUser from "../../entities/User";
 
 class JwtService {
   constructor() {}

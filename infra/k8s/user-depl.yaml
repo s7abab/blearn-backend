@@ -31,41 +31,12 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JWT_SECRET
-            - name: JWT_EXPIRE
-              valueFrom:
-                secretKeyRef:
-                  name: jwt-expire
-                  key: JWT_EXPIRE
-            - name: SMTP_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: smtp-host
-                  key: SMTP_HOST
-            - name: SMTP_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: smtp-port
-                  key: SMTP_PORT
-            - name: SMTP_SERVICE
-              valueFrom:
-                secretKeyRef:
-                  name: smtp-service
-                  key: SMTP_SERVICE
-            - name: SMTP_MAIL
-              valueFrom:
-                secretKeyRef:
-                  name: smtp-mail
-                  key: SMTP_MAIL
-            - name: SMTP_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: smtp-password
-                  key: SMTP_PASSWORD
             - name: RABBIT_MQ
               valueFrom:
                 secretKeyRef:
                   name: rabbit-mq
                   key: RABBIT_MQ
+                  
 ---
 apiVersion: v1
 kind: Service
