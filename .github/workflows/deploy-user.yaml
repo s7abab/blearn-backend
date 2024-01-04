@@ -1,0 +1,29 @@
+name: deploy-user
+
+on: 
+ push:
+   branches:
+     - main
+   paths:
+     - 'user/**'
+     
+jobs: 
+ build:
+   runs-on: ubuntu-latest
+   steps: 
+     - name: Checkout code
+       uses: actions/checkout@v2
+     - name: Build Docker Image
+       run: |
+         cd user
+         docker build -t s7abab/user .
+     - name: Login to Docker Hub
+       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+       env:
+         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+     - name: Push Docker Image
+       run: docker push s7abab/user
+  
+   
+   
