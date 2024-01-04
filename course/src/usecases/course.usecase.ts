@@ -175,7 +175,7 @@ class CourseUsecase {
     try {
       let duration = 60;
       const res = await axios.get(
-        `${process.env.CLOUD_SRV}/api/v1/get-url?fileName=${data.url}`
+        `http://localhost:8005/api/v1/get-url?fileName=${data.url}`
       );
 
       if (data.type === "video") {
