@@ -54,12 +54,12 @@ spec:
             - name: STRIPE_PUBLISHABLE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: stripe-publisable-key
+                  name: stripe
                   key: STRIPE_PUBLISHABLE_KEY
             - name: STRIPE_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: stripe-secret-key
+                  name: stripe-secret
                   key: STRIPE_SECRET_KEY
 ---
 apiVersion: v1

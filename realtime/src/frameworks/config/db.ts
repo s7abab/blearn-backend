@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 require("dotenv").config();
 
-const dbUrl: string | undefined = process.env.MONGO_URL;
+const dbUrl: string | undefined = "mongodb+srv://s7abab:n4AiAOBnXsv8ygfC@cluster1.aejszzn.mongodb.net/bLearnRealtime"
 
 const connectDb = async () => {
   try {
