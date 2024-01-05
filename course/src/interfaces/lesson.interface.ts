@@ -14,6 +14,12 @@ export interface ILessonRequest extends ILesson {
   lessonIndex: number;
 }
 
+export interface ILessonDelete {
+  courseId: string;
+  moduleId: string;
+  lessonIndex: number;
+}
+
 export interface ILessonGetRequest {
   courseId: string;
   instructorId: string;

@@ -1,7 +1,7 @@
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import CourseUsecase from "../usecases/course.usecase";
-import { ILessonRequest } from "../interfaces/lesson.interface";
+import { ILessonDelete, ILessonRequest } from "../interfaces/lesson.interface";
 import { IModule } from "../interfaces/module.interface";
 import ICourse from "../entities/course";
 
@@ -179,6 +179,21 @@ class CourseController {
     }
   }
 
+  // delete lesson
+  public async deleteLesson(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = req.body as ILessonDelete;
+      await this.courseUsecase.deleteLesson(data);
+
+      res.status(200).json({
+        success: true,
+        message: "Lesson deleted",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, error.statusCode || 500));
+    }
+  }
+// find lessons for instructor
   public async findLessonsForInstructor(
     req: Request,
     res: Response,
@@ -319,7 +334,7 @@ class CourseController {
   public async trackLesson(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req?.user?.id;
-      const course = await this.courseUsecase.updateProgresson({
+      await this.courseUsecase.updateProgresson({
         ...req.body,
         userId,
       });
@@ -351,7 +366,7 @@ class CourseController {
   // get course data for dashboard
   public async getCourseData(req: Request, res: Response, next: NextFunction) {
     try {
-      const instructorId = req.user?.id
+      const instructorId = req.user?.id;
       const courseData = await this.courseUsecase.getCourseData(instructorId);
 
       res.status(200).json({
