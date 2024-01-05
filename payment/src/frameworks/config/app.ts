@@ -14,13 +14,11 @@ app.use(express.json({ limit: "50mb" }));
 // cookie parser
 app.use(cookieParser());
 
-// cors
-app.use(
-  cors({
-    origin: [process.env.ORGIN!],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: 'https://blearn-azure.vercel.app',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 
 // morgan for logging in console
 app.use(morgan("dev"));

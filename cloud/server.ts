@@ -8,13 +8,11 @@ import { getObjectSignedUrl, uploadFile } from "./services/s3";
 
 const app = express();
 
-// cors
-app.use(
-  cors({
-    origin: [process.env.ORGIN!],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: 'https://blearn-azure.vercel.app',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 
 app.use(morgan("dev"));
 dotenv.config();
