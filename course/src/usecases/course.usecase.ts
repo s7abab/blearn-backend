@@ -175,7 +175,7 @@ class CourseUsecase {
     try {
       let duration = 60;
       const res = await axios.get(
-        `http://localhost:8005/api/v1/get-url?fileName=${data.url}`
+        `https://www.mintapp.online/api/v1/upload?fileName=${data.url}`
       );
 
       if (data.type === "video") {
