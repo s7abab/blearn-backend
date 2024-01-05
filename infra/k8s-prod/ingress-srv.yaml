@@ -6,6 +6,7 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/websocket-services: "realtime-srv"
 
 spec:
   tls:
@@ -84,6 +85,10 @@ spec:
       port: 80
       protocol: TCP
       targetPort: http
+    - name: websocket
+      port: 6005
+      protocol: TCP
+      targetPort: websocket
     - name: https
       port: 443
       protocol: TCP
