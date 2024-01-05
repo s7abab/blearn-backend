@@ -40,7 +40,11 @@ class UserController {
     try {
       const user = await this.userUsecase.login(req.body);
 
-      res.cookie("token", user.token, { expires: user.expires });
+      res.cookie("token", user.token, {
+        expires: user.expires,
+        secure: true,
+        sameSite: "strict",
+      });
       res.status(200).json({
         success: true,
         token: user.token,
