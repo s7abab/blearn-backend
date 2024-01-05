@@ -25,7 +25,7 @@ class UserController {
 
   public async activateUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const newUser = await this.userUsecase.activateUser(req.body);
+      await this.userUsecase.activateUser(req.body);
 
       res.status(201).json({
         success: true,
@@ -42,6 +42,7 @@ class UserController {
 
       res.cookie("token", user.token, {
         expires: user.expires,
+        httpOnly: true,
         secure: true,
         sameSite: "none",
       });
@@ -60,7 +61,12 @@ class UserController {
       const { userId } = req.body;
       await this.userUsecase.logout(userId);
 
-      res.clearCookie("token");
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
