@@ -21,6 +21,11 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JWT_SECRET
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: port
+                  key: PORT
 
 ---
 apiVersion: v1
