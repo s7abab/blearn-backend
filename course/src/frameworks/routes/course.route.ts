@@ -120,8 +120,8 @@ router.put(
 
 router.delete(
   "/delete-lesson",
-  // isAuthenticated,
-  // authorizeRoles(Roles.INSTRUCTOR),
+  isAuthenticated,
+  authorizeRoles(Roles.INSTRUCTOR),
   (req: Request, res: Response, next: NextFunction) =>
     courseController.deleteLesson(req, res, next)
 );

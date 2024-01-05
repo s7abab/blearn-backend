@@ -331,14 +331,15 @@ class CourseRepository implements ICourseRepository {
       if (!course) {
         throw new Error("Course not found");
       }
-      console.log(data)
-      const moduleIndex = course.modules.findIndex(
-        (module) => module._id === data.moduleId
-      );
-
+      const moduleIndex = course.modules.findIndex((module) => {
+        console.log(module._id, data.moduleId);
+        return module._id.equals(data.moduleId);  // Return the result of the comparison
+      });
+      
       if (moduleIndex === -1 || !course.modules[moduleIndex].lessons) {
         throw new Error("Module or lessons not found");
       }
+      
 
       // Remove the lesson from the lessons array
       const deletedLesson = course.modules[moduleIndex].lessons.splice(
