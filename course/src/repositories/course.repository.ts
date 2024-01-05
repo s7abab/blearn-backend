@@ -3,6 +3,7 @@ import courseModel from "../frameworks/models/course.model";
 import { IEnroll, IEnrolledUser } from "../interfaces/enrollment.interface";
 import {
   ILesson,
+  ILessonDelete,
   ILessonProgressTrackData,
   ILessonRequest,
 } from "../interfaces/lesson.interface";
@@ -322,6 +323,51 @@ class CourseRepository implements ICourseRepository {
     }
   }
 
+  // lesson delete
+  public async findLessonAndDelete(data: ILessonDelete): Promise<ICourse | null> {
+    try {
+      const course = await courseModel.findById(data.courseId);
+
+      if (!course) {
+        throw new Error("Course not found");
+      }
+
+      const moduleIndex = course.modules.findIndex(
+        (module) => module._id === data.moduleId
+      );
+
+      if (moduleIndex === -1 || !course.modules[moduleIndex].lessons) {
+        throw new Error("Module or lessons not found");
+      }
+
+      // Remove the lesson from the lessons array
+      const deletedLesson = course.modules[moduleIndex].lessons.splice(
+        data.lessonIndex,
+        1
+      );
+
+      if (deletedLesson && deletedLesson.length > 0) {
+        const deletedLessonDuration = deletedLesson[0].duration || 0;
+
+        // If the lesson was a video, subtract its duration from the course duration
+        if (deletedLesson[0].type === "video") {
+          course.duration -= deletedLessonDuration;
+        }
+        // Decrement totalLessons count
+        course.totalLessons -= 1;
+
+        // Save the updated course
+        await course.save();
+
+        return course;
+      } else {
+        throw new Error("Lesson not found");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  // enroll
   public async createEnroll(data: IEnroll) {
     try {
       const course = await courseModel.findById(data.courseId);
@@ -402,7 +448,7 @@ class CourseRepository implements ICourseRepository {
           );
         }, 0),
       };
- 
+
       return courseData;
     } catch (error) {
       throw error;

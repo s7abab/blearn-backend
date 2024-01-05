@@ -8,6 +8,7 @@ import {
 } from "../interfaces/module.interface";
 import axios from "axios";
 import {
+  ILessonDelete,
   ILessonGetRequest,
   ILessonProgressTrackData,
   ILessonRequest,
@@ -198,7 +199,7 @@ class CourseUsecase {
       throw error;
     }
   }
-
+  // update lesson
   public async updateLesson(data: ILessonRequest) {
     try {
       let duration = 60;
@@ -216,6 +217,15 @@ class CourseUsecase {
       if (!lesson) {
         throw new Error("Lesson not updated");
       }
+      return lesson;
+    } catch (error) {
+      throw error;
+    }
+  }
+  // delete lesson
+  public async deleteLesson(data: ILessonDelete) {
+    try {
+      const lesson = await this.courseRepository.findLessonAndDelete(data);
       return lesson;
     } catch (error) {
       throw error;
@@ -312,12 +322,14 @@ class CourseUsecase {
   }
 
   // get course data for dashboard
-  public async getCourseData (instructorId:string){
+  public async getCourseData(instructorId: string) {
     try {
-      const courseData  = await this.courseRepository.createCourseData(instructorId);
+      const courseData = await this.courseRepository.createCourseData(
+        instructorId
+      );
       return courseData;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }

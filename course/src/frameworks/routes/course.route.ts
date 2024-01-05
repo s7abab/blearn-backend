@@ -118,6 +118,14 @@ router.put(
     courseController.updateLesson(req, res, next)
 );
 
+router.put(
+  "/delete-lesson",
+  // isAuthenticated,
+  // authorizeRoles(Roles.INSTRUCTOR),
+  (req: Request, res: Response, next: NextFunction) =>
+    courseController.deleteLesson(req, res, next)
+);
+
 router.get(
   "/enrolled-courses",
   isAuthenticated,
