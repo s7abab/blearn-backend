@@ -93,7 +93,13 @@ class UserController {
   public async socialAuth(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await this.userUsecase.socialAuth(req.body);
-      res.cookie("token", user.token, { expires: user.expires });
+      
+      res.cookie("token", user.token, {
+        expires: user.expires,
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
       res.status(200).json({
         success: true,
         token: user.token,
