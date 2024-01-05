@@ -331,7 +331,7 @@ class CourseRepository implements ICourseRepository {
       if (!course) {
         throw new Error("Course not found");
       }
-
+      console.log(data)
       const moduleIndex = course.modules.findIndex(
         (module) => module._id === data.moduleId
       );

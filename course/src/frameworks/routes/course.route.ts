@@ -118,7 +118,7 @@ router.put(
     courseController.updateLesson(req, res, next)
 );
 
-router.put(
+router.delete(
   "/delete-lesson",
   // isAuthenticated,
   // authorizeRoles(Roles.INSTRUCTOR),
