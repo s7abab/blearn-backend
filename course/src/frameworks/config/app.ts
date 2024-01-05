@@ -16,7 +16,12 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 // cors
-app.use(cors());
+app.use(
+  cors({
+    origin: ["*"],
+    credentials: true,
+  })
+);
 
 // morgan for logging in console
 app.use(morgan("dev"));
