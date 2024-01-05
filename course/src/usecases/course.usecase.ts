@@ -175,16 +175,6 @@ class CourseUsecase {
   public async createLesson(data: ILessonRequest) {
     try {
       let duration = 60;
-      const res = await axios.get(
-        `https://www.mintapp.online/api/v1/upload?fileName=${data.url}`
-      );
-
-      if (data.type === "video") {
-        const videoDuration = await this.getVideoDuration.getVideoDuration(
-          res.data
-        );
-        duration = Math.round(videoDuration);
-      }
 
       const lesson = await this.courseRepository.createLesson({
         ...data,
