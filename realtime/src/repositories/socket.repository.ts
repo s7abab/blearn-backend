@@ -14,7 +14,7 @@ class SocketIORepository {
     this.httpServer = httpServer;
     this.io = new Server(httpServer, {
       cors: {
-        origin: "http://localhost:3000",
+        origin: "https://blearn-azure.vercel.app",
         credentials: true,
       },
     });
