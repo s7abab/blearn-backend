@@ -8,7 +8,14 @@ import { getObjectSignedUrl, uploadFile } from "./services/s3";
 
 const app = express();
 
-app.use(cors());
+// cors
+app.use(
+  cors({
+    origin: [process.env.ORGIN!],
+    credentials: true,
+  })
+);
+
 app.use(morgan("dev"));
 dotenv.config();
 
