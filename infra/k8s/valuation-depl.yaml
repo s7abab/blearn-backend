@@ -38,5 +38,5 @@ spec:
   ports:
     - name: valuation
       protocol: TCP
-      port: 8003
-      targetPort: 8003
+      port: 3000
+      targetPort: 3000

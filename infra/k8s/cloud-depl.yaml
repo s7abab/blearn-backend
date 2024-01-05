@@ -62,5 +62,5 @@ spec:
   ports:
     - name: cloud
       protocol: TCP
-      port: 8005
-      targetPort: 8005
+      port: 3000
+      targetPort: 3000

@@ -73,5 +73,5 @@ spec:
   ports:
     - name: user
       protocol: TCP
-      port: 8000
-      targetPort: 8000
+      port: 3000
+      targetPort: 3000

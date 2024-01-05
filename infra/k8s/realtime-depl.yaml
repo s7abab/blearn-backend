@@ -47,5 +47,5 @@ spec:
   ports:
     - name: realtime
       protocol: TCP
-      port: 8004
-      targetPort: 8004
+      port: 3000
+      targetPort: 3000
