@@ -18,7 +18,7 @@ app.use(cookieParser());
 // cors
 app.use(
   cors({
-    origin: [process.env.ORGIN!],
+    origin: ["https://blearn-azure.vercel.app/"],
     credentials: true,
   })
 );
