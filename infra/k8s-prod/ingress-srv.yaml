@@ -17,39 +17,39 @@ spec:
               service:
                 name: user-srv
                 port:
-                  number: 8000
+                  number: 3000
           - path: /api/v1/course/?(.*)
             pathType: Prefix
             backend:
               service:
                 name: course-srv
                 port:
-                  number: 8001
+                  number: 3000
           - path: /api/v1/payment/?(.*)
             pathType: Prefix
             backend:
               service:
                 name: payment-srv
                 port:
-                  number: 8002
+                  number: 3000
           - path: /api/v1/valuation/?(.*)
             pathType: Prefix
             backend:
               service:
                 name: valuation-srv
                 port:
-                  number: 8003
+                  number: 3000
           - path: /api/v1/realtime/?(.*)
             pathType: Prefix
             backend:
               service:
                 name: realtime-srv
                 port:
-                  number: 8004
+                  number: 3000
           - path: /api/v1/upload/?(.*)
             pathType: Prefix
             backend:
               service:
                 name: cloud-srv
                 port:
-                  number: 8005
+                  number: 3000
