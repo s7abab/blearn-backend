@@ -6,7 +6,6 @@ import {
   IModuleDeleteRequest,
   IModuleRequest,
 } from "../interfaces/module.interface";
-import axios from "axios";
 import {
   ILessonDelete,
   ILessonGetRequest,
@@ -14,17 +13,13 @@ import {
   ILessonRequest,
 } from "../interfaces/lesson.interface";
 import { IEnroll } from "../interfaces/enrollment.interface";
-import GetVideoDuration from "../frameworks/utils/get-video-duration";
 
 class CourseUsecase {
   private courseRepository: CourseRepository;
-  private getVideoDuration: GetVideoDuration;
   constructor(
     courseRepository: CourseRepository,
-    getVideoDuration: GetVideoDuration
   ) {
     this.courseRepository = courseRepository;
-    this.getVideoDuration = getVideoDuration;
   }
 
   // course
@@ -174,8 +169,7 @@ class CourseUsecase {
 
   public async createLesson(data: ILessonRequest) {
     try {
-      let duration = 60;
-
+      const duration = Math.round(data.duration);
       const lesson = await this.courseRepository.createLesson({
         ...data,
         duration,
@@ -192,14 +186,7 @@ class CourseUsecase {
   // update lesson
   public async updateLesson(data: ILessonRequest) {
     try {
-      let duration = 60;
-      if (data.type === "video") {
-        const videoDuration = await this.getVideoDuration.getVideoDuration(
-          data.url
-        );
-        duration = Math.round(videoDuration);
-      }
-
+      const duration = Math.round(data.duration);
       const lesson = await this.courseRepository.findLessonsAndUpdate({
         ...data,
         duration,

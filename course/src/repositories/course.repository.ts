@@ -298,9 +298,9 @@ class CourseRepository implements ICourseRepository {
         throw new Error("Course not found");
       }
       // find index of the module
-      const moduleIndex = course.modules.findIndex(
-        (module) => module._id === data.moduleId
-      );
+      const moduleIndex = course.modules.findIndex((module) => {
+        return module._id.equals(data.moduleId); // Return the result of the comparison
+      });
       const lessonIndex = data.lessonIndex;
 
       // Update the lesson with new data
@@ -324,7 +324,9 @@ class CourseRepository implements ICourseRepository {
   }
 
   // lesson delete
-  public async findLessonAndDelete(data: ILessonDelete): Promise<ICourse | null> {
+  public async findLessonAndDelete(
+    data: ILessonDelete
+  ): Promise<ICourse | null> {
     try {
       const course = await courseModel.findById(data.courseId);
 
@@ -332,14 +334,12 @@ class CourseRepository implements ICourseRepository {
         throw new Error("Course not found");
       }
       const moduleIndex = course.modules.findIndex((module) => {
-        console.log(module._id, data.moduleId);
-        return module._id.equals(data.moduleId);  // Return the result of the comparison
+        return module._id.equals(data.moduleId); // Return the result of the comparison
       });
-      
+
       if (moduleIndex === -1 || !course.modules[moduleIndex].lessons) {
         throw new Error("Module or lessons not found");
       }
-      
 
       // Remove the lesson from the lessons array
       const deletedLesson = course.modules[moduleIndex].lessons.splice(
