@@ -350,7 +350,7 @@ class CourseController {
     try {
       const { courseId } = req.params;
       const userId = req?.user?.id;
-      console.log(userId,"This is userId")
+ 
       const progression = await this.courseUsecase.getProgression(
         userId,
         courseId
@@ -360,6 +360,7 @@ class CourseController {
         progression,
       });
     } catch (error: any) {
+      console.log(error)
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
