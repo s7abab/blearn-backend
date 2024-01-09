@@ -10,9 +10,8 @@ const server = http.createServer(app);
 new SocketIORepository(server); // Initialize Socket.IO
 startListening();
 
-connectDb()
+connectDb();
 // create server
-app.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 3000, () => {
   console.log(`Server running on ${process.env.PORT}`);
 });
-
