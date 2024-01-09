@@ -416,16 +416,22 @@ class CourseRepository implements ICourseRepository {
     userId: string,
     courseId: string
   ) {
-    const course = await this.findEnrolledCourseByUserAndCourseId(
-      userId,
-      courseId
-    );
-    const totalDuration = course?.duration;
-    const completedDuration = course?.enrolledUsers.find(
-      (user) => user.userId === userId
-    )?.progress;
-    const progression = Math.floor((completedDuration! / totalDuration!) * 100);
-    return progression;
+    try {
+      const course = await this.findEnrolledCourseByUserAndCourseId(
+        userId,
+        courseId
+      );
+      const totalDuration = course?.duration;
+      const completedDuration = course?.enrolledUsers.find(
+        (user) => user.userId === userId
+      )?.progress;
+      const progression = Math.floor(
+        (completedDuration! / totalDuration!) * 100
+      );
+      return progression;
+    } catch (error) {
+      throw error;
+    }
   }
 
   // course data for instructor dahsboard
