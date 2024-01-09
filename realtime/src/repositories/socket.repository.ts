@@ -15,9 +15,7 @@ class SocketIORepository {
     this.io = new Server(httpServer, {
       cors: {
         origin: "https://blearn-azure.vercel.app",
-        credentials: true,
       },
-      path: "/socket.io",
     });
     this.users = new Map();
     this.messageRepository = new MessageRepository();

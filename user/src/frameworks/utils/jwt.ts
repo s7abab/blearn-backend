@@ -27,7 +27,7 @@ class JwtService {
     // Set refresh token in Redis with an expiration time
     redis.set(user._id.toString(), userString, "EX", 3 * 24 * 60 * 60); // Expires in 3 days
 
-    const oneHourInMillis = 24 * 60 * 60 * 1000; // 1 hour in milliseconds
+    const oneHourInMillis = 7 * 24 * 60 * 60 * 1000; // 1 hour in milliseconds
     const expirationDate = new Date(Date.now() + oneHourInMillis);
     return { token, expires: expirationDate, user };
   }
