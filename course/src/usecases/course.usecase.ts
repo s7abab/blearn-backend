@@ -16,9 +16,7 @@ import { IEnroll } from "../interfaces/enrollment.interface";
 
 class CourseUsecase {
   private courseRepository: CourseRepository;
-  constructor(
-    courseRepository: CourseRepository,
-  ) {
+  constructor(courseRepository: CourseRepository) {
     this.courseRepository = courseRepository;
   }
 
@@ -289,9 +287,7 @@ class CourseUsecase {
           userId,
           courseId
         );
-      if (!progression) {
-        throw new Error("An error occured while fetching progression");
-      }
+
       return progression;
     } catch (error) {
       throw error;
