@@ -396,7 +396,11 @@ class CourseRepository implements ICourseRepository {
       if (!course) {
         throw new Error("ICourse not found");
       }
-      const user = course.enrolledUsers.find((user) => user.userId);
+
+      const user = course.enrolledUsers.find(
+        (user) => user.userId === data.userId
+      );
+
       if (!user) {
         throw new Error("User not found");
       }
@@ -428,6 +432,7 @@ class CourseRepository implements ICourseRepository {
       const progression = Math.floor(
         (completedDuration! / totalDuration!) * 100
       );
+
       return progression;
     } catch (error) {
       throw error;
