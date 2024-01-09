@@ -396,7 +396,7 @@ class CourseRepository implements ICourseRepository {
       if (!course) {
         throw new Error("ICourse not found");
       }
-
+      // comapre data.user id with userId
       const user = course.enrolledUsers.find(
         (user) => user.userId === data.userId
       );
