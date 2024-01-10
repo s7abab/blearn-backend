@@ -1,6 +1,6 @@
-B LEARN - Scalable Education Platform
+## B LEARN - Scalable Education Platform
 
-B LEARN is a scalable education platform built using the MERN stack and microservices architecture following clean architecture principles. This project ensures maintainable and loosely coupled code to facilitate learning and teaching experiences for both learners and tutors.
+### B LEARN is a scalable education platform built using the MERN stack and microservices architecture following clean architecture principles. This project ensures maintainable and loosely coupled code to facilitate learning and teaching experiences for both learners and tutors.
 Features
 
     Course Marketplace: Users can buy courses and start learning.
