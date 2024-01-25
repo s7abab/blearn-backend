@@ -11,8 +11,9 @@ import { Exchanges } from "../frameworks/rabbitmq/exchanges";
 import { Topics } from "../frameworks/rabbitmq/topics";
 import IUser from "../entities/User";
 import IUserRepository from "../interfaces/repository/user.repository";
+import IUserUsecase from "../interfaces/usecase/user.usecase";
 
-class UserUsecase {
+class UserUsecase implements IUserUsecase {
   private userRepository: IUserRepository;
   private jwt: JwtService;
   private eventPublisher: EventPublisher;

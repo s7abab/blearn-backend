@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import UserUsecase from "../usecases/user.usecase";
 import { IUpdateUser } from "../interfaces/user.interface";
+import IUserUsecase from "../interfaces/usecase/user.usecase";
 
 class UserController {
-  private userUsecase: UserUsecase;
-  constructor(userUsecase: UserUsecase) {
+  private userUsecase: IUserUsecase;
+  constructor(userUsecase: IUserUsecase) {
     this.userUsecase = userUsecase;
   }
 
@@ -93,7 +93,7 @@ class UserController {
   public async socialAuth(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await this.userUsecase.socialAuth(req.body);
-      
+
       res.cookie("token", user.token, {
         expires: user.expires,
         httpOnly: true,
