@@ -1,8 +1,9 @@
 ## B LEARN - Scalable Education Platform
 
-Live Link :- https://blearn-azure.vercel.app/
+Live Link :- https://blearn-azure.vercel.app
 
 ### B LEARN is a scalable education platform built using the MERN stack and microservices architecture following clean architecture principles. This project ensures maintainable and loosely coupled code to facilitate learning and teaching experiences for both learners and tutors.
+
 Features
 
     Course Marketplace: Users can buy courses and start learning.
@@ -44,5 +45,3 @@ To set up and run this project locally, follow these steps:
     Install dependencies on each service using npm install.
     Configure environment variables.
     Run the services using npm start.
-
-Thank You
