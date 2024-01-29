@@ -1,6 +1,5 @@
 require("dotenv").config();
-import CourseRepository from "../repositories/course.repository";
-import Course from "../entities/course";
+import Course, { ICourse } from "../entities/course";
 import {
   IModule,
   IModuleDeleteRequest,
@@ -13,15 +12,17 @@ import {
   ILessonRequest,
 } from "../interfaces/lesson.interface";
 import { IEnroll } from "../interfaces/enrollment.interface";
+import ICourseRepository from "../interfaces/repository/course.repository";
+import ICourseUsecase from "../interfaces/usecases/course.usecase";
 
-class CourseUsecase {
-  private courseRepository: CourseRepository;
-  constructor(courseRepository: CourseRepository) {
+class CourseUsecase implements ICourseUsecase {
+  private courseRepository: ICourseRepository;
+  constructor(courseRepository: ICourseRepository) {
     this.courseRepository = courseRepository;
   }
 
   // course
-  public async createCourse(data: Course) {
+  public async createCourse(data: Course): Promise<ICourse | null> {
     try {
       const course = await this.courseRepository.create(data);
       if (!course) {
@@ -33,7 +34,7 @@ class CourseUsecase {
     }
   }
 
-  public async updateCourse(data: Course) {
+  public async updateCourse(data: Course): Promise<ICourse | null> {
     try {
       const updatedCourse = await this.courseRepository.findByCourseIdAndUpdate(
         data
@@ -47,7 +48,7 @@ class CourseUsecase {
     }
   }
 
-  public async getCourses() {
+  public async getCourses(): Promise<ICourse[] | null> {
     try {
       const courses = await this.courseRepository.findCourses();
 
@@ -66,7 +67,7 @@ class CourseUsecase {
     }
   }
 
-  public async getOneCourse(courseId: string) {
+  public async getOneCourse(courseId: string): Promise<ICourse | null> {
     try {
       const course = await this.courseRepository.findByCourseId(courseId);
       return course;
@@ -75,7 +76,7 @@ class CourseUsecase {
     }
   }
 
-  public async deleteCourse(courseId: string) {
+  public async deleteCourse(courseId: string): Promise<ICourse | null> {
     try {
       const course = await this.courseRepository.findByCourseIdAndDelete(
         courseId
@@ -86,7 +87,9 @@ class CourseUsecase {
     }
   }
   // get all courses for instructor
-  public async getCoursesForInstructor(instructorId: string) {
+  public async getCoursesForInstructor(
+    instructorId: string
+  ): Promise<ICourse[] | null> {
     try {
       const courses = await this.courseRepository.findByInstructorId(
         instructorId
@@ -125,7 +128,7 @@ class CourseUsecase {
     }
   }
 
-  public async getModules(courseId: string) {
+  public async getModules(courseId: string): Promise<IModule[] | null> {
     try {
       const modules = await this.courseRepository.findModules(courseId);
       if (!modules) {
@@ -137,7 +140,7 @@ class CourseUsecase {
     }
   }
 
-  public async updateModule(data: IModuleRequest) {
+  public async updateModule(data: IModuleRequest): Promise<any> {
     try {
       const updatedModule = await this.courseRepository.findModuleAndUpdate(
         data
