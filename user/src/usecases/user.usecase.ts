@@ -5,20 +5,21 @@ import {
   ILoginRequest,
   IRegisterUser,
 } from "../interfaces/user.interface";
-import UserRepository from "../repositories/user.repository";
 import JwtService from "../frameworks/utils/jwt";
 import EventPublisher from "../frameworks/rabbitmq/publisher";
 import { Exchanges } from "../frameworks/rabbitmq/exchanges";
 import { Topics } from "../frameworks/rabbitmq/topics";
 import IUser from "../entities/User";
+import IUserRepository from "../interfaces/repository/user.repository";
+import IUserUsecase from "../interfaces/usecase/user.usecase";
 
-class UserUsecase {
-  private userRepository: UserRepository;
+class UserUsecase implements IUserUsecase {
+  private userRepository: IUserRepository;
   private jwt: JwtService;
   private eventPublisher: EventPublisher;
 
   constructor(
-    userRepository: UserRepository,
+    userRepository: IUserRepository,
     jwt: JwtService,
     eventPublisher: EventPublisher
   ) {
