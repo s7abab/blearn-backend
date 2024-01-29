@@ -1,13 +1,13 @@
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
-import CourseUsecase from "../usecases/course.usecase";
 import { ILessonDelete, ILessonRequest } from "../interfaces/lesson.interface";
 import { IModule } from "../interfaces/module.interface";
 import ICourse from "../entities/course";
+import ICourseUsecase from "../interfaces/usecases/course.usecase";
 
 class CourseController {
-  private courseUsecase: CourseUsecase;
-  constructor(courseUsecase: CourseUsecase) {
+  private courseUsecase: ICourseUsecase;
+  constructor(courseUsecase: ICourseUsecase) {
     this.courseUsecase = courseUsecase;
   }
 
@@ -193,7 +193,7 @@ class CourseController {
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
-// find lessons for instructor
+  // find lessons for instructor
   public async findLessonsForInstructor(
     req: Request,
     res: Response,
@@ -350,7 +350,7 @@ class CourseController {
     try {
       const { courseId } = req.params;
       const userId = req?.user?.id;
- 
+
       const progression = await this.courseUsecase.getProgression(
         userId,
         courseId
@@ -360,7 +360,7 @@ class CourseController {
         progression,
       });
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       return next(new ErrorHandler(error.message, error.statusCode || 500));
     }
   }
