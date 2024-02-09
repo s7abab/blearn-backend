@@ -5,7 +5,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from "helmet";
-import csurf from "csurf";
 import rateLimit from "express-rate-limit";
 
 import userRouter from "../routes/user.route";
@@ -13,9 +12,6 @@ import { ErrorMiddleware } from "@s7abab/common";
 
 // Security Middleware
 app.use(helmet());
-// CSRF Protection
-const csrfProtection = csurf({ cookie: true });
-app.use(csrfProtection);
 
 // Rate Limiting Middleware Configuration
 const limiter = rateLimit({
