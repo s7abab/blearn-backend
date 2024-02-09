@@ -4,19 +4,40 @@ export const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
+import helmet from "helmet";
+import csurf from "csurf";
+import rateLimit from "express-rate-limit";
+
 import userRouter from "../routes/user.route";
 import { ErrorMiddleware } from "@s7abab/common";
+
+// Security Middleware
+app.use(helmet());
+// CSRF Protection
+const csrfProtection = csurf({ cookie: true });
+app.use(csrfProtection);
+
+// Rate Limiting Middleware Configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15-minute window for tracking requests
+  max: 100, // Allow up to 100 requests per IP within the window
+});
+
+app.use(limiter);
+
 // body parser
 app.use(express.json({ limit: "50mb" }));
 
 // cookie parser
 app.use(cookieParser());
 
-app.use(cors({
-  origin: 'https://blearn-azure.vercel.app',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "https://blearn-azure.vercel.app",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 
 // morgan for logging in console
 app.use(morgan("dev"));
