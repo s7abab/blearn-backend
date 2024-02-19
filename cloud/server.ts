@@ -8,7 +8,7 @@ import { getObjectSignedUrl, uploadFile } from "./services/s3";
 
 const app = express();
 // payload size
-app.use(express.json({ limit: "100mb" }));
+app.use(express.json({ limit: "50" }));
 app.use(express.urlencoded({ limit: "100mb", extended: true }));
 
 app.use(
