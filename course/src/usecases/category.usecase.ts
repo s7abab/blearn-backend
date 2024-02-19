@@ -1,5 +1,5 @@
 import { ICategory } from "../interfaces/category.interface";
-import CategoryRepository from "../repositories/category.repository";
+import CategoryRepository from "../interfaces/repository/category.repository";
 
 class CategoryUsecase {
   private categoryRepository: CategoryRepository;
