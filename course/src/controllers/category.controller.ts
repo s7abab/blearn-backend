@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "@s7abab/common/build/src/utils/ErrorHandler";
-import CategoryService from "../usecases/category.usecase";
 import { validateCategoryName } from "../frameworks/utils/validations/category.validation";
 import { isEmpty } from "../frameworks/utils/validations/common.validation";
 import { ICategory } from "../interfaces/category.interface";
+import ICategoryUsecase from "../interfaces/usecases/category.usecase";
 
 class CategoryController {
-  private categoryService: CategoryService;
+  private categoryService: ICategoryUsecase;
 
-  constructor(categoryService: CategoryService) {
+  constructor(categoryService: ICategoryUsecase) {
     this.categoryService = categoryService;
   }
 
