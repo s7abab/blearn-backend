@@ -27,7 +27,7 @@ jobs:
      - uses: digitalocean/action-doctl@v2
        with:
         token: ${{ secrets.DIGITALOCEAN_TOKEN }}
-     - run: doctl kubernetes cluster kubeconfig save blearn
+     - run: doctl kubernetes cluster kubeconfig save blea
      - run: kubectl rollout restart deployment payment-depl
    
    
