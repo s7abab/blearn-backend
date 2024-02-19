@@ -41,7 +41,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use("/api/v1/user", userRouter);
-
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`Route not found`) as any;
