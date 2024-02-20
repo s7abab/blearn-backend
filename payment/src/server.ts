@@ -4,6 +4,7 @@ import { startListening } from "./frameworks/rabbitmq/middleware";
 require("dotenv").config();
 
 startListening()
+
 connectDb();
 // create server
 app.listen(process.env.PORT || 3000, () => {

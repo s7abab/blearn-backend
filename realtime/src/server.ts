@@ -8,6 +8,7 @@ import { startListening } from "./frameworks/rabbitmq/middleware";
 const server = http.createServer(app);
 
 new SocketIORepository(server); // Initialize Socket.IO
+
 startListening();
 
 connectDb();
