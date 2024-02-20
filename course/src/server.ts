@@ -6,7 +6,6 @@ import { startListening } from "./frameworks/rabbitmq/middleware";
 
 // mongoDB connection
 connectDb();
-
 // rabbitmq consumer connection
 startListening();
 
