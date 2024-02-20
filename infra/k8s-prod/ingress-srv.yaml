@@ -11,10 +11,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - www.mintapp.online
+        - www.mintcounseling.online
       secretName: blearn-tls
   rules:
-    - host: www.mintapp.online
+    - host: www.mintcounseling.online
       http:
         paths:
           - path: /api/v1/user/?(.*)
